@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../../store/store.ts";
-import { fetchOrders } from "../../../store/features/orders/orderSlice.ts";
+import { useCallback, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../store/store.ts";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import StatusBadge from "../../../components/StatusBadge";
@@ -25,18 +24,67 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { EllipsisVertical, Pencil, Trash2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { EllipsisVertical, Pencil, XCircle } from "lucide-react";
 import { Button } from "../../../components/ui/button.tsx";
+import {
+  cancelOrder,
+  fetchOrders,
+} from "../../../store/features/orders/orderThunks.ts";
+import { useAppSelector } from "../../../store/hooks.ts";
+import ProgressIndicator from "../../../components/ProgressIndicator.tsx";
+import { toast } from "sonner";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../../../components/ui/form.tsx";
+
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 const OrdersTable = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { orders, status } = useSelector((state: RootState) => state.orders);
+  const {
+    orders,
+    status,
+    error,
+    selectedOrderNumber,
+    selectedOrderState,
+    successMessage,
+  } = useAppSelector((state) => state.orders);
 
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [selectedOrders, setSelectedOrders] = useState<Order[]>([]);
   const [selectedDuration] = useState<DurationOption>("this_month");
+
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [orderToCancel, setOrderToCancel] = useState<Order | null>(null);
+
+  const cancelSchema = z.object({
+    reason: z.string().min(1, "Reson for cancelling order is required"),
+  });
+
+  type CancelFormVaues = z.infer<typeof cancelSchema>;
+  const form = useForm<CancelFormVaues>({
+    resolver: zodResolver(cancelSchema),
+    defaultValues: {
+      reason: "",
+    },
+  });
 
   const orderStatusOptions = [
     { label: "All", value: "All" },
@@ -54,6 +102,27 @@ const OrdersTable = () => {
   useEffect(() => {
     setFilteredOrders(orders);
   }, [orders]);
+
+  const refreshOrders = useCallback(() => {
+    const { start_date, end_date } = getDateRange(selectedDuration);
+    dispatch(fetchOrders({ start_date, end_date }));
+  }, [dispatch, selectedDuration]);
+
+  useEffect(() => {
+    if (selectedOrderState == "cancelled") {
+      setCancelDialogOpen(false);
+      form.reset();
+      toast.success(successMessage ?? "Order cancelled successfully");
+      refreshOrders();
+    }
+
+    if (selectedOrderState == "deleting") {
+      toast.success("Order deleted successfully");
+    }
+    if (selectedOrderState == "error") {
+      toast.error(error);
+    }
+  }, [selectedOrderState, error, successMessage, form, refreshOrders]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();
@@ -95,33 +164,63 @@ const OrdersTable = () => {
     console.log("Edit order " + order.id);
   };
 
-  const handleDelete = (order: Order) => {
-    console.log("Delete order " + order.id);
+  const handleCancelOrder = (order: Order) => {
+    setOrderToCancel(order);
+    setCancelDialogOpen(true);
   };
 
-  const actionsTemplate = (order: Order) => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 rounded-full"
-          aria-label="Actions"
-        >
-          <EllipsisVertical className="w-4 h-4" />
-        </Button>
-      </DropdownMenuTrigger>
+  const handleConfirmCancelOrder = async (data: CancelFormVaues) => {
+    if (!orderToCancel) return;
 
-      <DropdownMenuContent align="end" className="w-auto">
-        <DropdownMenuItem onClick={() => handleEdit(order)}>
-          <Pencil className="mr-2 h-4 w-4" /> Edit
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleDelete(order)}>
-          <Trash2 className="mr-2 h-4 w-4 text-red-400" /> <span className="text-red-400">Delete</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
+    await dispatch(
+      cancelOrder({
+        order_id: orderToCancel.id,
+        cancel_reason: data.reason,
+      })
+    );
+  };
+
+  const handleCancelForm = () => {
+    setCancelDialogOpen(false);
+    setOrderToCancel(null);
+    form.reset();
+  };
+
+  const actionsTemplate = (order: Order) => {
+    const isLoading =
+      selectedOrderNumber === order.id &&
+      (selectedOrderState === "cancelling" ||
+        selectedOrderState === "deleting");
+
+    if (isLoading) {
+      return <ProgressIndicator height="28px" width="28px" />;
+    }
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 rounded-full"
+            aria-label="Actions"
+          >
+            <EllipsisVertical className="w-4 h-4" />
+          </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent align="end" className="w-auto">
+          <DropdownMenuItem onClick={() => handleEdit(order)}>
+            <Pencil className="mr-2 h-4 w-4" /> Edit
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleCancelOrder(order)}>
+            <XCircle className="text-red-400" />{" "}
+            <span className="text-red-400">Cancel</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
 
   if (status == LoadingState.Loading) {
     return <LoadingPage />;
@@ -209,6 +308,66 @@ const OrdersTable = () => {
           style={{ width: "4rem", textAlign: "center" }}
         />
       </DataTable>
+
+      <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <DialogContent className="sm:max-w-md transition-all duration-100 ease-in-out">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleConfirmCancelOrder)}
+              className="space-y-4"
+            >
+              <DialogHeader>
+                <DialogTitle>Cancel Order</DialogTitle>
+                <DialogDescription>
+                  Please provide a reason for cancelling order{" "}
+                  <span className="font-bold">MG{orderToCancel?.order_id}</span>
+                </DialogDescription>
+              </DialogHeader>
+
+              <FormField
+                control={form.control}
+                name="reason"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Reason</FormLabel>
+                    <FormControl>
+                      <textarea
+                        {...field}
+                        placeholder="Reason for cancellation"
+                        className="w-full h-24 p-2 border border-input rounded-md resize-none text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCancelForm}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  {selectedOrderState == "cancelling" ? (
+                    <>
+                      <ProgressIndicator
+                        height="30px"
+                        width="30px"
+                        className="px-12 py-2"
+                      />
+                    </>
+                  ) : (
+                    "Confirm Cancel"
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

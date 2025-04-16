@@ -1,43 +1,27 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import axios from "../../../service/api";
-import { Order, OrderFilters } from "./orderTypes";
+import { OperationState, Order } from "./orderTypes";
 import { LoadingState, LoadingStatus } from "../../../types/LoadingStatus";
+import { cancelOrder, fetchOrders } from "./orderThunks";
+import { CancelOrderResponse } from "./request/response/CancelOrderRespons";
 
 interface OrderState {
   orders: Order[];
+  selectedOrderNumber: string | null;
+  selectedOrderState: OperationState;
   status: LoadingStatus;
   error: string | null;
+  successMessage: string | null;
 }
 
 const initialState: OrderState = {
   orders: [],
+  selectedOrderNumber: null,
+  selectedOrderState: "idle",
   status: LoadingState.Idle,
   error: null,
+  successMessage: null,
 };
-
-export const fetchOrders = createAsyncThunk<
-  Order[],
-  OrderFilters,
-  { rejectValue: string }
->("orders/fetchOrders", async (filters, { rejectWithValue }) => {
-  try {
-    const params = new URLSearchParams();
-
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined) {
-        params.append(key, value);
-      }
-    });
-
-    const response = await axios.get(`/admin/orders?${params.toString()}`);
-    return response.data;
-  } catch (err: any) {
-    return rejectWithValue(
-      err.response?.data?.message || "Failed to fetch orders"
-    );
-  }
-});
 
 const orderSlice = createSlice({
   name: "orders",
@@ -59,6 +43,22 @@ const orderSlice = createSlice({
       .addCase(fetchOrders.rejected, (state, action) => {
         state.status = LoadingState.Loading;
         state.error = action.payload || "Failed to fetch orders";
+      })
+      .addCase(cancelOrder.pending, (state, action) => {
+        state.selectedOrderNumber = action.meta.arg.order_id;
+        state.selectedOrderState = "cancelling";
+      })
+      .addCase(
+        cancelOrder.fulfilled,
+        (state, action: PayloadAction<CancelOrderResponse>) => {
+          state.selectedOrderNumber = null;
+          state.successMessage = action.payload.message;
+          state.selectedOrderState = "cancelled";
+        }
+      )
+      .addCase(cancelOrder.rejected, (state, action) => {
+        state.selectedOrderState = "error";
+        state.error = action.payload || "Failed to cancel order";
       });
   },
 });
