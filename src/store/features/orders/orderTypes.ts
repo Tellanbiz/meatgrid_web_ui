@@ -23,6 +23,14 @@ export enum OrderStatus {
   Cancelled = "cancelled",
 }
 
+export type OperationState =
+  | "idle"
+  | "cancelling"
+  | "cancelled"
+  | "deleting"
+  | "deleted"
+  | "error";
+
 export enum DeliveryMethod {
   Delivery = "delivery",
   ScheduledDelivery = "scheduled_delivery",
