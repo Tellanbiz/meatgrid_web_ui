@@ -16,5 +16,5 @@ pipelines:
                   cd /var/www/meatgrid-admin &&
                   git stash &&
                   git pull origin main &&
-                  npm run build &&
+                  docker compose -p meatgrid-admin -f docker-compose.yml up --build -d &&
                   echo "✅ Vite app updated on server"
