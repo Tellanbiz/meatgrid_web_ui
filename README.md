@@ -1,2 +1,2 @@
 # MeatGrid Admin
-MeatGrid Admin Panel
+MeatGrid Admin Dashboard
