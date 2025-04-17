@@ -63,7 +63,7 @@ const RecipeTable = () => {
     <img
       src={rowData.image}
       alt={rowData.name}
-      className="w-16 h-16 object-cover rounded"
+      className="w-10 h-10 object-cover rounded"
     />
   );
 

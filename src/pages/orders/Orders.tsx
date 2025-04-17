@@ -5,7 +5,7 @@ import OrdersTable from "./components/OrdersTable";
 const Orders = () => {
   return (
     <>
-      <div className="flex flex-row justify-between items-center">
+      <div className="flex justify-between items-center py-2 sticky top-0 z-10 bg-background">
         <h4 className="text-base font-bold">Orders</h4>
 
         <div className="flex space-x-2">

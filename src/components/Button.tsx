@@ -17,7 +17,7 @@ export const PrimaryButton: React.FC<ButtonProps> = ({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center px-4 py-2 font-bold bg-primary text-white rounded hover:bg-blue-800 focus:outline-none transition duration-100 ${className}`}
+      className={`flex items-center justify-center px-4 py-2 font-bold bg-primary text-white rounded hover:bg-blue-800 focus:outline-none transition duration-100 ${className}`}
     >
       {icon && <span className="mr-2">{icon}</span>}
       {text}
