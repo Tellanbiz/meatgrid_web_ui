@@ -17,6 +17,7 @@ import AddRecipe from "../pages/recipes/AddRecipe";
 import EditRecipe from "../pages/recipes/EditRecipe";
 import PrivateRoute from "./PrivateRoute.js";
 import OrderDetails from "../pages/orders/OrderDetails.js";
+import TagsPage from "../pages/tags/TagsPage.js";
 
 const routes: RouteObject[] = [
   {
@@ -83,6 +84,10 @@ const routes: RouteObject[] = [
       {
         path: "coupons/new",
         element: <AddCoupon />,
+      },
+      {
+        path: "tags",
+        element: <TagsPage />,
       },
       {
         path: "settings",

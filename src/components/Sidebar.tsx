@@ -1,4 +1,3 @@
-
 import { JSX } from "react";
 import NavigationItem from "./NavigationItem";
 import {
@@ -16,6 +15,7 @@ import {
   FiMessageSquare,
   FiBookOpen,
 } from "react-icons/fi";
+import { Tags } from "lucide-react";
 
 type MenuItem = {
   name?: string;
@@ -35,6 +35,8 @@ const menuItems: MenuItem[] = [
   { name: "Coupons", path: "/coupons", icon: <FiStar /> },
   { name: "Recipes", path: "/recipes", icon: <FiBookOpen /> },
   { name: "Inbox", path: "/inbox", icon: <FiMessageSquare /> },
+  { divider: "Marketting" },
+  { name: "Promotion Tags", path: "/tags", icon: <Tags /> },
   { divider: "Other Information" },
   { name: "Knowledge Base", path: "/knowledge-base", icon: <FiBook /> },
   { name: "Product Updates", path: "/product-updates", icon: <FiBell /> },
