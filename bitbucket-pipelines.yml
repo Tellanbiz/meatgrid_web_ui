@@ -11,7 +11,7 @@ pipelines:
             - pipe: atlassian/ssh-run:0.4.0
               variables:
                 SSH_USER: "root"
-                SERVER: "81.90.245.131"
+                SERVER: "139.162.152.133"
                 COMMAND: >
                   cd /var/www/meatgrid-admin &&
                   git stash &&
