@@ -65,7 +65,7 @@ const TagsTable = () => {
         toast.success("Tag status updated");
       })
       .catch((err) => {
-        toast.error("Failed to update tag");
+        toast.error("Failed to update tag: " + err.message);
       })
       .finally(() => {
         setUpdatingIds((prev) => {
@@ -107,7 +107,7 @@ const TagsTable = () => {
 
             <div className="flex gap-3 justify-end mt-4">
               {updatingIds.has(tag.id) ? (
-                <Loader  size={22}/>
+                <Loader size={22} />
               ) : (
                 <Switch
                   checked={tag.active}
