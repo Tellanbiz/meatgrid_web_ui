@@ -18,14 +18,14 @@ const OrdersTableHeader: React.FC<OrdersTableHeaderProps> = ({
   orderStatusOptions,
 }) => {
   return (
-    <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-2 bg-gray-50 rounded-t">
-      <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+    <div className="flex flex-col md:flex-row justify-between gap-4 p-2 bg-gray-50 rounded-t">
+      <div className="flex flex-col items-end md:flex-row gap-x-4 w-full md:w-auto">
         <Dropdown
           value={selectedStatus}
           options={orderStatusOptions}
           onChange={onStatusChange}
           placeholder="Filter"
-          className="w-full md:w-48 h-12 md:mr-3"
+          className="w-full md:w-48 h-12"
         />
 
         <div className="relative flex items-center w-full md:w-64">

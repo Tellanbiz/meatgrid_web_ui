@@ -82,7 +82,7 @@ export default function ProductsTable({
 
   return (
     <div>
-      <div className="card">
+      <div className="card bg-background">
         <DataTable
           ref={dtRef}
           value={products}

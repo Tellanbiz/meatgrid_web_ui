@@ -15,7 +15,8 @@ import AddCoupon from "../pages/coupons/AddCoupon";
 import Recipes from "../pages/recipes/Recipes";
 import AddRecipe from "../pages/recipes/AddRecipe";
 import EditRecipe from "../pages/recipes/EditRecipe";
-import PrivateRoute from "./PrivateRoute.js"
+import PrivateRoute from "./PrivateRoute.js";
+import OrderDetails from "../pages/orders/OrderDetails.js";
 
 const routes: RouteObject[] = [
   {
@@ -45,6 +46,10 @@ const routes: RouteObject[] = [
       {
         path: "orders",
         element: <Orders />,
+      },
+      {
+        path: "orders/:orderId",
+        element: <OrderDetails />,
       },
       {
         path: "products",

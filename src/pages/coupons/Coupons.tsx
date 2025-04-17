@@ -11,7 +11,7 @@ const Coupons = () => {
 
   return (
     <>
-      <div className="flex flex-row justify-between items-center">
+      <div className="flex justify-between items-center py-2 bg-background sticky top-0 z-10">
         <h4 className="text-base font-bold">Coupons</h4>
 
         <PrimaryButton

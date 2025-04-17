@@ -1,6 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../store/store.ts";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import StatusBadge from "../../../components/StatusBadge";
@@ -38,7 +36,7 @@ import {
   cancelOrder,
   fetchOrders,
 } from "../../../store/features/orders/orderThunks.ts";
-import { useAppSelector } from "../../../store/hooks.ts";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks.ts";
 import ProgressIndicator from "../../../components/ProgressIndicator.tsx";
 import { toast } from "sonner";
 import {
@@ -53,9 +51,11 @@ import {
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { NavLink } from "react-router-dom";
+import { resetCancelOrderState } from "../../../store/features/orders/orderSlice.ts";
 
 const OrdersTable = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const {
     orders,
     status,
@@ -113,6 +113,8 @@ const OrdersTable = () => {
       setCancelDialogOpen(false);
       form.reset();
       toast.success(successMessage ?? "Order cancelled successfully");
+      dispatch(resetCancelOrderState());
+
       refreshOrders();
     }
 
@@ -122,7 +124,14 @@ const OrdersTable = () => {
     if (selectedOrderState == "error") {
       toast.error(error);
     }
-  }, [selectedOrderState, error, successMessage, form, refreshOrders]);
+  }, [
+    selectedOrderState,
+    error,
+    successMessage,
+    form,
+    refreshOrders,
+    dispatch,
+  ]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();
@@ -256,10 +265,15 @@ const OrdersTable = () => {
         <Column selectionMode="multiple" headerStyle={TableHeaderStyle} />
         <Column
           header="Order ID"
-          body={(order: Order) => `MG${order.order_id}`}
+          body={(order: Order) => (
+            <NavLink to={`/orders/${order.order_id}`} className="underline">
+              {`MG${order.order_id}`}
+            </NavLink>
+          )}
           headerStyle={TableHeaderStyle}
           className="font-bold text-xs"
         />
+
         <Column
           header="Full Name"
           body={(order: Order) => order.recipient.full_name}

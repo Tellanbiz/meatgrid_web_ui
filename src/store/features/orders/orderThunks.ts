@@ -2,7 +2,9 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Order, OrderFilters } from "./orderTypes";
 import axios from "../../../service/api";
 import { CancelOrderRequest } from "./request/CancelOrderRequest";
-import { CancelOrderResponse } from "./request/response/CancelOrderRespons";
+import { CancelOrderResponse } from "./request/response/CancelOrderResponse";
+import { OrderDetails } from "./request/response/FetchOrderByIdResponse";
+import { UpdateOrderStatusRequest } from "./request/UpdateOrderStatusRequest";
 
 export const fetchOrders = createAsyncThunk<
   Order[],
@@ -38,6 +40,36 @@ export const cancelOrder = createAsyncThunk<
   } catch (err: any) {
     return rejectWithValue(
       err.response?.data?.error || "Failed to cancel order"
+    );
+  }
+});
+
+export const fetchOrderById = createAsyncThunk<
+  OrderDetails,
+  string,
+  { rejectValue: string }
+>("orders/fetchOrderById", async (orderId, { rejectWithValue }) => {
+  try {
+    const response = await axios.get(`/orders/${orderId}`);
+    return response.data;
+  } catch (err: any) {
+    return rejectWithValue(
+      err.response?.data?.error || "Failed to fetch order details"
+    );
+  }
+});
+
+export const updateOrderStatus = createAsyncThunk<
+  string,
+  UpdateOrderStatusRequest,
+  { rejectValue: string }
+>("orders/updateOrderStatus", async (payload, { rejectWithValue }) => {
+  try {
+    const response = await axios.post(`/orders/update`, payload);
+    return response.data;
+  } catch (err: any) {
+    return rejectWithValue(
+      err.response?.data?.error || "Failed to update order status"
     );
   }
 });
