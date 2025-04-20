@@ -1,7 +1,7 @@
 import Settings from "../pages/Settings";
 import NotFound from "../pages/NotFound";
 import { RouteObject } from "react-router-dom";
-import DashboardLayout from "../components/DashboardLayout";
+import MainLayout from "../components/MainLayout.js";
 import Dashboard from "../pages/dashboard/Dashboard";
 import Orders from "../pages/orders/Orders";
 import Products from "../pages/products/Products";
@@ -36,7 +36,7 @@ const routes: RouteObject[] = [
     path: "/",
     element: (
       <PrivateRoute>
-        <DashboardLayout />
+        <MainLayout />
       </PrivateRoute>
     ),
     children: [

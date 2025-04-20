@@ -5,6 +5,7 @@ import { OldProduct } from "../../types/OldProduct";
 import { DataTable } from "primereact/datatable";
 import { PrimaryButton, SecondaryButton } from "../../components/Button";
 import { FiPlus } from "react-icons/fi";
+import Breadcrumbs from "../../components/breadcrumbs";
 
 const Products = () => {
   const [products, setProducts] = useState<OldProduct[]>([]);
@@ -38,7 +39,18 @@ const Products = () => {
   return (
     <div>
       <div className="flex justify-between items-center py-2 sticky top-0 z-10 bg-background">
-        <h4 className="text-base font-bold">Products</h4>
+        <Breadcrumbs
+          items={[
+            {
+              label: "Products",
+              to: "/products",
+            },
+            {
+              label: "Products Details",
+              isPage: true,
+            },
+          ]}
+        />
         <div className="flex space-x-2">
           <SecondaryButton
             text="Export"

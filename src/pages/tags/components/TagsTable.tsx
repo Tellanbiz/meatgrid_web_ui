@@ -87,7 +87,7 @@ const TagsTable = () => {
         {tags.map((tag) => (
           <Card
             key={tag.id}
-            className="p-4 relative flex flex-col justify-between min-h-[150px]"
+            className="p-4 relative flex flex-col justify-between min-h-[50px]"
           >
             <div className="space-y-2">
               <h2 className="text-sm font-semibold">{tag.name}</h2>
