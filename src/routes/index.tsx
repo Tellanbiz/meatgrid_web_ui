@@ -18,6 +18,7 @@ import EditRecipe from "../pages/recipes/EditRecipe";
 import PrivateRoute from "./PrivateRoute.js";
 import OrderDetails from "../pages/orders/OrderDetails.js";
 import TagsPage from "../pages/tags/TagsPage.js";
+import EditCategory from "../pages/categories/EditCategory.js";
 
 const routes: RouteObject[] = [
   {
@@ -63,6 +64,10 @@ const routes: RouteObject[] = [
       {
         path: "categories",
         element: <Categories />,
+      },
+      {
+        path: "categories/:categoryId/edit",
+        element: <EditCategory />,
       },
       {
         path: "coupons",

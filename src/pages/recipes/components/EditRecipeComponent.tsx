@@ -19,6 +19,7 @@ import ProgressIndicator from "../../../components/ProgressIndicator";
 import { EditRecipeRequest } from "../../../types/EditRecipeRequest";
 import IngredientItem from "./IngredientItem";
 import { fetchProducts } from "../../../store/features/products/productSlice";
+import { ApiError } from "../../../types/ApiError";
 
 const EditRecipeComponent = () => {
   const dispatch = useAppDispatch();
@@ -75,8 +76,9 @@ const EditRecipeComponent = () => {
 
     try {
       await dispatch(uploadImages([files[0]])).unwrap();
-    } catch (err: any) {
-      toast.error(err?.message ?? "Upload failed");
+    } catch (err: unknown) {
+      const error = err as ApiError;
+      toast.error(error.response?.data.error ?? "Upload failed");
     }
   };
 
