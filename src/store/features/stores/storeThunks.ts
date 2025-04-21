@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../../../service/api";
 import { Store } from "./storeTypes";
+import { ApiError } from "../../../types/ApiError";
 
 export const fetchStores = createAsyncThunk<
   Store[],
@@ -10,9 +11,10 @@ export const fetchStores = createAsyncThunk<
   try {
     const res = await axios.get<Store[]>("/stores");
     return res.data;
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as ApiError;
     return rejectWithValue(
-      err.response?.data?.message || "Failed to fetch stores"
+      error.response?.data?.error || "Failed to fetch stores"
     );
   }
 });

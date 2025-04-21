@@ -3,6 +3,7 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import axios from "../../../service/api";
 import { Coupon } from "../../../types/Coupon";
 import { CreateCouponRequest } from "../../../types/CreateCouponRequest";
+import { ApiError } from "../../../types/ApiError";
 
 interface CouponsState {
   coupons: Coupon[];
@@ -24,9 +25,10 @@ export const fetchCoupons = createAsyncThunk<
   try {
     const response = await axios.get("/marketing/coupons");
     return response.data as Coupon[];
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as ApiError;
     return rejectWithValue(
-      err.response?.data?.message || "Failed to fetch coupons"
+      error.response?.data?.error || "Failed to fetch coupons"
     );
   }
 });
@@ -39,9 +41,10 @@ export const createCoupon = createAsyncThunk<
   try {
     const response = await axios.post("/marketing/coupons", couponData);
     return response.data as Coupon;
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as ApiError;
     return rejectWithValue(
-      err.response?.data?.error || "Failed to create coupon"
+      error.response?.data?.error || "Failed to create coupon"
     );
   }
 });
@@ -72,12 +75,9 @@ const couponsSlice = createSlice({
         state.status = "loading";
         state.error = null;
       })
-      .addCase(
-        createCoupon.fulfilled,
-        (state) => {
-          state.status = "succeeded";
-        }
-      )
+      .addCase(createCoupon.fulfilled, (state) => {
+        state.status = "succeeded";
+      })
       .addCase(createCoupon.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || "Failed to create coupon";

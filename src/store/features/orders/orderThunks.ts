@@ -5,6 +5,7 @@ import { CancelOrderRequest } from "./request/CancelOrderRequest";
 import { CancelOrderResponse } from "./request/response/CancelOrderResponse";
 import { OrderDetails } from "./request/response/FetchOrderByIdResponse";
 import { UpdateOrderStatusRequest } from "./request/UpdateOrderStatusRequest";
+import { ApiError } from "../../../types/ApiError";
 
 export const fetchOrders = createAsyncThunk<
   Order[],
@@ -22,9 +23,10 @@ export const fetchOrders = createAsyncThunk<
 
     const response = await axios.get(`/admin/orders?${params.toString()}`);
     return response.data;
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as ApiError;
     return rejectWithValue(
-      err.response?.data?.error || "Failed to fetch orders"
+      error.response?.data?.error || "Failed to fetch orders"
     );
   }
 });
@@ -37,9 +39,10 @@ export const cancelOrder = createAsyncThunk<
   try {
     const response = await axios.post(`/orders/cancel`, payload);
     return response.data;
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as ApiError;
     return rejectWithValue(
-      err.response?.data?.error || "Failed to cancel order"
+      error.response?.data?.error || "Failed to cancel order"
     );
   }
 });
@@ -52,9 +55,10 @@ export const fetchOrderById = createAsyncThunk<
   try {
     const response = await axios.get(`/orders/${orderId}`);
     return response.data;
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as ApiError;
     return rejectWithValue(
-      err.response?.data?.error || "Failed to fetch order details"
+      error.response?.data?.error || "Failed to fetch order details"
     );
   }
 });
@@ -67,9 +71,10 @@ export const updateOrderStatus = createAsyncThunk<
   try {
     const response = await axios.post(`/orders/update`, payload);
     return response.data;
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as ApiError;
     return rejectWithValue(
-      err.response?.data?.error || "Failed to update order status"
+      error.response?.data?.error || "Failed to update order status"
     );
   }
 });

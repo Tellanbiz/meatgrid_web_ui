@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import axios from "../../../service/api";
 import { Product } from "../../../types/Product";
+import { ApiError } from "../../../types/ApiError";
 
 interface ProductState {
   products: Product[];
@@ -23,9 +24,10 @@ export const fetchProducts = createAsyncThunk<
   try {
     const response = await axios.get("/products");
     return response.data;
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as ApiError;
     return rejectWithValue(
-      err.response?.data?.message || "Failed to fetch products"
+      error.response?.data?.error || "Failed to fetch products"
     );
   }
 });

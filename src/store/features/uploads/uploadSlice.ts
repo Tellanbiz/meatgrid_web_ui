@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../../../service/api";
 import { ImageUploadResponse } from "../../../types/ImageUploadResponse";
+import { ApiError } from "../../../types/ApiError";
 
 interface UploadState {
   images: string[];
@@ -32,9 +33,10 @@ export const uploadImages = createAsyncThunk<
     );
 
     return res.data.images;
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as ApiError;
     return thunkAPI.rejectWithValue(
-      err?.response?.data?.message || "Upload failed"
+      error?.response?.data?.error || "Upload failed"
     );
   }
 });

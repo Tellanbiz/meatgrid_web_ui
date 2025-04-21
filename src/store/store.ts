@@ -5,7 +5,8 @@ import recipeReducer from "./features/recipe/recipeSlice";
 import imageUploadReducer from "./features/uploads/uploadSlice";
 import productReducer from "./features/products/productSlice";
 import orderReducer from "./features/orders/orderSlice";
-import tagReducer from "./features/tags/tagSlice"
+import tagReducer from "./features/tags/tagSlice";
+import categoryReducer from "./features/categories/categorySlice";
 
 export const store = configureStore({
   reducer: {
@@ -15,7 +16,8 @@ export const store = configureStore({
     uploads: imageUploadReducer,
     products: productReducer,
     orders: orderReducer,
-    tags: tagReducer
+    tags: tagReducer,
+    categories: categoryReducer,
   },
   devTools: process.env.NODE_ENV != "production",
 });

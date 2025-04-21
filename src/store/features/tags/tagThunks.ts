@@ -3,6 +3,7 @@ import axios from "../../../service/api";
 import { CreateTagRequest } from "./request/CreateTagRequest";
 import { UpdateTagRequest } from "./request/UdateTagRequest";
 import { Tag } from "./tagTypes";
+import { ApiError } from "../../../types/ApiError";
 
 export const fetchTags = createAsyncThunk<Tag[], void, { rejectValue: string }>(
   "tags/fetchTags",
@@ -10,7 +11,8 @@ export const fetchTags = createAsyncThunk<Tag[], void, { rejectValue: string }>(
     try {
       const response = await axios.get<Tag[]>("/marketing/tags/all");
       return response.data;
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as ApiError;
       return rejectWithValue(
         error.response?.data?.error || "Error fetching tags"
       );
@@ -26,7 +28,8 @@ export const createTag = createAsyncThunk<
   try {
     const response = await axios.post("/marketing/tags", tagData);
     return response.data.message || "Tag created successfully";
-  } catch (error: any) {
+  } catch (err: unknown) {
+    const error = err as ApiError;
     return rejectWithValue(error.response?.data?.error || "Error creating tag");
   }
 });
@@ -39,7 +42,8 @@ export const updateTag = createAsyncThunk<
   try {
     const response = await axios.post("/marketing/tags", tagData);
     return response.data.message || "Tag updated successfully";
-  } catch (error: any) {
+  } catch (err: unknown) {
+    const error = err as ApiError;
     return rejectWithValue(error.response?.data?.error || "Error updating tag");
   }
 });

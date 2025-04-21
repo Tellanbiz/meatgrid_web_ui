@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "../../../service/api";
 import { User } from "../../../types/User";
+import { ApiError } from "../../../types/ApiError";
 
 interface AuthState {
   user: User | null;
@@ -27,8 +28,9 @@ export const loginUser = createAsyncThunk<
     localStorage.setItem("token", token);
 
     return response.data;
-  } catch (err: any) {
-    return rejectWithValue(err.response?.data?.error || "Login failed");
+  } catch (err: unknown) {
+    const error = err as ApiError;
+    return rejectWithValue(error.response?.data?.error || "Login failed");
   }
 });
 

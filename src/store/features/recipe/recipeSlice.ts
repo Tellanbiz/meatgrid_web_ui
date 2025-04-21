@@ -4,6 +4,7 @@ import axios from "../../../service/api";
 import { Recipe } from "../../../types/Recipe";
 import { EditRecipeRequest } from "../../../types/EditRecipeRequest";
 import { RecipeWithDetails } from "../../../types/RecipeWithDetails";
+import { ApiError } from "../../../types/ApiError";
 
 interface RecipesState {
   recipes: Recipe[];
@@ -31,9 +32,10 @@ export const fetchRecipes = createAsyncThunk<
   try {
     const response = await axios.get("/marketing/recipes");
     return response.data;
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as ApiError;
     return rejectWithValue(
-      err.response?.data?.message || "Failed to fetch recipes"
+      error.response?.data?.error || "Failed to fetch recipes"
     );
   }
 });
@@ -46,9 +48,10 @@ export const fetchRecipeById = createAsyncThunk<
   try {
     const response = await axios.get(`/marketing/recipes/info?id=${id}`);
     return response.data;
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as ApiError;
     return rejectWithValue(
-      err.response?.data?.message || "Failed to fetch recipe"
+      error.response?.data?.error || "Failed to fetch recipe"
     );
   }
 });
@@ -61,9 +64,10 @@ export const createRecipe = createAsyncThunk<
   try {
     const response = await axios.post("/marketing/recipes", recipeData);
     return response.data;
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as ApiError;
     return rejectWithValue(
-      err.response?.data?.error || "Failed to create recipe"
+      error.response?.data?.error || "Failed to create recipe"
     );
   }
 });
@@ -72,13 +76,14 @@ export const updateRecipe = createAsyncThunk<
   Recipe,
   { id: string; data: EditRecipeRequest },
   { rejectValue: string }
->("/recipes/udateRecipe", async ({data }, { rejectWithValue }) => {
+>("/recipes/udateRecipe", async ({ data }, { rejectWithValue }) => {
   try {
     const response = await axios.post(`/marketing/recipes/update`, data);
     return response.data;
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as ApiError;
     return rejectWithValue(
-      err.response?.data?.error || "Failed to update recipe"
+      error.response?.data?.error || "Failed to update recipe"
     );
   }
 });
@@ -91,9 +96,10 @@ export const deleteRecipe = createAsyncThunk<
   try {
     await axios.delete(`/marketing/recipes`, { data: { id } });
     return id;
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as ApiError;
     return rejectWithValue(
-      err.response?.data?.error || "Failed to delete recipe"
+      error.response?.data?.error || "Failed to delete recipe"
     );
   }
 });
