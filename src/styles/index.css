@@ -12,6 +12,9 @@
   .text-m-secondary {
     @apply text-gray-500
   }
+  .btn {
+    @apply bg-primary hover:bg-blue-800 transition duration-300
+  }
 }
 
 :root {

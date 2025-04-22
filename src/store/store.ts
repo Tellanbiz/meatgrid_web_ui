@@ -7,6 +7,7 @@ import productReducer from "./features/products/productSlice";
 import orderReducer from "./features/orders/orderSlice";
 import tagReducer from "./features/tags/tagSlice";
 import categoryReducer from "./features/categories/categorySlice";
+import supplierReducer from "./features/suppliers/supplierSlice";
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     orders: orderReducer,
     tags: tagReducer,
     categories: categoryReducer,
+    suppliers: supplierReducer,
   },
   devTools: process.env.NODE_ENV != "production",
 });

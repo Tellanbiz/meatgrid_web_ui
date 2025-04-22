@@ -19,6 +19,7 @@ import PrivateRoute from "./PrivateRoute.js";
 import OrderDetails from "../pages/orders/OrderDetails.js";
 import TagsPage from "../pages/tags/TagsPage.js";
 import EditCategory from "../pages/categories/EditCategory.js";
+import SupplierPage from "../pages/suppliers/SupplierPage.js";
 
 const routes: RouteObject[] = [
   {
@@ -93,6 +94,10 @@ const routes: RouteObject[] = [
       {
         path: "tags",
         element: <TagsPage />,
+      },
+      {
+        path: "suppliers",
+        element: <SupplierPage />,
       },
       {
         path: "settings",
