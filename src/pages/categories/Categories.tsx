@@ -5,7 +5,7 @@ import { PrimaryButton, SecondaryButton } from "../../components/Button";
 import CategoryCard from "./components/CategoryCard";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchCategories } from "../../store/features/categories/categoryThunks";
-import LoadingPage from "../../components/LoadingPage";
+import { ProgressBar } from "primereact/progressbar";
 
 const Categories = () => {
   const dispatch = useAppDispatch();
@@ -50,14 +50,16 @@ const Categories = () => {
 
       {/* Category List */}
       <div className="mt-4">
-        {status === "loading" ? (
-          <LoadingPage />
-        ) : error ? (
+        {status === "loading" && (
+          <ProgressBar mode="indeterminate" style={{ height: "6px" }} />
+        )}
+
+        {error ? (
           <div className="text-center text-red-500 font-medium py-4">
             {error}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-2">
             {categories.map((category) => (
               <CategoryCard
                 key={category.id}

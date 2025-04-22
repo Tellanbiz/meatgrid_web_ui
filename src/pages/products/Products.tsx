@@ -1,39 +1,16 @@
-import { useState, useEffect, useRef } from "react";
 import ProductsTable from "./components/ProductsTable";
-import { generateProducts } from "../../service/ProductService";
-import { OldProduct } from "../../types/OldProduct";
-import { DataTable } from "primereact/datatable";
 import { PrimaryButton, SecondaryButton } from "../../components/Button";
 import { FiPlus } from "react-icons/fi";
 import Breadcrumbs from "../../components/breadcrumbs";
+import { toast } from "sonner";
 
 const Products = () => {
-  const [products, setProducts] = useState<OldProduct[]>([]);
-  const [selectedProducts, setSelectedProducts] = useState<OldProduct[]>([]);
-  const [globalFilter, setGlobalFilter] = useState<string>("");
-  const dt = useRef<DataTable<OldProduct[]>>(null!);
-
-  useEffect(() => {
-    generateProducts().then((data) => setProducts(data));
-  }, []);
-
   const handleAddProduct = () => {
     console.log("Add Product clicked");
   };
 
-  const handleDeleteSelectedProducts = () => {
-    console.log("Delete Selected Products clicked");
-    const remainingProducts = products.filter(
-      (product) => !selectedProducts.includes(product)
-    );
-    setProducts(remainingProducts);
-    setSelectedProducts([]);
-  };
-
   const handleExport = () => {
-    if (dt.current) {
-      dt.current.exportCSV();
-    }
+    toast.success("Export successfully");
   };
 
   return (
@@ -43,10 +20,6 @@ const Products = () => {
           items={[
             {
               label: "Products",
-              to: "/products",
-            },
-            {
-              label: "Products Details",
               isPage: true,
             },
           ]}
@@ -68,16 +41,7 @@ const Products = () => {
       </div>
 
       <div className="mt-4">
-        <ProductsTable
-          products={products}
-          selectedProducts={selectedProducts}
-          setSelectedProducts={setSelectedProducts}
-          globalFilter={globalFilter}
-          dtRef={dt}
-          setGlobalFilter={setGlobalFilter}
-          onDeleteClicked={handleDeleteSelectedProducts}
-          onEditClicked={() => console.log("Edit clicked")}
-        />
+        <ProductsTable />
       </div>
     </div>
   );

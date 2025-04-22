@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import axios from "../../../service/api";
-import { Product } from "../../../types/Product";
 import { ApiError } from "../../../types/ApiError";
+import { Product } from "./productTypes";
 
 interface ProductState {
   products: Product[];
@@ -22,7 +22,7 @@ export const fetchProducts = createAsyncThunk<
   { rejectValue: string }
 >("products/fetchProducts", async (_, { rejectWithValue }) => {
   try {
-    const response = await axios.get("/products");
+    const response = await axios.get("/admin/products");
     return response.data;
   } catch (err: unknown) {
     const error = err as ApiError;
