@@ -175,7 +175,7 @@ const OrdersTable = () => {
 
   const handleCancelOrder = (order: Order) => {
     setOrderToCancel(order);
-    setCancelDialogOpen(true);
+    setTimeout(() => setCancelDialogOpen(true), 10);
   };
 
   const handleConfirmCancelOrder = async (data: CancelFormVaues) => {
