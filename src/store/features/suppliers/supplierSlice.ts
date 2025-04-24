@@ -11,7 +11,7 @@ import {
 interface SupplierState {
   suppliers: Supplier[];
   status: LoadingStatus;
-  currentOperation: "fetch" | "craete" | "delete" | "update" | null;
+  currentOperation: "create" | "fetch" | "update" | "delete" | null;
   error: string | null;
   successMessage: string | null;
 }
@@ -53,7 +53,7 @@ const storeSlice = createSlice({
         state.error = action.payload || "Unknown error";
       })
       .addCase(fetchSuppliers.pending, (state) => {
-        state.currentOperation = "fetch"
+        state.currentOperation = "fetch";
         state.status = "loading";
         state.error = null;
       })

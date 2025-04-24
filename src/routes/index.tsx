@@ -20,6 +20,7 @@ import OrderDetails from "../pages/orders/OrderDetails.js";
 import TagsPage from "../pages/tags/TagsPage.js";
 import EditCategory from "../pages/categories/EditCategory.js";
 import SupplierPage from "../pages/suppliers/SupplierPage.js";
+import StocksPage from "../pages/stocks/StocksPage.js";
 
 const routes: RouteObject[] = [
   {
@@ -98,6 +99,10 @@ const routes: RouteObject[] = [
       {
         path: "suppliers",
         element: <SupplierPage />,
+      },
+      {
+        path: "stock",
+        element: <StocksPage />,
       },
       {
         path: "settings",

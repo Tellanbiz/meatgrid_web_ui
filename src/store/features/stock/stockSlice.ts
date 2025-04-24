@@ -1,0 +1,42 @@
+import { createSlice } from "@reduxjs/toolkit";
+import { fetchStocks } from "./stockThunks";
+import { Stock } from "./stockTypes";
+import { LoadingStatus } from "../../../types/LoadingStatus";
+
+interface StocksState {
+  stocks: Stock[];
+  currentOperation: "create" | "fetch" | "update" | "delete" | null;
+  status: LoadingStatus;
+  error: string | null;
+}
+
+const initialState: StocksState = {
+  stocks: [],
+  currentOperation: null,
+  status: "idle",
+  error: null,
+};
+
+const stockSlice = createSlice({
+  name: "stocks",
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchStocks.pending, (state) => {
+        state.currentOperation = "fetch";
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(fetchStocks.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.stocks = action.payload;
+      })
+      .addCase(fetchStocks.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Unknown error";
+      });
+  },
+});
+
+export default stockSlice.reducer;

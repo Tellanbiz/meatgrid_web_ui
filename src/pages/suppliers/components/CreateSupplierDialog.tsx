@@ -62,11 +62,13 @@ const CreateSupplierDialog = ({
     },
   });
 
-  const { status, error, successMessage } = useAppSelector(
+  const { status, currentOperation, error, successMessage } = useAppSelector(
     (state) => state.suppliers
   );
 
   useEffect(() => {
+    if(currentOperation !== "create") return;
+    
     if (status == "failed" && error) {
       toast.error(error);
     }
@@ -75,7 +77,7 @@ const CreateSupplierDialog = ({
       onOpenChange(false);
       form.reset();
     }
-  }, [status, error, successMessage, onOpenChange, form]);
+  }, [currentOperation, status, error, successMessage, onOpenChange, form]);
 
   const onSubmit = (data: SupplierFormData) => {
     const request: CreateSupplierRequest = {

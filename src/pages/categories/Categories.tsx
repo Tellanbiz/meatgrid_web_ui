@@ -8,6 +8,8 @@ import { fetchCategories } from "../../store/features/categories/categoryThunks"
 import { ProgressBar } from "primereact/progressbar";
 
 const Categories = () => {
+  
+  
   const dispatch = useAppDispatch();
   const { categories, status, error } = useAppSelector(
     (state) => state.categories

@@ -1,9 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import ProductsTableHeader from "./ProductsTableHeader";
-import StatusBadge from "../../../components/StatusBadge";
-import { inventoryStatusColor } from "../../../constants/StatusColors";
 import {
   DataTableStyle,
   TableHeaderStyle,
@@ -24,11 +22,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu";
-
-export default function ProductsTable() {
+import React from "react";
+const ProductsTable = () => {
   const dispatch = useAppDispatch();
   const { products, status, error } = useAppSelector((state) => state.products);
-  const { tags } = useAppSelector((state) => state.tags);
   const { categories } = useAppSelector((state) => state.categories);
 
   const [globalFilter, setGlobalFilter] = useState<string>("");
@@ -157,69 +154,74 @@ export default function ProductsTable() {
             style={{ height: "6px" }}
           ></ProgressBar>
         )}
-        <DataTable
-          ref={dt}
-          value={products}
-          dataKey="name"
-          tableStyle={DataTableStyle}
-          paginator
-          rows={10}
-          rowsPerPageOptions={[5, 10, 25]}
-          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
-          scrollable
-          scrollHeight="500px"
-          size="small"
-          globalFilter={globalFilter}
-          header={
-            <ProductsTableHeader
-              searchTerm={globalFilter}
-              onSearchChange={(e) => setGlobalFilter(e.target.value)}
-              selectedStatus={null}
-              onStatusChange={() => null}
-              dropdownOptions={dropdownOptions}
-              onDeleteClicked={handleDeleteClicked}
-              onEditClicked={handleEditClicked}
-            />
-          }
-        >
-          <Column
-            field="name"
-            header="Product"
-            body={imageBodyTemplate}
-            headerStyle={TableHeaderStyle}
-          ></Column>
-          <Column
-            field="unit_type"
-            header="Unit Type"
-            headerStyle={TableHeaderStyle}
-          ></Column>
-          <Column
-            header="Category"
-            body={(rowData) =>
-              getCategoryById(rowData.category_id)?.name ?? "-"
+
+        {status !== "loading" && (
+          <DataTable
+            ref={dt}
+            value={products}
+            dataKey="id"
+            tableStyle={DataTableStyle}
+            paginator
+            rows={10}
+            rowsPerPageOptions={[5, 10, 25]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+            scrollable
+            scrollHeight="500px"
+            size="small"
+            globalFilter={globalFilter}
+            header={
+              <ProductsTableHeader
+                searchTerm={globalFilter}
+                onSearchChange={(e) => setGlobalFilter(e.target.value)}
+                selectedStatus={null}
+                onStatusChange={() => null}
+                dropdownOptions={dropdownOptions}
+                onDeleteClicked={handleDeleteClicked}
+                onEditClicked={handleEditClicked}
+              />
             }
-            headerStyle={TableHeaderStyle}
-          ></Column>
-          <Column
-            header="Inventory"
-            body={inventoryBodyTemplate}
-            sortable
-            headerStyle={TableHeaderStyle}
-          ></Column>
-          <Column
-            header="Regular Price"
-            body={priceBodyTemplate}
-            sortable
-            headerStyle={TableHeaderStyle}
-          ></Column>
-          <Column
-            header="Actions"
-            body={actionsBodyTemplate}
-            headerStyle={TableHeaderStyle}
-          ></Column>
-        </DataTable>
+          >
+            <Column
+              field="name"
+              header="Product"
+              body={imageBodyTemplate}
+              headerStyle={TableHeaderStyle}
+            />
+            <Column
+              field="unit_type"
+              header="Unit Type"
+              headerStyle={TableHeaderStyle}
+            />
+            <Column
+              header="Category"
+              body={(rowData) =>
+                getCategoryById(rowData.category_id)?.name ?? "-"
+              }
+              headerStyle={TableHeaderStyle}
+            />
+            <Column
+              header="Inventory"
+              body={inventoryBodyTemplate}
+              sortable
+              headerStyle={TableHeaderStyle}
+            />
+            <Column
+              header="Regular Price"
+              body={priceBodyTemplate}
+              sortable
+              headerStyle={TableHeaderStyle}
+            />
+            <Column
+              header="Actions"
+              body={actionsBodyTemplate}
+              headerStyle={TableHeaderStyle}
+            />
+          </DataTable>
+        )}
       </div>
     </div>
   );
-}
+};
+
+export default React.memo(ProductsTable);

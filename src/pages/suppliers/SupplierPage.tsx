@@ -16,26 +16,28 @@ const SupplierPage = () => {
 
   return (
     <>
-      <div className="flex justify-between items-center">
-        <h4 className="text-md">Suppliers</h4>
-        <div className="flex space-x-2">
-          <Button variant="outline" className="" onClick={handleRefresh}>
-            <RefreshCcw /> Refresh
-          </Button>
-          <Button className="btn" onClick={() => setIsDialogOpen(true)}>
-            New Supplier
-          </Button>
+      <div className="h-full overflow-hidden">
+        <div className="flex justify-between items-center relative">
+          <h4 className="text-md">Suppliers</h4>
+          <div className="flex space-x-2">
+            <Button variant="outline" className="" onClick={handleRefresh}>
+              <RefreshCcw /> Refresh
+            </Button>
+            <Button className="btn" onClick={() => setIsDialogOpen(true)}>
+              New Supplier
+            </Button>
+          </div>
         </div>
-      </div>
 
-      <div className="mt-4">
-        <SuppliersTable />
-      </div>
+        <div className="pt-4">
+          <SuppliersTable />
+        </div>
 
-      <CreateSupplierDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-      />
+        <CreateSupplierDialog
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+        />
+      </div>
     </>
   );
 };
