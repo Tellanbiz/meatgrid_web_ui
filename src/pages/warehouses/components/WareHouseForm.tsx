@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import { Checkbox } from "../../../components/ui/checkbox";
 import { Input } from "../../../components/ui/input";
@@ -44,8 +44,15 @@ const WarehouseForm: React.FC<WarehouseFormProps> = ({
     isWarehouse: false,
     isStore: false,
     status: "active",
-    ...initialValues,
   });
+
+  useEffect(() => {
+    if (initialValues) {
+      setForm({
+        ...initialValues,
+      });
+    }
+  }, [initialValues]);
 
   const handleChange = (field: keyof WarehouseFormData, value: unknown) => {
     setForm((prev) => ({ ...prev, [field]: value }));

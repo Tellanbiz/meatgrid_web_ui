@@ -39,8 +39,7 @@ const WareHousePage = () => {
   ];
 
   const handleEdit = (rowData) => {
-    // Logic for editing warehouse
-    console.log("Edit warehouse:", rowData);
+    navigate(`/warehouses/${rowData.id}/edit`);
   };
 
   const actionBodyTemplate = (rowData) => {
@@ -58,7 +57,7 @@ const WareHousePage = () => {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" className="w-auto">
-          <DropdownMenuItem onClick={() => handleEdit(order)}>
+          <DropdownMenuItem onClick={() => handleEdit(rowData)}>
             <Pencil className="mr-2 h-4 w-4" /> Edit
           </DropdownMenuItem>
         </DropdownMenuContent>

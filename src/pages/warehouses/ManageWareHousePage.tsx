@@ -32,7 +32,7 @@ const ManageWareHousePage = () => {
       } else {
         await fakeCreateWarehouse(formData);
       }
-      navigate("/warehouses");
+      navigate(-1);
       setFormLoading(false);
     } catch (err) {
       console.error("Failed to save warehouse:", err);
