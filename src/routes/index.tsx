@@ -24,6 +24,7 @@ import StocksPage from "../pages/stocks/StocksPage.js";
 import AddProductPage from "../pages/products/AddProductPage.js";
 import { Warehouse } from "lucide-react";
 import WareHousePage from "../pages/warehouses/WareHousePage.js";
+import AddWareHousePage from "../pages/warehouses/AddWareHousePage.js";
 
 const routes: RouteObject[] = [
   {
@@ -114,6 +115,10 @@ const routes: RouteObject[] = [
       {
         path: "warehouses",
         element: <WareHousePage />,
+      },
+      {
+        path: "warehouses/new",
+        element: <AddWareHousePage />,
       },
       {
         path: "settings",
