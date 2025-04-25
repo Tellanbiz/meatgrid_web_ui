@@ -90,7 +90,7 @@ const StocksTable = () => {
         />
         <Column
           header="Store"
-          body={(stock) => stock.store.name}
+          body={(stock) => stock.store?.name ?? "N/A"}
           headerStyle={TableHeaderStyle}
         />
         <Column

@@ -22,6 +22,8 @@ import EditCategory from "../pages/categories/EditCategory.js";
 import SupplierPage from "../pages/suppliers/SupplierPage.js";
 import StocksPage from "../pages/stocks/StocksPage.js";
 import AddProductPage from "../pages/products/AddProductPage.js";
+import { Warehouse } from "lucide-react";
+import WareHousePage from "../pages/warehouses/WareHousePage.js";
 
 const routes: RouteObject[] = [
   {
@@ -108,6 +110,10 @@ const routes: RouteObject[] = [
       {
         path: "stock",
         element: <StocksPage />,
+      },
+      {
+        path: "warehouses",
+        element: <WareHousePage />,
       },
       {
         path: "settings",

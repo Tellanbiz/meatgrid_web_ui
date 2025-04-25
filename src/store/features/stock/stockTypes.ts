@@ -14,6 +14,6 @@ export interface Stock {
   quantity: number;
   status: string;
   product: StockProduct;
-  store: StockStore;
+  store?: StockStore;
   created_at: string;
 }
