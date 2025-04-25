@@ -22,9 +22,8 @@ import EditCategory from "../pages/categories/EditCategory.js";
 import SupplierPage from "../pages/suppliers/SupplierPage.js";
 import StocksPage from "../pages/stocks/StocksPage.js";
 import AddProductPage from "../pages/products/AddProductPage.js";
-import { Warehouse } from "lucide-react";
 import WareHousePage from "../pages/warehouses/WareHousePage.js";
-import AddWareHousePage from "../pages/warehouses/AddWareHousePage.js";
+import ManageWareHousePage from "../pages/warehouses/ManageWareHousePage.js";
 
 const routes: RouteObject[] = [
   {
@@ -118,7 +117,11 @@ const routes: RouteObject[] = [
       },
       {
         path: "warehouses/new",
-        element: <AddWareHousePage />,
+        element: <ManageWareHousePage />,
+      },
+      {
+        path: "warehouses/:warehouseId/edit",
+        element: <ManageWareHousePage />,
       },
       {
         path: "settings",
