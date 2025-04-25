@@ -21,6 +21,7 @@ import TagsPage from "../pages/tags/TagsPage.js";
 import EditCategory from "../pages/categories/EditCategory.js";
 import SupplierPage from "../pages/suppliers/SupplierPage.js";
 import StocksPage from "../pages/stocks/StocksPage.js";
+import AddProductPage from "../pages/products/AddProductPage.js";
 
 const routes: RouteObject[] = [
   {
@@ -58,6 +59,10 @@ const routes: RouteObject[] = [
       {
         path: "products",
         element: <Products />,
+      },
+      {
+        path: "products/new",
+        element: <AddProductPage />,
       },
       {
         path: "reports",

@@ -3,11 +3,14 @@ import { X } from "lucide-react";
 interface Props {
   src: string;
   onRemove: () => void;
+  className?: string;
 }
 
-const ImageThumbnail = ({ src, onRemove }: Props) => {
+const ImageThumbnail = ({ src, onRemove, className }: Props) => {
   return (
-    <div className="relative w-full h-32 rounded border overflow-hidden group">
+    <div
+      className={`relative w-full h-32 rounded border overflow-hidden group shadow-sm ${className}`}
+    >
       <img src={src} alt="Uploaded" className="w-full h-full object-cover" />
       <button
         onClick={onRemove}

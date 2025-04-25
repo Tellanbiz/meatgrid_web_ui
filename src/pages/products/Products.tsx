@@ -3,10 +3,12 @@ import { PrimaryButton, SecondaryButton } from "../../components/Button";
 import { FiPlus } from "react-icons/fi";
 import Breadcrumbs from "../../components/breadcrumbs";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const Products = () => {
+  const navigate = useNavigate();
   const handleAddProduct = () => {
-    console.log("Add Product clicked");
+    navigate("/products/new");
   };
 
   const handleExport = () => {
