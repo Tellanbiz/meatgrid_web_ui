@@ -15,3 +15,6 @@ export const selectCurrentOperation = (state: RootState) =>
 export const selectIsFetchingPaymentMethods = (state: RootState) =>
   state.paymentMethods.status === LoadingState.Loading &&
   state.paymentMethods.currentOperation === "fetch";
+
+export const selectPaymentMethodById = (id: string) => (state: RootState) =>
+    state.paymentMethods.paymentMethods.find((method) => method.id === id);
