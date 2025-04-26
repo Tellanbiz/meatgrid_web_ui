@@ -9,6 +9,7 @@ import tagReducer from "./features/tags/tagSlice";
 import categoryReducer from "./features/categories/categorySlice";
 import supplierReducer from "./features/suppliers/supplierSlice";
 import stockReducer from "./features/stock/stockSlice";
+import paymentMethodReducer from "./features/payment-methods/paymentMethodSlice";
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     categories: categoryReducer,
     suppliers: supplierReducer,
     stocks: stockReducer,
+    paymentMethods: paymentMethodReducer,
   },
   devTools: process.env.NODE_ENV != "production",
 });
