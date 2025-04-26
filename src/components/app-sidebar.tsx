@@ -60,7 +60,10 @@ const data = {
       title: "Order Management",
       url: "#",
       icon: ShoppingCart,
-      items: [{ title: "Orders", url: "/orders" }],
+      items: [
+        { title: "Orders", url: "/orders" },
+        { title: "Payment Methods", url: "/payment-methods" },
+      ],
     },
     {
       title: "Inventory Management",
@@ -80,8 +83,8 @@ const data = {
       icon: Users,
       items: [
         { title: "Customers", url: "/customers" },
+        { title: "Staff Members", url: "/staffs" },
         { title: "Riders", url: "/riders" },
-        { title: "Users", url: "/customers" },
       ],
     },
 
@@ -94,15 +97,6 @@ const data = {
         { title: "Coupons", url: "/coupons", icon: Star },
         { title: "Banners", url: "/banners" },
         { title: "Promotion Tags", url: "/tags" },
-      ],
-    },
-    {
-      title: "Other Information",
-      url: "#",
-      icon: Book,
-      items: [
-        { title: "Knowledge Base", url: "/knowledge-base" },
-        { title: "Product Updates", url: "/product-updates", icon: Bell },
       ],
     },
     {
