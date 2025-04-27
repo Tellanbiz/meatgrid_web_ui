@@ -24,8 +24,13 @@ import { toast } from "sonner";
 import DeleteDialog from "../../../components/DeleteDialog";
 import { DeleteSupplierRequest } from "../../../store/features/suppliers/request/DeleteSupplierRequest";
 import { resetSupplierState } from "../../../store/features/suppliers/supplierSlice";
+import { selectIsFetchingSuppliers } from "../../../store/features/suppliers/supplierSelectors";
 
-const SuppliersTable = () => {
+interface SuppliersTableProps {
+  onEdit: (supplier: Supplier) => void;
+}
+
+const SuppliersTable = ({ onEdit }: SuppliersTableProps) => {
   const dispatch = useAppDispatch();
   const { suppliers, status, error, currentOperation } = useAppSelector(
     (state) => state.suppliers
@@ -34,6 +39,7 @@ const SuppliersTable = () => {
   const [supplierToDelete, setSupplierToDelete] = useState<Supplier | null>(
     null
   );
+  const isFetching = useAppSelector(selectIsFetchingSuppliers);
 
   useEffect(() => {
     dispatch(fetchSuppliers());
@@ -41,10 +47,14 @@ const SuppliersTable = () => {
 
   useEffect(() => {
     if (
-      (status == "succeeded" || status == "failed") &&
-      currentOperation == "delete"
+      (status === "succeeded" || status === "failed") &&
+      currentOperation === "delete"
     ) {
-      toast.success("Supplier deleted successfully");
+      if (status === "succeeded") {
+        toast.success("Supplier deleted successfully");
+      } else if (status === "failed" && error) {
+        toast.error(error);
+      }
       setDeleteDialogOpen(false);
       dispatch(resetSupplierState());
     }
@@ -60,7 +70,7 @@ const SuppliersTable = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem
-            onSelect={() => handleEdit(rowData)}
+            onSelect={() => onEdit(rowData)} // Call the onEdit prop
             className="flex items-center gap-2"
           >
             <Pencil className="h-4 w-4" /> Edit
@@ -74,10 +84,6 @@ const SuppliersTable = () => {
         </DropdownMenuContent>
       </DropdownMenu>
     );
-  };
-
-  const handleEdit = (rowData: Supplier) => {
-    // Logic for editing product
   };
 
   const handleDelete = (rowData: Supplier) => {
@@ -95,7 +101,7 @@ const SuppliersTable = () => {
   return (
     <>
       <div className="card bg-background">
-        {status === "loading" && currentOperation == "fetch" && (
+        {isFetching && (
           <ProgressBar
             mode="indeterminate"
             style={{ height: "6px" }}
@@ -109,7 +115,7 @@ const SuppliersTable = () => {
           rows={10}
           rowsPerPageOptions={[5, 10, 25]}
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} suppliers"
           scrollable
           scrollHeight="500px"
           size="small"
@@ -159,7 +165,7 @@ const SuppliersTable = () => {
         </DataTable>
       </div>
       <DeleteDialog
-        isLoading={status == "loading" && currentOperation == "delete"}
+        isLoading={status === "loading" && currentOperation === "delete"}
         onConfirm={handleConfirmDelete}
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}

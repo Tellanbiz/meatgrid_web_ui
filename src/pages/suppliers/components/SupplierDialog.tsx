@@ -1,3 +1,7 @@
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Dialog,
   DialogContent,
@@ -7,9 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
@@ -20,14 +21,23 @@ import {
 } from "@/components/ui/form";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { Loader2 } from "lucide-react";
-import { useEffect } from "react";
 import { toast } from "sonner";
-import { createSupplier } from "../../../store/features/suppliers/supplierThunks";
+import {
+  createSupplier,
+  updateSupplier,
+} from "../../../store/features/suppliers/supplierThunks";
 import { CreateSupplierRequest } from "../../../store/features/suppliers/request/CreateSupplierRequest";
+import { Supplier } from "../../../store/features/suppliers/supplierTypes";
+import {
+  selectIsCreateSupplierLoading,
+  selectIsUpdateSupplierLoading,
+} from "../../../store/features/suppliers/supplierSelectors";
 
-interface CreateSupplierDialogProps {
+interface SupplierDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  isEditMode?: boolean;
+  initialValues?: Supplier;
 }
 
 const supplierSchema = z.object({
@@ -44,10 +54,12 @@ const supplierSchema = z.object({
 
 type SupplierFormData = z.infer<typeof supplierSchema>;
 
-const CreateSupplierDialog = ({
+const SupplierDialog = ({
   open,
   onOpenChange,
-}: CreateSupplierDialogProps) => {
+  isEditMode = false,
+  initialValues,
+}: SupplierDialogProps) => {
   const dispatch = useAppDispatch();
 
   const form = useForm<SupplierFormData>({
@@ -66,18 +78,42 @@ const CreateSupplierDialog = ({
     (state) => state.suppliers
   );
 
+  const isCreateSupplierLoading = useAppSelector(selectIsCreateSupplierLoading);
+  const isUpdateSupplierLoading = useAppSelector(selectIsUpdateSupplierLoading);
+
   useEffect(() => {
-    if(currentOperation !== "create") return;
-    
-    if (status == "failed" && error) {
+    if (initialValues) {
+      form.reset({
+        full_name: initialValues.full_name,
+        phone_number: initialValues.phone_number,
+        email: initialValues.email,
+        address: initialValues.address,
+        building_name: initialValues.building_name,
+        website: initialValues.website || "",
+      });
+    }
+  }, [initialValues, form]);
+
+  useEffect(() => {
+    if (currentOperation !== (isEditMode ? "update" : "create")) return;
+
+    if (status === "failed" && error) {
       toast.error(error);
     }
-    if (status == "succeeded" && successMessage) {
+    if (status === "succeeded" && successMessage) {
       toast.success(successMessage);
       onOpenChange(false);
       form.reset();
     }
-  }, [currentOperation, status, error, successMessage, onOpenChange, form]);
+  }, [
+    currentOperation,
+    status,
+    error,
+    successMessage,
+    onOpenChange,
+    form,
+    isEditMode,
+  ]);
 
   const onSubmit = (data: SupplierFormData) => {
     const request: CreateSupplierRequest = {
@@ -89,14 +125,20 @@ const CreateSupplierDialog = ({
       website: data.website ?? "",
     };
 
-    dispatch(createSupplier(request));
+    if (isEditMode && initialValues) {
+      dispatch(updateSupplier({ id: initialValues.id, ...request }));
+    } else {
+      dispatch(createSupplier(request));
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
-          <DialogTitle>New Supplier</DialogTitle>
+          <DialogTitle>
+            {isEditMode ? "Edit Supplier" : "New Supplier"}
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -201,15 +243,15 @@ const CreateSupplierDialog = ({
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={status === "loading"}>
-                {status === "loading" ? (
-                  <>
-                    <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                    Saving...
-                  </>
-                ) : (
-                  "Save changes"
+              <Button
+                type="submit"
+                disabled={isCreateSupplierLoading || isUpdateSupplierLoading}
+              >
+                {(isCreateSupplierLoading || isUpdateSupplierLoading) && (
+                  <Loader2 className="animate-spin mr-2 h-4 w-4" />
                 )}
+
+                Save changes
               </Button>
             </DialogFooter>
           </form>
@@ -219,4 +261,4 @@ const CreateSupplierDialog = ({
   );
 };
 
-export default CreateSupplierDialog;
+export default SupplierDialog;

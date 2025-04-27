@@ -1,9 +1,4 @@
-import {
-  EllipsisVertical,
-  Pencil,
-  Plus,
-  RefreshCcw,
-} from "lucide-react";
+import { EllipsisVertical, Pencil, Plus, RefreshCcw } from "lucide-react";
 import Breadcrumbs from "../../components/breadcrumbs";
 import { Button } from "../../components/ui/button";
 import { DataTable } from "primereact/datatable";
@@ -130,7 +125,11 @@ const WareHousePage = () => {
             header="Created At"
             headerStyle={TableHeaderStyle}
           />
-          <Column header="Actions" body={actionBodyTemplate} />
+          <Column
+            header="Actions"
+            body={actionBodyTemplate}
+            headerStyle={TableHeaderStyle}
+          />
         </DataTable>
       </div>
     </div>

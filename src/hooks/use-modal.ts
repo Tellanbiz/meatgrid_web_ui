@@ -8,7 +8,8 @@ export const useModal = () => {
     setIsOpen(true);
   };
 
-  const closeModal = () => {
+  const closeModal = async () => {
+    await new Promise((resolve) => setTimeout(resolve, 30));
     setIsOpen(false);
   };
 

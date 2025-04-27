@@ -38,6 +38,7 @@ const storeSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(createSupplier.pending, (state) => {
+        state.currentOperation = "create";
         state.status = "loading";
         state.error = null;
       })
@@ -66,6 +67,7 @@ const storeSlice = createSlice({
         state.error = action.payload || "Unknown error";
       })
       .addCase(updateSupplier.pending, (state) => {
+        state.currentOperation = "update";
         state.status = "loading";
         state.error = null;
       })
