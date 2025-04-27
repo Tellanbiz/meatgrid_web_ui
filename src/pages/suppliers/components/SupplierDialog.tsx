@@ -91,6 +91,15 @@ const SupplierDialog = ({
         building_name: initialValues.building_name,
         website: initialValues.website || "",
       });
+    } else {
+      form.reset({
+        full_name: "",
+        phone_number: "",
+        email: "",
+        address: "",
+        building_name: "",
+        website: "",
+      });
     }
   }, [initialValues, form]);
 
