@@ -1,4 +1,4 @@
-import { RefreshCcw } from "lucide-react";
+import { Plus, RefreshCcw } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import SupplierDialog from "./components/SupplierDialog";
 import SuppliersTable from "./components/SuppliersTable";
@@ -52,6 +52,7 @@ const SupplierPage = () => {
               className="btn"
               onClick={() => handleOpenDialog(false, null)}
             >
+              <Plus className="h-4 w-4 mr-2" />
               New Supplier
             </Button>
           </div>
