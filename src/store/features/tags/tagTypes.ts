@@ -7,5 +7,4 @@ export interface Tag {
   is_mobile: boolean;
   priority: number;
   created_at: string;
-  active: boolean;
 }

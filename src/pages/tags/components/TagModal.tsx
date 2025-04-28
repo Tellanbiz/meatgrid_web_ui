@@ -10,11 +10,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { updateTag } from "../../../store/features/tags/tagThunks";
-import { useAppDispatch } from "../../../store/hooks";
 import { Tag } from "../../../store/features/tags/tagTypes";
 import { Label } from "@/components/ui/label";
-import Loader from "../../../components/Loader";
+import { Loader2 } from "lucide-react";
 
 const tagSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -22,26 +20,24 @@ const tagSchema = z.object({
   promotional_price: z.number().min(0, "Promotional price is required"),
   is_mobile: z.boolean(),
   is_pos: z.boolean(),
-  active: z.boolean(),
 });
 
-type TagFormValues = z.infer<typeof tagSchema>;
-
-type EditTagModalProps = {
-  isUpdating: boolean;
+export type TagFormValues = z.infer<typeof tagSchema>;
+type TagModalProps = {
+  isLoading?: boolean;
   open: boolean;
   onClose: () => void;
   tag: Tag | null;
+  onSubmit: (values: TagFormValues) => void;
 };
 
-const EditTagModal = ({
-  isUpdating,
+const TagModal = ({
+  isLoading = false,
   open,
   onClose,
   tag,
-}: EditTagModalProps) => {
-  const dispatch = useAppDispatch();
-
+  onSubmit,
+}: TagModalProps) => {
   const form = useForm<TagFormValues>({
     resolver: zodResolver(tagSchema),
     defaultValues: {
@@ -50,33 +46,21 @@ const EditTagModal = ({
       promotional_price: tag?.promotional_price || 0,
       is_mobile: tag?.is_mobile || false,
       is_pos: tag?.is_pos || false,
-      active: tag?.active || false,
     },
   });
 
-  const onSubmit = (values: TagFormValues) => {
-    if (!tag) return;
-    dispatch(
-      updateTag({
-        id: tag.id,
-        name: values.name,
-        priority: values.priority,
-        promotional_price: values.promotional_price,
-        is_mobile: values.is_mobile,
-        is_pos: values.is_pos,
-        active: values.active,
-      })
-    );
+  const handleSubmit = (values: TagFormValues) => {
+    onSubmit(values);
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Tag</DialogTitle>
+          <DialogTitle>{tag ? "Edit Tag" : "Create Tag"}</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label>Name</Label>
             <Input {...form.register("name")} />
@@ -139,7 +123,13 @@ const EditTagModal = ({
             <Button variant="outline" type="button" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">{isUpdating ? <Loader size={24} color="border-white" className="mx-3"/> : "Update"}</Button>
+            <Button
+              type="submit"
+              disabled={isLoading || form.formState.isSubmitting}
+            >
+              {isLoading && <Loader2 className="animate-spin h-4 w-4 mr-2" />}
+              Save
+            </Button>
           </div>
         </form>
       </DialogContent>
@@ -147,4 +137,4 @@ const EditTagModal = ({
   );
 };
 
-export default EditTagModal;
+export default TagModal;

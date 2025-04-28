@@ -2,5 +2,6 @@ export interface CreateTagRequest {
   name: string;
   promotional_price: number;
   priority: number;
-  active: boolean;
+  is_pos: boolean;
+  is_mobile: boolean;
 }

@@ -1,9 +1,5 @@
-export interface UpdateTagRequest {
+import { CreateTagRequest } from "./CreateTagRequest";
+
+export interface UpdateTagRequest extends CreateTagRequest {
   id: string;
-  name: string;
-  promotional_price: number;
-  priority: number;
-  is_pos: boolean;
-  is_mobile: boolean;
-  active: boolean;
 }
