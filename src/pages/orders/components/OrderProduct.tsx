@@ -16,10 +16,10 @@ const OrderProduct = ({
           className="w-16 h-16 object-cover rounded"
         />
         <div className="flex flex-col items-start justify-around text-start flex-1">
-          <h3 className="font-medium">{product.name}</h3>
+          <h3 className="font-light">{product.name}</h3>
           <div className="flex items-center space-x-2 py-1">
-            <p className="text-sm text-gray-700">KES {product.price}</p>{" "}
-            <span className="text-sm font-semibold">x {quantity}</span>
+            <p className="text-sm text-gray-700 font-light">KES {product.price}</p>{" "}
+            <span className="text-sm font-medium">x {quantity}</span>
           </div>
         </div>
       </div>

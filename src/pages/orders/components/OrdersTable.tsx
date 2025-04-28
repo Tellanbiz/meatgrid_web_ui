@@ -236,17 +236,15 @@ const OrdersTable = () => {
   }
 
   return (
-    <div className="card">
+    <div>
       <DataTable
         value={filteredOrders}
         dataKey="id"
         tableStyle={DataTableStyle}
-        selection={selectedOrders}
         size="small"
         selectionMode="checkbox"
-        onSelectionChange={(e) => {
-          setSelectedOrders(Array.isArray(e.value) ? e.value : []);
-        }}
+        selection={selectedOrders}
+        onSelectionChange={(e) => setSelectedOrders(e.value)}
         paginator
         rows={10}
         rowsPerPageOptions={[10, 20, 50]}
@@ -262,7 +260,6 @@ const OrdersTable = () => {
           />
         }
       >
-        <Column selectionMode="multiple" headerStyle={TableHeaderStyle} />
         <Column
           header="Order ID"
           body={(order: Order) => (

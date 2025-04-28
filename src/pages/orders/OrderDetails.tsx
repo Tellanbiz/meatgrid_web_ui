@@ -6,6 +6,8 @@ import { fetchOrderById } from "../../store/features/orders/orderThunks";
 import OrderDetailsComponent from "./components/OrderDetailsComponent";
 import { FiChevronLeft } from "react-icons/fi";
 import LoadingPage from "../../components/LoadingPage.tsx";
+import { Badge } from "../../components/ui/badge.tsx";
+import { orderStatusColors } from "../../constants/StatusColors.ts";
 
 const OrderDetails = () => {
   const navigate = useNavigate();
@@ -34,10 +36,36 @@ const OrderDetails = () => {
           <FiChevronLeft className="mr-2" />
           Back
         </button>
-        <h4 className="text-base font-bold">Order Details</h4>
+        <div className="flex flex-col space-y-1">
+          <div className="flex items-center space-x-2">
+            <span className="text-sm">MG{selectedOrderDetails?.order_id}</span>
+            <Badge
+              className={
+                orderStatusColors[selectedOrderDetails?.status || "pending"]
+              }
+            >
+              {selectedOrderDetails?.status}
+            </Badge>
+          </div>
+
+          <span className="text-xs font-light text-gray-500">
+            {selectedOrderDetails?.created_at &&
+              new Date(selectedOrderDetails.created_at).toLocaleString(
+                "en-US",
+                {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                  hour: "numeric",
+                  minute: "numeric",
+                  hour12: true,
+                }
+              )}
+          </span>
+        </div>
       </div>
 
-      <div className="mt-4 p-4 bg-background rounded">
+      <div className=" mt-2 bg-background rounded">
         {status === "loading" && <LoadingPage />}
 
         {error && <p className="text-red-500">{error}</p>}

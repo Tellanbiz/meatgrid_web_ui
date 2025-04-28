@@ -15,9 +15,8 @@ import {
 } from "@/components/ui/select";
 
 import { useEffect, useState } from "react";
-import { Phone } from "lucide-react";
+import { Loader2, Phone } from "lucide-react";
 
-import { PrimaryButton, SecondaryButton } from "../../../components/Button";
 import OrderProduct from "./OrderProduct";
 import Divider from "./Divider";
 import { OrderDetails } from "../../../store/features/orders/request/response/FetchOrderByIdResponse";
@@ -26,6 +25,7 @@ import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { updateOrderStatus } from "../../../store/features/orders/orderThunks";
 import { toast } from "sonner";
 import { resetUpdateOrderStatusState } from "../../../store/features/orders/orderSlice";
+import { Button } from "../../../components/ui/button";
 
 const OrderDetailsComponent = ({ order }: { order: OrderDetails }) => {
   const dispatch = useAppDispatch();
@@ -36,9 +36,9 @@ const OrderDetailsComponent = ({ order }: { order: OrderDetails }) => {
   } = useAppSelector((state) => state.orders.updateStatus);
 
   const [open, setOpen] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<
-    OrderStatus | undefined
-  >(order.status);
+  const [selectedStatus, setSelectedStatus] = useState<OrderStatus | undefined>(
+    order.status
+  );
 
   const groupedProducts = order.products.reduce((acc, product) => {
     const existing = acc.find((p) => p.product.id === product.id);
@@ -91,7 +91,7 @@ const OrderDetailsComponent = ({ order }: { order: OrderDetails }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
       <div className="space-y-2">
-        <h2 className="text-md font-semibold">Order Items</h2>
+        <h2 className="text-md font-normal">Order Items</h2>
         <div className="grid grid-cols-1 gap-2">
           {groupedProducts.map(({ product, quantity }, idx) => (
             <OrderProduct product={product} quantity={quantity} key={idx} />
@@ -101,27 +101,27 @@ const OrderDetailsComponent = ({ order }: { order: OrderDetails }) => {
 
       <div className="space-y-6">
         {/* Bill Summary */}
-        <Card className="shadow-sm">
+        <Card className="shadow-none border-none">
           <CardHeader>
-            <CardTitle>Bill Summary</CardTitle>
+            <CardTitle className="font-normal">Bill Summary</CardTitle>
           </CardHeader>
 
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span>Item Total:</span>
-              <span className="font-bold">
+              <span className="text-sm font-light">Item Total:</span>
+              <span className="text-sm font-medium">
                 KES {discountedTotal.toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between">
-              <span>Delivery Fee:</span>
-              <span className="font-bold">
+              <span className="text-sm font-light">Delivery Fee:</span>
+              <span className="text-sm font-medium">
                 KES {order.delivery_fee.toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between">
-              <span>Discount:</span>
-              <span className="font-bold text-green-600">
+              <span className="text-sm font-light">Discount:</span>
+              <span className="text-sm font-medium text-green-600">
                 KES {discount.toLocaleString()}
               </span>
             </div>
@@ -129,18 +129,18 @@ const OrderDetailsComponent = ({ order }: { order: OrderDetails }) => {
             <Divider />
 
             <div className="flex justify-between">
-              <span>Amount Paid:</span>
-              <span className="font-bold">KES {total.toLocaleString()}</span>
+              <span className="text-sm font-light">Amount Paid:</span>
+              <span className="text-sm font-medium">
+                KES {total.toLocaleString()}
+              </span>
             </div>
 
             {/* Order Status Update Modal Trigger */}
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <PrimaryButton
-                  className="w-full"
-                  text="Update Order Status"
-                  onClick={() => setOpen(true)}
-                />
+                <Button className="w-full" onClick={() => setOpen(true)}>
+                  Update Order Status
+                </Button>
               </DialogTrigger>
 
               <DialogContent>
@@ -168,14 +168,19 @@ const OrderDetailsComponent = ({ order }: { order: OrderDetails }) => {
                   </Select>
 
                   <div className="flex items-center justify-end gap-x-4">
-                    <SecondaryButton text="Cancel" onClick={handleCancel} />
-                    <PrimaryButton
-                      text={
-                        updateState === "loading" ? "Updating..." : "Update"
-                      }
-                      disabled={updateState === "loading"}
+                    <Button variant="outline" onClick={handleCancel}>
+                      Cancel
+                    </Button>
+                    <Button
                       onClick={handleUdateOrderStatus}
-                    />
+                      disabled={updateState === "loading"}
+                    >
+                      {updateState === "loading" ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : null}
+
+                      {updateState === "loading" ? "Updating..." : "Update"}
+                    </Button>
                   </div>
                 </div>
               </DialogContent>
@@ -186,7 +191,7 @@ const OrderDetailsComponent = ({ order }: { order: OrderDetails }) => {
         {/* Customer Details */}
         <Card className="shadow-xs border-none gap-y-4">
           <CardHeader>
-            <CardTitle>Customer</CardTitle>
+            <CardTitle className="font-normal">Customer</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center space-x-4 mb-2">
@@ -196,7 +201,7 @@ const OrderDetailsComponent = ({ order }: { order: OrderDetails }) => {
                 className="w-10 h-10 rounded-full object-cover"
               />
               <div>
-                <p className="font-medium">{order.recipient.full_name}</p>
+                <p className="font-normal">{order.recipient.full_name}</p>
                 <p className="text-sm text-muted-foreground">
                   {order.contact_details.phone_number}
                 </p>
@@ -215,14 +220,14 @@ const OrderDetailsComponent = ({ order }: { order: OrderDetails }) => {
         {/* Store Details */}
         <Card className="shadow-xs border-none gap-y-4">
           <CardHeader className="mb-0">
-            <CardTitle>Store Details</CardTitle>
+            <CardTitle className="font-normal">Store Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center space-x-2">
               <div className="flex justify-center items-center bg-background text-primary rounded-full h-10 w-10">
                 {order.store.name.charAt(0).toUpperCase()}
               </div>
-              <p className="font-medium">{order.store.name}</p>
+              <p className="text-sm font-light text-black">{order.store.name}</p>
             </div>
             <Divider />
             <p className="text-sm text-gray-600">{order.store.address}</p>
@@ -232,7 +237,7 @@ const OrderDetailsComponent = ({ order }: { order: OrderDetails }) => {
         {/* Rider Details (if any) */}
         <Card className="shadow-xs gap-y-4 border-none">
           <CardHeader>
-            <CardTitle>Rider Details</CardTitle>
+            <CardTitle className="font-normal">Rider Details</CardTitle>
           </CardHeader>
           <CardContent>
             {order.driver ? (
