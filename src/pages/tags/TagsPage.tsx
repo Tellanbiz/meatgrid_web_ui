@@ -7,10 +7,14 @@ import { Plus, RefreshCcw } from "lucide-react";
 import {
   selectIsCreatingTag,
   selectIsFetchingTags,
+  selectTagError,
+  selectTagSuccessMessage,
 } from "../../store/features/tags/tagSelectors";
 import TagModal, { TagFormValues } from "./components/TagModal";
 import { Tag } from "../../store/features/tags/tagTypes";
 import { CreateTagRequest } from "../../store/features/tags/request/CreateTagRequest";
+import { toast } from "sonner";
+import { resetTagState } from "../../store/features/tags/tagSlice";
 
 const TagsPage = () => {
   const dispatch = useAppDispatch();
@@ -19,6 +23,25 @@ const TagsPage = () => {
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
   const isCreateTagLoading = useAppSelector(selectIsCreatingTag);
+  const tagSuccessMessage = useAppSelector(selectTagSuccessMessage);
+  const tagError = useAppSelector(selectTagError);
+
+  useEffect(() => {
+    if (tagSuccessMessage && isCreateTagLoading) {
+      setIsTagModalOpen(false);
+      setSelectedTag(null);
+      toast.success(tagSuccessMessage);
+      dispatch(resetTagState());
+      dispatch(fetchTags());
+    }
+  }, [tagSuccessMessage, isCreateTagLoading, dispatch]);
+
+  useEffect(() => {
+    if (tagError && isCreateTagLoading) {
+      toast.error(tagError);
+      dispatch(resetTagState());
+    }
+  }, [tagError, isCreateTagLoading, dispatch]);
 
   useEffect(() => {
     dispatch(fetchTags());
