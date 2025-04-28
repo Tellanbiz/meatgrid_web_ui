@@ -5,23 +5,35 @@ import { Store } from "./storeTypes";
 
 interface StoresState {
   stores: Store[];
+  currentOperation: "create" | "fetch" | "update" | "delete" | null;
   status: LoadingStatus;
   error: string | null;
+  successMessage: string | null;
 }
 
 const initialState: StoresState = {
   stores: [],
+  currentOperation: null,
   status: "idle",
   error: null,
+  successMessage: null,
 };
 
 const storeSlice = createSlice({
   name: "stores",
   initialState,
-  reducers: {},
+  reducers: {
+    resetStoreState: (state) => {
+      state.currentOperation = null;
+      state.status = "idle";
+      state.error = null;
+      state.successMessage = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchStores.pending, (state) => {
+        state.currentOperation = "fetch";
         state.status = "loading";
         state.error = null;
       })
@@ -36,4 +48,5 @@ const storeSlice = createSlice({
   },
 });
 
+export const { resetStoreState } = storeSlice.actions;
 export default storeSlice.reducer;

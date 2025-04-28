@@ -11,32 +11,36 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import {
+  selectStores,
+  selectIsFetchingStores,
+} from "../../store/features/stores/storeSelectors";
+import { fetchStores } from "../../store/features/stores/storeThunks";
+import { Store } from "../../store/features/stores/storeTypes";
+import { useEffect } from "react";
+import LoadingPage from "../../components/LoadingPage";
 
 const WareHousePage = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
-  const stores = [
-    {
-      id: 1,
-      name: "Warehouse A",
-      address: "123 Main St, City, Country",
-      building: "Building 1",
-      created_at: "2023-01-01",
-    },
-    {
-      id: 2,
-      name: "Warehouse B",
-      address: "456 Elm St, City, Country",
-      building: "Building 2",
-      created_at: "2023-02-01",
-    },
-  ];
+  const stores = useAppSelector(selectStores);
+  const isFetchingStores = useAppSelector(selectIsFetchingStores);
 
-  const handleEdit = (rowData) => {
-    navigate(`/warehouses/${rowData.id}/edit`);
+  const handleRefresh = () => {
+    dispatch(fetchStores());
   };
 
-  const actionBodyTemplate = (rowData) => {
+  const handleEdit = (store: Store) => {
+    navigate(`/warehouses/${store.id}/edit`);
+  };
+
+  useEffect(() => {
+    dispatch(fetchStores());
+  }, [dispatch]);
+
+  const actionBodyTemplate = (store: Store) => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -51,7 +55,7 @@ const WareHousePage = () => {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" className="w-auto">
-          <DropdownMenuItem onClick={() => handleEdit(rowData)}>
+          <DropdownMenuItem onClick={() => handleEdit(store)}>
             <Pencil className="mr-2 h-4 w-4" /> Edit
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -74,9 +78,11 @@ const WareHousePage = () => {
           <Button
             variant="outline"
             className="hover:bg-gray-200"
-            onClick={() => null}
+            onClick={handleRefresh}
           >
-            <RefreshCcw className="h-4 w-4" />
+            <RefreshCcw
+              className={`h-4 w-4 ${isFetchingStores ? "animate-spin" : ""}`}
+            />
             Refresh
           </Button>
           <Button
@@ -90,47 +96,52 @@ const WareHousePage = () => {
       </div>
 
       <div className="mt-4 h-full mb-2">
-        <DataTable
-          value={stores}
-          paginator
-          rows={10}
-          className="bg-background h-full"
-          emptyMessage="No warehouses found."
-          loading={false}
-          loadingIcon="pi pi-spin pi-spinner"
-          showGridlines
-          stripedRows
-          rowHover
-          globalFilterFields={["name", "location"]}
-          scrollable
-          scrollHeight="flex"
-          size="small"
-          dataKey="id"
-          tableStyle={DataTableStyle}
-        >
-          {/* Define your columns here */}
-          <Column field="name" header="Name" headerStyle={TableHeaderStyle} />
-          <Column
-            field="address"
-            header="Address"
-            headerStyle={TableHeaderStyle}
-          />
-          <Column
-            field="building"
-            header="Building"
-            headerStyle={TableHeaderStyle}
-          />
-          <Column
-            field="created_at"
-            header="Created At"
-            headerStyle={TableHeaderStyle}
-          />
-          <Column
-            header="Actions"
-            body={actionBodyTemplate}
-            headerStyle={TableHeaderStyle}
-          />
-        </DataTable>
+        {isFetchingStores && <LoadingPage />}
+
+        {!isFetchingStores && (
+          <DataTable
+            value={stores}
+            paginator
+            rows={10}
+            className="bg-background h-full"
+            emptyMessage="No warehouses found."
+            loading={false}
+            loadingIcon="pi pi-spin pi-spinner"
+            showGridlines
+            stripedRows
+            rowHover
+            globalFilterFields={["name", "location"]}
+            scrollable
+            scrollHeight="flex"
+            size="small"
+            dataKey="id"
+            tableStyle={DataTableStyle}
+          >
+            {/* Define your columns here */}
+            <Column field="name" header="Name" headerStyle={TableHeaderStyle} />
+            <Column
+              field="address"
+              header="Address"
+              headerStyle={TableHeaderStyle}
+            />
+            <Column
+              field="building"
+              header="Building"
+              headerStyle={TableHeaderStyle}
+            />
+            <Column
+              field="created_at"
+              header="Created At"
+              headerStyle={TableHeaderStyle}
+            />
+            <Column
+              header="Actions"
+              body={actionBodyTemplate}
+              headerStyle={TableHeaderStyle}
+            />
+          </DataTable>
+        )}
+
       </div>
     </div>
   );

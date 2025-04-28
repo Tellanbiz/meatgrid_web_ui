@@ -18,3 +18,19 @@ export const fetchStores = createAsyncThunk<
     );
   }
 });
+
+export const createStore = createAsyncThunk<
+  string,
+  Store,
+  { rejectValue: string }
+>("stores/createStore", async (store, { rejectWithValue }) => {
+  try {
+    const res = await axios.post("/stores", store);
+    return res.data.message;
+  } catch (err: unknown) {
+    const error = err as ApiError;
+    return rejectWithValue(
+      error.response?.data?.error || "Failed to create store"
+    );
+  }
+});
