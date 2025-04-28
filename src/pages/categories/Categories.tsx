@@ -1,15 +1,14 @@
 import { useEffect } from "react";
-import { Plus } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 import Breadcrumbs from "../../components/breadcrumbs";
 import { PrimaryButton, SecondaryButton } from "../../components/Button";
 import CategoryCard from "./components/CategoryCard";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchCategories } from "../../store/features/categories/categoryThunks";
 import { ProgressBar } from "primereact/progressbar";
+import { Button } from "../../components/ui/button";
 
 const Categories = () => {
-  
-  
   const dispatch = useAppDispatch();
   const { categories, status, error } = useAppSelector(
     (state) => state.categories
@@ -36,17 +35,15 @@ const Categories = () => {
       <div className="flex justify-between items-center py-3 sticky top-0 z-10 bg-background">
         <Breadcrumbs items={[{ label: "Categories", isPage: true }]} />
         <div className="flex gap-2">
-          <SecondaryButton
-            text="Export"
-            className="font-semibold"
-            onClick={handleExport}
-          />
-          <PrimaryButton
-            text="New Category"
-            icon={<Plus size={16} />}
-            className="font-semibold"
-            onClick={handleAddCategory}
-          />
+          <Button variant="outline" onClick={handleExport}>
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+
+          <Button variant="default" onClick={handleAddCategory}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Category
+          </Button>
         </div>
       </div>
 
