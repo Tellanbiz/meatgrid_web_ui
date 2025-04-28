@@ -80,7 +80,7 @@ const TagsTable = () => {
             className="p-4 relative flex flex-col justify-between min-h-[30px]"
           >
             <div className="space-y-2">
-              <h2 className="text-sm font-semibold">{tag.name}</h2>
+              <h2 className="text-sm">{tag.name}</h2>
               <p className="text-sm text-muted-foreground">
                 Priority: {tag.priority}
               </p>

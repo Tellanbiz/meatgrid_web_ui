@@ -15,6 +15,7 @@ import { Tag } from "../../store/features/tags/tagTypes";
 import { CreateTagRequest } from "../../store/features/tags/request/CreateTagRequest";
 import { toast } from "sonner";
 import { resetTagState } from "../../store/features/tags/tagSlice";
+import Breadcrumbs from "../../components/breadcrumbs";
 
 const TagsPage = () => {
   const dispatch = useAppDispatch();
@@ -75,8 +76,15 @@ const TagsPage = () => {
 
   return (
     <>
-      <div className="flex justify-between items-center py-2 sticky top-0 z-10 bg-background">
-        <h4 className="text-base font-bold">Tags</h4>
+      <div className="flex justify-between items-center py-2 sticky top-0 z-10">
+        <Breadcrumbs
+          items={[
+            {
+              label: "Tags",
+              isPage: true,
+            },
+          ]}
+        />
 
         <div className="flex space-x-2">
           <Button variant="outline" size="sm" onClick={handleRefresh}>
@@ -93,7 +101,7 @@ const TagsPage = () => {
         </div>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-2">
         <TagsTable />
       </div>
 
