@@ -25,6 +25,7 @@ import AddProductPage from "../pages/products/AddProductPage.js";
 import WareHousePage from "../pages/warehouses/WareHousePage.js";
 import ManageWareHousePage from "../pages/warehouses/ManageWareHousePage.js";
 import PaymentMethodsPage from "../pages/payment-methods/PaymentMethodsPage.js";
+import BannersPage from "../pages/banners/BannersPage.js";
 
 const routes: RouteObject[] = [
   {
@@ -103,6 +104,10 @@ const routes: RouteObject[] = [
       {
         path: "tags",
         element: <TagsPage />,
+      },
+      {
+        path:"/banners",
+        element: <BannersPage />,
       },
       {
         path: "suppliers",

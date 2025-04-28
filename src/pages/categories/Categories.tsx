@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { Download, Plus } from "lucide-react";
 import Breadcrumbs from "../../components/breadcrumbs";
-import { PrimaryButton, SecondaryButton } from "../../components/Button";
 import CategoryCard from "./components/CategoryCard";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchCategories } from "../../store/features/categories/categoryThunks";

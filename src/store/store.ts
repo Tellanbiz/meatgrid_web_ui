@@ -11,6 +11,7 @@ import supplierReducer from "./features/suppliers/supplierSlice";
 import stockReducer from "./features/stock/stockSlice";
 import paymentMethodReducer from "./features/payment-methods/paymentMethodSlice";
 import storeReducer from "./features/stores/storeSlice";
+import bannerReducer from "./features/banners/bannerSlice";
 
 export const store = configureStore({
   reducer: {
@@ -26,6 +27,7 @@ export const store = configureStore({
     stocks: stockReducer,
     paymentMethods: paymentMethodReducer,
     stores: storeReducer,
+    banners: bannerReducer,
   },
   devTools: process.env.NODE_ENV != "production",
 });
