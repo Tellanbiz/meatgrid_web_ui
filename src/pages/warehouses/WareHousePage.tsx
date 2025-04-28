@@ -117,7 +117,6 @@ const WareHousePage = () => {
             dataKey="id"
             tableStyle={DataTableStyle}
           >
-            {/* Define your columns here */}
             <Column field="name" header="Name" headerStyle={TableHeaderStyle} />
             <Column
               field="address"
@@ -125,7 +124,7 @@ const WareHousePage = () => {
               headerStyle={TableHeaderStyle}
             />
             <Column
-              field="building"
+              field="building_name"
               header="Building"
               headerStyle={TableHeaderStyle}
             />
@@ -133,6 +132,13 @@ const WareHousePage = () => {
               field="created_at"
               header="Created At"
               headerStyle={TableHeaderStyle}
+              body={(store) =>
+                new Date(store.created_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })
+              }
             />
             <Column
               header="Actions"
@@ -141,7 +147,6 @@ const WareHousePage = () => {
             />
           </DataTable>
         )}
-
       </div>
     </div>
   );
