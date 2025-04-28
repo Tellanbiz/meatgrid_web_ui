@@ -8,6 +8,7 @@ import { Textarea } from "../../../components/ui/textarea";
 import { Loader2 } from "lucide-react";
 
 export interface WarehouseFormData {
+  id?: string;
   name: string;
   description?: string;
   address: string;
@@ -35,6 +36,7 @@ const WarehouseForm: React.FC<WarehouseFormProps> = ({
   isLoading = false,
 }) => {
   const [form, setForm] = useState<WarehouseFormData>({
+    id: "",
     name: "",
     description: "",
     address: "",

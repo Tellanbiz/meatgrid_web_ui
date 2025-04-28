@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchStores } from "./storeThunks";
+import { fetchStores, updateStore } from "./storeThunks";
 import { LoadingStatus } from "../../../types/LoadingStatus";
 import { Store } from "./storeTypes";
 
@@ -42,6 +42,20 @@ const storeSlice = createSlice({
         state.stores = action.payload;
       })
       .addCase(fetchStores.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Unknown error";
+      })
+      // Update
+      .addCase(updateStore.pending, (state) => {
+        state.currentOperation = "update";
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(updateStore.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.successMessage = action.payload;
+      })
+      .addCase(updateStore.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || "Unknown error";
       });

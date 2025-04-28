@@ -1,36 +1,48 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { selectStoreById } from "../../store/features/stores/storeSelectors";
 import Breadcrumbs from "../../components/breadcrumbs";
 import WarehouseForm, { WarehouseFormData } from "./components/WareHouseForm";
+import { CreateStoreRequest } from "../../store/features/stores/requests/CreateStoreRequest";
+import {
+  createStore,
+  updateStore,
+} from "../../store/features/stores/storeThunks";
+import { UpdateStoreRequest } from "../../store/features/stores/requests/UpdateStoreRequest";
 
 const ManageWareHousePage = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { warehouseId } = useParams();
   const isEditMode = Boolean(warehouseId);
-  const [initialData, setInitialData] = useState<
-    WarehouseFormData | undefined
-  >();
+
+  const selectedStore = useAppSelector((state) =>
+    warehouseId ? selectStoreById(state, warehouseId) : undefined
+  );
+
   const [formLoading, setFormLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (isEditMode) {
-      const fetchData = async () => {
-        setFormLoading(true);
-        const data = await fakeFetchWarehouseById(warehouseId);
-        setInitialData(data);
-        setFormLoading(false);
-      };
-      fetchData();
-    }
-  }, [isEditMode, warehouseId]);
+  const initialValues: WarehouseFormData = {
+    id: selectedStore?.id || "",
+    name: selectedStore?.name || "",
+    description: selectedStore?.description || "",
+    address: selectedStore?.address || "",
+    building: selectedStore?.building_name || "",
+    latitude: selectedStore?.points[0].toString() || "",
+    longitude: selectedStore?.points[1].toString() || "",
+    isStore: selectedStore?.is_store || false,
+    isWarehouse: selectedStore?.is_warehouse || false,
+    status: selectedStore?.is_active ? "active" : "inactive",
+  };
 
   const handleSubmit = async (formData: WarehouseFormData) => {
     try {
       setFormLoading(true);
       if (isEditMode) {
-        await fakeUpdateWarehouse(warehouseId!, formData);
+        await updateWareHouse(warehouseId!, formData);
       } else {
-        await fakeCreateWarehouse(formData);
+        await createWareHouse(formData);
       }
       navigate(-1);
       setFormLoading(false);
@@ -44,6 +56,37 @@ const ManageWareHousePage = () => {
     navigate(-1);
   };
 
+  const createWareHouse = async (data: WarehouseFormData) => {
+    const request: CreateStoreRequest = {
+      name: data.name,
+      description: data.description || "",
+      address: data.address,
+      building_name: data.building || "",
+      points: [Number(data.latitude), Number(data.longitude)],
+      is_store: data.isStore,
+      is_warehouse: data.isWarehouse,
+      is_active: data.status === "active",
+    };
+
+    dispatch(createStore(request));
+  };
+
+  const updateWareHouse = async (id: string, data: WarehouseFormData) => {
+    const updateRequest: UpdateStoreRequest = {
+      id: id,
+      name: data.name,
+      description: data.description || "",
+      address: data.address,
+      building_name: data.building || "",
+      points: [Number(data.latitude), Number(data.longitude)],
+      is_store: data.isStore,
+      is_warehouse: data.isWarehouse,
+      is_active: data.status === "active",
+    };
+
+    dispatch(updateStore(updateRequest));
+  };
+
   return (
     <div className="h-full">
       <Breadcrumbs
@@ -55,7 +98,7 @@ const ManageWareHousePage = () => {
 
       <div className="mt-4">
         <WarehouseForm
-          initialValues={initialData}
+          initialValues={initialValues}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
           isEditMode={isEditMode}
@@ -67,28 +110,3 @@ const ManageWareHousePage = () => {
 };
 
 export default ManageWareHousePage;
-
-// Temporary mock functions
-const fakeFetchWarehouseById = async (
-  id: string | undefined
-): Promise<WarehouseFormData> => ({
-  name: "Kajiado Central",
-  description: "Main warehouse in Kajiado",
-  address: "Kajiado",
-  building: "Block A",
-  latitude: "-1.2921",
-  longitude: "36.8219",
-  isWarehouse: true,
-  isStore: false,
-  status: "active",
-});
-
-const fakeCreateWarehouse = async (data: WarehouseFormData) => {
-  console.log("Creating", data);
-  await new Promise((resolve) => setTimeout(resolve, 5000));
-};
-
-const fakeUpdateWarehouse = async (id: string, data: WarehouseFormData) => {
-  console.log("Updating", id, data);
-  await new Promise((resolve) => setTimeout(resolve, 5000));
-};
