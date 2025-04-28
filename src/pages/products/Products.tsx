@@ -1,9 +1,9 @@
 import ProductsTable from "./components/ProductsTable";
-import { PrimaryButton, SecondaryButton } from "../../components/Button";
-import { FiPlus } from "react-icons/fi";
 import Breadcrumbs from "../../components/breadcrumbs";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { Download, Plus } from "lucide-react";
+import { Button } from "../../components/ui/button";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -27,18 +27,15 @@ const Products = () => {
           ]}
         />
         <div className="flex space-x-2">
-          <SecondaryButton
-            text="Export"
-            className="mr-2 font-bold"
-            onClick={handleExport}
-          />
+          <Button variant="outline" onClick={handleExport}>
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
 
-          <PrimaryButton
-            text="Add Product"
-            className="font-bold"
-            icon={<FiPlus />}
-            onClick={handleAddProduct}
-          />
+          <Button onClick={handleAddProduct}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Product
+          </Button>
         </div>
       </div>
 
