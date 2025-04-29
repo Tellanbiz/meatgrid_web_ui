@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Breadcrumbs from "../../components/breadcrumbs";
 import BannerList from "./components/BannerList";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -10,7 +11,11 @@ import LoadingPage from "../../components/LoadingPage";
 import { Button } from "../../components/ui/button";
 import { Plus, RefreshCcw } from "lucide-react";
 import { useEffect } from "react";
-import { fetchBanners } from "../../store/features/banners/bannerThunks";
+import {
+  fetchBanners,
+  deleteBanner,
+  toggleBannerActive,
+} from "../../store/features/banners/bannerThunks";
 import { fetchTags } from "../../store/features/tags/tagThunks";
 import { selectCategories } from "../../store/features/categories/categorySelectors";
 import { fetchCategories } from "../../store/features/categories/categoryThunks";
@@ -22,6 +27,8 @@ const BannersPage = () => {
   const tags = useAppSelector(selectTags);
   const isFetching = useAppSelector(selectIsFetchingBanners);
 
+  const [toggleLoadingId, setToggleLoadingId] = useState<string | null>(null);
+
   useEffect(() => {
     dispatch(fetchCategories());
     dispatch(fetchTags());
@@ -32,6 +39,22 @@ const BannersPage = () => {
     dispatch(fetchCategories());
     dispatch(fetchTags());
     dispatch(fetchBanners());
+  };
+
+  const handleEdit = (id: string) => {
+    console.log("Edit banner with ID:", id);
+  };
+
+  const handleDelete = async (id: string) => {
+    await dispatch(deleteBanner(id));
+    handleRefresh();
+  };
+
+  const handleToggleActive = async (id: string, active: boolean) => {
+    setToggleLoadingId(id);
+    await dispatch(toggleBannerActive({ id, active }));
+    setToggleLoadingId(null);
+    handleRefresh();
   };
 
   return (
@@ -72,7 +95,15 @@ const BannersPage = () => {
         {isFetching ? (
           <LoadingPage />
         ) : (
-          <BannerList banners={banners} categories={categories} tags={tags} />
+          <BannerList
+            banners={banners}
+            categories={categories}
+            tags={tags}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onToggleActive={handleToggleActive}
+            toggleLoadingId={toggleLoadingId}
+          />
         )}
       </div>
     </div>

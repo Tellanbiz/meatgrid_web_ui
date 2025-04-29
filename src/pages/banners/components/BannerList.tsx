@@ -7,23 +7,22 @@ interface BannerListProps {
   banners: Banner[];
   categories: Category[];
   tags: Tag[];
+  toggleLoadingId: string | null;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  onToggleActive: (id: string, active: boolean) => void;
+  
 }
 
-const BannerList = ({ banners, categories, tags }: BannerListProps) => {
-  const handleEdit = (id: string) => {
-    console.log("Edit banner with ID:", id);
-  };
-
-  const handleDelete = (id: string) => {
-    console.log("Delete banner with ID:", id);
-  };
-
-  const handleToggleActive = (id: string, active: boolean) => {
-    console.log(
-      `Banner with ID ${id} is now ${active ? "Active" : "Inactive"}`
-    );
-  };
-
+const BannerList = ({
+  banners,
+  categories,
+  tags,
+  toggleLoadingId,
+  onEdit,
+  onDelete,
+  onToggleActive,
+}: BannerListProps) => {
   const enrichedBanners = banners.map((banner) => {
     const category = categories.find(
       (category) => category.id === banner.category_id
@@ -34,6 +33,7 @@ const BannerList = ({ banners, categories, tags }: BannerListProps) => {
       ...banner,
       categoryName: category?.name || "Unknown Category",
       tagName: tag?.name || "Unknown Tag",
+      toggleActiveLoading: toggleLoadingId === banner.id,
     };
   });
 
@@ -48,9 +48,10 @@ const BannerList = ({ banners, categories, tags }: BannerListProps) => {
           active={banner.active}
           categoryName={banner.categoryName}
           tagName={banner.tagName}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onToggleActive={handleToggleActive}
+          toggleActiveLoading={banner.toggleActiveLoading}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onToggleActive={onToggleActive}
         />
       ))}
     </div>

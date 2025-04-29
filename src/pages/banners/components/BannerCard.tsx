@@ -62,7 +62,7 @@ const BannerCard = ({
       <CardFooter className="flex justify-between items-center">
         <div className="flex items-center space-x-2">
           {toggleActiveLoading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin [animation-duration:0.7s]" />
           ) : (
             <Switch
               checked={active}

@@ -4,6 +4,8 @@ import { Banner } from "./bannerTypes";
 import { CreateBannerRequest } from "./request/CreateBannerRequest";
 import { UpdateBannerRequest } from "./request/UpdateBannerRequest";
 import { ApiError } from "../../../types/ApiError";
+import { ToggleBannerActiveRequest } from "./request/ToggleBannerActive";
+import { RootState } from "../../store";
 
 export const fetchBanners = createAsyncThunk<
   Banner[],
@@ -51,6 +53,28 @@ export const updateBanner = createAsyncThunk<
       error.response?.data?.error || "Failed to update banner"
     );
   }
+});
+
+export const toggleBannerActive = createAsyncThunk<
+  void,
+  ToggleBannerActiveRequest,
+  { state: RootState }
+>("banners/toggleBannerActive", async (payload, { getState, dispatch }) => {
+  const state = getState();
+  const banner = state.banners.banners.find(
+    (banner) => banner.id === payload.id
+  );
+
+  if (!banner) {
+    throw new Error("Banner not found");
+  }
+
+  const updateRequest: UpdateBannerRequest = {
+    ...banner,
+    active: payload.active,
+  };
+
+  await dispatch(updateBanner(updateRequest));
 });
 
 export const deleteBanner = createAsyncThunk<
