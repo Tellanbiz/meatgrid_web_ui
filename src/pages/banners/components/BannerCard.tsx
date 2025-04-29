@@ -12,14 +12,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Loader2, MoreHorizontal } from "lucide-react";
+import { Loader2, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 
 interface BannerCardProps {
   id: string;
   name: string;
   imageUrl: string;
   active: boolean;
+  categoryName: string;
+  tagName: string;
   toggleActiveLoading?: boolean;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
@@ -31,24 +34,32 @@ const BannerCard = ({
   name,
   imageUrl,
   active,
+  categoryName,
+  tagName,
   toggleActiveLoading,
   onEdit,
   onDelete,
   onToggleActive,
 }: BannerCardProps) => {
   return (
-    <Card className="shadow-md border rounded-lg">
+    <Card className="shadow-md border rounded-lg gap-y-0">
       <CardHeader className="p-0">
         <img
           src={imageUrl}
           alt={name}
-          className="w-full h-40 object-cover rounded-t-lg"
+          className="w-full h-32 object-cover rounded-t-lg"
         />
       </CardHeader>
-      <CardContent className="p-4">
-        <CardTitle className="text-lg font-medium truncate">{name}</CardTitle>
+      <CardContent className="p-4 space-y-2">
+        <CardTitle className="font-medium truncate p-0">{name}</CardTitle>
+        <div className="text-sm text-muted-foreground truncate">
+          {categoryName}
+        </div>
+        <Badge variant="outline" className="text-xs">
+          {tagName}
+        </Badge>
       </CardContent>
-      <CardFooter className="flex justify-between items-center p-4">
+      <CardFooter className="flex justify-between items-center">
         <div className="flex items-center space-x-2">
           {toggleActiveLoading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -66,11 +77,15 @@ const BannerCard = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEdit(id)}>Edit</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onEdit(id)}>
+              <Pencil className="w-4 h-4" />
+              Edit
+            </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => onDelete(id)}
               className="text-red-500"
             >
+              <Trash2 className="w-4 h-4" />
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>

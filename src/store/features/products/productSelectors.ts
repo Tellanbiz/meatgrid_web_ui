@@ -3,10 +3,9 @@ import { RootState } from "../../store";
 export const selectProducts = (state: RootState) => state.products.products;
 
 export const selectProductById = (state: RootState, productId: string) => {
-  const product = state.products.products.find(
-    (product) => product.id === productId
+  return (
+    state.products.products.find((product) => product.id === productId) || null
   );
-  return product ? { id: product.id, name: product.name } : null;
 };
 
 export const selectIsFetchingProducts = (state: RootState) =>
