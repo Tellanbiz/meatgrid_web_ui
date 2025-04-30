@@ -19,8 +19,10 @@ import {
 import { fetchTags } from "../../store/features/tags/tagThunks";
 import { selectCategories } from "../../store/features/categories/categorySelectors";
 import { fetchCategories } from "../../store/features/categories/categoryThunks";
+import { useNavigate } from "react-router-dom";
 
 const BannersPage = () => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const banners = useAppSelector(selectBanners);
   const categories = useAppSelector(selectCategories);
@@ -42,7 +44,11 @@ const BannersPage = () => {
   };
 
   const handleEdit = (id: string) => {
-    console.log("Edit banner with ID:", id);
+    navigate(`/banners/${id}/edit`);
+  };
+
+  const handleAddNew = () => {
+    navigate("/banners/new");
   };
 
   const handleDelete = async (id: string) => {
@@ -84,7 +90,7 @@ const BannersPage = () => {
             />
             Refresh
           </Button>
-          <Button variant="default">
+          <Button variant="default" onClick={handleAddNew}>
             <Plus className="h-4 w-4 mr-2" />
             <span>Add Banner</span>
           </Button>

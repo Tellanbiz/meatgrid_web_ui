@@ -7,7 +7,6 @@ import {
   fetchRecipes,
 } from "../../../store/features/recipe/recipeSlice";
 import {
-  uploadImages,
   resetUploadState,
 } from "../../../store/features/uploads/uploadSlice";
 import TextField from "../../../components/TextField";
@@ -19,6 +18,7 @@ import ProgressIndicator from "../../../components/ProgressIndicator";
 import IngredientItem from "./IngredientItem";
 import { fetchProducts } from "../../../store/features/products/productSlice";
 import { ApiError } from "../../../types/ApiError";
+import { uploadImages } from "../../../store/features/uploads/uploadThunks";
 
 const AddRecipeComponent = () => {
   const dispatch = useAppDispatch();
@@ -83,6 +83,8 @@ const AddRecipeComponent = () => {
 
     try {
       await dispatch(createRecipe(recipeData)).unwrap();
+      dispatch(resetUploadState());
+      toast.success("Recipe created successfully");
       navigate(-1);
       setTimeout(() => {
         dispatch(fetchRecipes());

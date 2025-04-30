@@ -8,7 +8,6 @@ import {
   updateRecipe,
 } from "../../../store/features/recipe/recipeSlice";
 import {
-  uploadImages,
   resetUploadState,
 } from "../../../store/features/uploads/uploadSlice";
 import TextField from "../../../components/TextField";
@@ -20,6 +19,7 @@ import { EditRecipeRequest } from "../../../types/EditRecipeRequest";
 import IngredientItem from "./IngredientItem";
 import { fetchProducts } from "../../../store/features/products/productSlice";
 import { ApiError } from "../../../types/ApiError";
+import { uploadImages } from "../../../store/features/uploads/uploadThunks";
 
 const EditRecipeComponent = () => {
   const dispatch = useAppDispatch();

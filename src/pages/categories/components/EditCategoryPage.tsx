@@ -23,7 +23,6 @@ import {
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchCategories } from "@/store/features/categories/categoryThunks";
 import {
-  uploadImages,
   resetUploadState,
 } from "@/store/features/uploads/uploadSlice";
 import { updateCategory } from "@/store/features/categories/categoryThunks";
@@ -35,6 +34,7 @@ import { Category } from "@/store/features/categories/categoryTypes";
 import { UpdateCategoryRequest } from "@/store/features/categories/request/UpdateCategoryRequest";
 import { Loader2 } from "lucide-react";
 import { Textarea } from "../../../components/ui/textarea";
+import { uploadImages } from "../../../store/features/uploads/uploadThunks";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
