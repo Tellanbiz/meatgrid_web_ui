@@ -27,7 +27,7 @@ export const createCategory = createAsyncThunk<
   { rejectValue: string }
 >("categories/createCategory", async (payload, { rejectWithValue }) => {
   try {
-    const response = await axios.post("/product/categories", payload);
+    const response = await axios.post("/product/category/submit", payload);
     return response.data;
   } catch (err: unknown) {
     const error = err as ApiError;

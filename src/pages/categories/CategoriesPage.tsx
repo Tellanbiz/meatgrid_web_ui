@@ -6,12 +6,15 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchCategories } from "../../store/features/categories/categoryThunks";
 import { ProgressBar } from "primereact/progressbar";
 import { Button } from "../../components/ui/button";
+import { selectCategories } from "../../store/features/categories/categorySelectors";
+import { useNavigate } from "react-router-dom";
 
-const Categories = () => {
+const CategoriesPage = () => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { categories, status, error } = useAppSelector(
-    (state) => state.categories
-  );
+  const { status, error } = useAppSelector((state) => state.categories);
+
+  const categories = useAppSelector(selectCategories);
 
   useEffect(() => {
     dispatch(fetchCategories());
@@ -22,7 +25,7 @@ const Categories = () => {
   };
 
   const handleAddCategory = () => {
-    // Handle add new category logic
+    navigate("/categories/new");
   };
 
   const getCategoryById = (parentId: string) =>
@@ -30,7 +33,6 @@ const Categories = () => {
 
   return (
     <div>
-      {/* Top Bar */}
       <div className="flex justify-between items-center py-3 sticky top-16 z-20 bg-background">
         <Breadcrumbs items={[{ label: "Categories", isPage: true }]} />
         <div className="flex gap-2">
@@ -47,7 +49,7 @@ const Categories = () => {
       </div>
 
       {/* Category List */}
-      <div className="mt-4">
+      <div className="mt-2">
         {status === "loading" && (
           <ProgressBar mode="indeterminate" style={{ height: "6px" }} />
         )}
@@ -72,4 +74,4 @@ const Categories = () => {
   );
 };
 
-export default Categories;
+export default CategoriesPage;

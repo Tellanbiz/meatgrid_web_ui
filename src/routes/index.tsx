@@ -6,7 +6,6 @@ import Dashboard from "../pages/dashboard/Dashboard";
 import Orders from "../pages/orders/Orders";
 import Products from "../pages/products/Products";
 import Reports from "../pages/reports/Reports.jsx";
-import Categories from "../pages/categories/Categories.js";
 import LoginPage from "../pages/login/LoginPage.js";
 import RegisterPage from "../pages/register/RegisterPage.js";
 import ResetPassword from "../pages/reset-pasword/ResetPassword";
@@ -18,7 +17,6 @@ import EditRecipe from "../pages/recipes/EditRecipe";
 import PrivateRoute from "./PrivateRoute.js";
 import OrderDetails from "../pages/orders/OrderDetails.js";
 import TagsPage from "../pages/tags/TagsPage.js";
-import EditCategory from "../pages/categories/EditCategory.js";
 import SupplierPage from "../pages/suppliers/SupplierPage.js";
 import StocksPage from "../pages/stocks/StocksPage.js";
 import AddProductPage from "../pages/products/AddProductPage.js";
@@ -27,6 +25,8 @@ import ManageWareHousePage from "../pages/warehouses/ManageWareHousePage.js";
 import PaymentMethodsPage from "../pages/payment-methods/PaymentMethodsPage.js";
 import BannersPage from "../pages/banners/BannersPage.js";
 import ManageBannerPage from "../pages/banners/ManageBannerPage.js";
+import ManageCategoryPage from "../pages/categories/ManageCategoryPage.js";
+import CategoriesPage from "../pages/categories/CategoriesPage.js";
 
 const routes: RouteObject[] = [
   {
@@ -75,11 +75,15 @@ const routes: RouteObject[] = [
       },
       {
         path: "categories",
-        element: <Categories />,
+        element: <CategoriesPage />,
       },
       {
         path: "categories/:categoryId/edit",
-        element: <EditCategory />,
+        element: <ManageCategoryPage />,
+      },
+      {
+        path: "categories/new",
+        element: <ManageCategoryPage />,
       },
       {
         path: "coupons",

@@ -75,7 +75,7 @@ const OrdersTable = () => {
   const [orderToCancel, setOrderToCancel] = useState<Order | null>(null);
 
   const cancelSchema = z.object({
-    reason: z.string().min(1, "Reson for cancelling order is required"),
+    reason: z.string().min(1, "Reason for cancelling order is required"),
   });
 
   type CancelFormVaues = z.infer<typeof cancelSchema>;
@@ -168,11 +168,7 @@ const OrdersTable = () => {
     const colorClass = orderStatusColors[rowData.status];
     return <StatusBadge text={rowData.status} className={colorClass} />;
   };
-
-  const handleEdit = (order: Order) => {
-    console.log("Edit order " + order.id);
-  };
-
+  
   const handleCancelOrder = (order: Order) => {
     setOrderToCancel(order);
     setTimeout(() => setCancelDialogOpen(true), 10);
@@ -219,9 +215,6 @@ const OrdersTable = () => {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" className="w-auto">
-          <DropdownMenuItem onClick={() => handleEdit(order)}>
-            <Pencil className="mr-2 h-4 w-4" /> Edit
-          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleCancelOrder(order)}>
             <XCircle className="text-red-400" />{" "}
             <span className="text-red-400">Cancel</span>

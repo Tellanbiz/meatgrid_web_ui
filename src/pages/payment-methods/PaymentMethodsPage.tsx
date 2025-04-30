@@ -220,8 +220,17 @@ const PaymentMethodsPage = () => {
               headerStyle={TableHeaderStyle}
             />
             <Column
-              field="created_at"
               header="Created At"
+              body={(rowData) => {
+                return new Date(rowData.created_at).toLocaleString("en-US", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true,
+                });
+              }}
               headerStyle={TableHeaderStyle}
             />
             <Column

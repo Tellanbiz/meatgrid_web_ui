@@ -103,7 +103,7 @@ export default function CategoryCard({
           <p className="text-xs text-gray-500">
             Parent: {parentCategory?.name ?? "None"}
           </p>
-          <Badge variant="secondary" className="text-xs lowercase">
+          <Badge variant="outline" className="text-xs lowercase">
             {category.tag}
           </Badge>
         </CardContent>
