@@ -1,5 +1,3 @@
-import { PrimaryButton } from "../../components/Button";
-import { FiDownload } from "react-icons/fi";
 import CustomerGrowth from "./components/CustomerGrowth";
 import CustomerStatistics from "./components/CustomerStatistics";
 import CardComponent from "./components/CardComponent";
