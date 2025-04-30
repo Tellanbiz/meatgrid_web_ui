@@ -73,7 +73,7 @@ const data = {
         { title: "Stock", url: "/stock" },
         { title: "Suppliers", url: "/suppliers" },
         { title: "Warehouses", url: "/warehouses" },
-        { title: "Storage Types", url: "/storeage-types" },
+        { title: "Storage Types", url: "/storage-types" },
       ],
     },
 

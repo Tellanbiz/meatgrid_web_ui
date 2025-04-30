@@ -27,6 +27,8 @@ import BannersPage from "../pages/banners/BannersPage.js";
 import ManageBannerPage from "../pages/banners/ManageBannerPage.js";
 import ManageCategoryPage from "../pages/categories/ManageCategoryPage.js";
 import CategoriesPage from "../pages/categories/CategoriesPage.js";
+import StorageTypesPage from "../pages/storage-types/StorageTypesPage.js";
+import ManageStorageTypesPage from "../pages/storage-types/ManageStorageTypesPage.js";
 
 const routes: RouteObject[] = [
   {
@@ -145,6 +147,19 @@ const routes: RouteObject[] = [
       {
         path: "payment-methods",
         element: <PaymentMethodsPage />,
+      },
+      {
+        path: "storage-types",
+        element: <StorageTypesPage/>,
+      },
+      { 
+        path: "storage-types/new",
+        element: <ManageStorageTypesPage/>,
+      },
+      
+      { 
+        path: "storage-types/:storageTypeId/edit",
+        element: <ManageStorageTypesPage/>,
       },
       {
         path: "settings",

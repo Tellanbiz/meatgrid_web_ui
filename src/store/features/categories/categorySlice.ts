@@ -30,6 +30,7 @@ const categorySlice = createSlice({
   reducers: {
     resetCategoryState: (state) => {
       state.status = LoadingState.Idle;
+      state.currentOperation = null;
       state.error = null;
       state.successMessage = null;
     },

@@ -12,6 +12,7 @@ import stockReducer from "./features/stock/stockSlice";
 import paymentMethodReducer from "./features/payment-methods/paymentMethodSlice";
 import storeReducer from "./features/stores/storeSlice";
 import bannerReducer from "./features/banners/bannerSlice";
+import storageReducer from "./features/storages/storageSlice";
 
 export const store = configureStore({
   reducer: {
@@ -28,6 +29,7 @@ export const store = configureStore({
     paymentMethods: paymentMethodReducer,
     stores: storeReducer,
     banners: bannerReducer,
+    storages: storageReducer,
   },
   devTools: process.env.NODE_ENV != "production",
 });

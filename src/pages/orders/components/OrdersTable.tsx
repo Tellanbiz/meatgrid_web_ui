@@ -30,7 +30,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { EllipsisVertical, Pencil, XCircle } from "lucide-react";
+import { EllipsisVertical, XCircle } from "lucide-react";
 import { Button } from "../../../components/ui/button.tsx";
 import {
   cancelOrder,
@@ -168,7 +168,7 @@ const OrdersTable = () => {
     const colorClass = orderStatusColors[rowData.status];
     return <StatusBadge text={rowData.status} className={colorClass} />;
   };
-  
+
   const handleCancelOrder = (order: Order) => {
     setOrderToCancel(order);
     setTimeout(() => setCancelDialogOpen(true), 10);
