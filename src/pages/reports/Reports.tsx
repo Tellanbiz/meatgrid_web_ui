@@ -4,6 +4,9 @@ import CustomerGrowth from "./components/CustomerGrowth";
 import CustomerStatistics from "./components/CustomerStatistics";
 import CardComponent from "./components/CardComponent";
 import AverageOrderComponent from "./components/AverageOrderComponent";
+import { Button } from "../../components/ui/button";
+import { Download } from "lucide-react";
+import Breadcrumbs from "../../components/breadcrumbs";
 
 const Reports = () => {
   const handleDownload = () => {};
@@ -34,14 +37,19 @@ const Reports = () => {
   return (
     <div>
       <div className="flex flex-row justify-between items-center">
-        <h4 className="text-base font-bold">Reports</h4>
-
-        <PrimaryButton
-          text="Export"
-          className="font-bold"
-          icon={<FiDownload />}
-          onClick={handleDownload}
+        <Breadcrumbs
+          items={[
+            {
+              label: "Reports",
+              isPage: true,
+            },
+          ]}
         />
+
+        <Button className="space-x-2" onClick={handleDownload}>
+          <Download className="h-4 w-4" />
+          <span>Export</span>
+        </Button>
       </div>
 
       <div className="space-y-4 mt-4">

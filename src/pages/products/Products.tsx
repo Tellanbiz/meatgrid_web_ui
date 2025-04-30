@@ -28,13 +28,13 @@ const Products = () => {
         />
         <div className="flex space-x-2">
           <Button variant="outline" onClick={handleExport}>
-            <Download className="h-4 w-4 mr-2" />
-            Export
+            <Download className="h-4 w-4" />
+            <span>Export</span>
           </Button>
 
           <Button onClick={handleAddProduct}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Product
+            <Plus className="h-4 w-4" />
+            <span>Add Product</span>
           </Button>
         </div>
       </div>

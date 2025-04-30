@@ -152,8 +152,8 @@ const PaymentMethodsPage = () => {
   };
 
   return (
-    <div className="h-full overflow-hidden">
-      <div className="flex justify-between items-center">
+    <div className="bg-background">
+      <div className="flex justify-between items-center bg-background py-3 sticky top-16 z-20">
         <Breadcrumbs
           items={[
             {

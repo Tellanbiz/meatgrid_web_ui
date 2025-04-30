@@ -1,61 +1,39 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import axios from "../../../service/api";
-import { Coupon } from "../../../types/Coupon";
-import { CreateCouponRequest } from "../../../types/CreateCouponRequest";
-import { ApiError } from "../../../types/ApiError";
+import { Coupon } from "./couponTypes";
+import { createCoupon, fetchCoupons } from "./couponThunks";
 
 interface CouponsState {
   coupons: Coupon[];
+  currentOperation: "create" | "fetch" | "read" | "update" | "delete" | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
+  successMessage: string | null;
 }
 
 const initialState: CouponsState = {
   coupons: [],
+  currentOperation: null,
   status: "idle",
   error: null,
+  successMessage: null,
 };
-
-export const fetchCoupons = createAsyncThunk<
-  Coupon[],
-  void,
-  { rejectValue: string }
->("marketting/fetchCoupons", async (_, { rejectWithValue }) => {
-  try {
-    const response = await axios.get("/marketing/coupons");
-    return response.data as Coupon[];
-  } catch (err: unknown) {
-    const error = err as ApiError;
-    return rejectWithValue(
-      error.response?.data?.error || "Failed to fetch coupons"
-    );
-  }
-});
-
-export const createCoupon = createAsyncThunk<
-  Coupon,
-  CreateCouponRequest,
-  { rejectValue: string }
->("marketting/createCoupon", async (couponData, { rejectWithValue }) => {
-  try {
-    const response = await axios.post("/marketing/coupons", couponData);
-    return response.data as Coupon;
-  } catch (err: unknown) {
-    const error = err as ApiError;
-    return rejectWithValue(
-      error.response?.data?.error || "Failed to create coupon"
-    );
-  }
-});
 
 const couponsSlice = createSlice({
   name: "coupons",
   initialState,
-  reducers: {},
+  reducers: {
+    resetCouponsState: (state) => {
+      state.status = "idle";
+      state.error = null;
+      state.successMessage = null;
+      state.currentOperation = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchCoupons.pending, (state) => {
+        state.currentOperation = "fetch";
         state.status = "loading";
         state.error = null;
       })
@@ -72,11 +50,13 @@ const couponsSlice = createSlice({
       })
       // create coupons
       .addCase(createCoupon.pending, (state) => {
+        state.currentOperation = "create";
         state.status = "loading";
         state.error = null;
       })
-      .addCase(createCoupon.fulfilled, (state) => {
+      .addCase(createCoupon.fulfilled, (state, action) => {
         state.status = "succeeded";
+        state.successMessage = action.payload;
       })
       .addCase(createCoupon.rejected, (state, action) => {
         state.status = "failed";
@@ -85,4 +65,5 @@ const couponsSlice = createSlice({
   },
 });
 
+export const { resetCouponsState } = couponsSlice.actions;
 export default couponsSlice.reducer;

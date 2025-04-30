@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  createCoupon,
-  fetchCoupons,
-} from "../../../store/features/coupons/couponSlice.ts";
 import TextField from "../../../components/TextField";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { PrimaryButton, SecondaryButton } from "../../../components/Button";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { CreateCouponRequest } from "../../../types/CreateCouponRequest.ts";
+import { CreateCouponRequest } from "../../../store/features/coupons/requests/CreateCouponRequest.ts";
 import { toast } from "sonner";
+import {
+  createCoupon,
+  fetchCoupons,
+} from "../../../store/features/coupons/couponThunks.ts";
+import { selectCouponError } from "../../../store/features/coupons/couponSelectors.ts";
+import { resetCouponsState } from "../../../store/features/coupons/couponSlice.ts";
 
 const AddCouponComponent = () => {
   const dispatch = useAppDispatch();
@@ -23,13 +25,15 @@ const AddCouponComponent = () => {
   const [amount, setAmount] = useState(0);
   const [maxUsed, setMaxUsed] = useState(0);
 
-  const { status, error } = useAppSelector((state) => state.coupons);
+  const { status } = useAppSelector((state) => state.coupons);
+  const couponError = useAppSelector(selectCouponError);
 
   useEffect(() => {
-    if (error) {
-      toast.error(error);
+    if (couponError) {
+      toast.error(couponError);
+      dispatch(resetCouponsState());
     }
-  }, [error, dispatch]);
+  }, [couponError, dispatch]);
 
   const handleSave = async () => {
     const couponData: CreateCouponRequest = {
@@ -46,7 +50,7 @@ const AddCouponComponent = () => {
       navigate(-1);
       setTimeout(() => {
         dispatch(fetchCoupons());
-      }, 0);
+      }, 100);
     } catch (error) {
       console.error("Failed to create coupon:", error);
     }

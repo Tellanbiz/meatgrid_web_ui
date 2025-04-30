@@ -28,7 +28,7 @@ const OrderDetails = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between py-2 bg-background sticky top-0">
+      <div className="flex items-center justify-between py-2 bg-background sticky top-16 z-20">
         <button
           onClick={handleBack}
           className="flex items-center text-medium text-primary hover:underline"

@@ -31,7 +31,7 @@ const Categories = () => {
   return (
     <div>
       {/* Top Bar */}
-      <div className="flex justify-between items-center py-3 sticky top-0 z-10 bg-background">
+      <div className="flex justify-between items-center py-3 sticky top-16 z-20 bg-background">
         <Breadcrumbs items={[{ label: "Categories", isPage: true }]} />
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleExport}>

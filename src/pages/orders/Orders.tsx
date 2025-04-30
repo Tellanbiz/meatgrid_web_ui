@@ -1,6 +1,7 @@
 import OrdersTable from "./components/OrdersTable";
 import { Button } from "../../components/ui/button";
 import { Download, RefreshCcw } from "lucide-react";
+import Breadcrumbs from "../../components/breadcrumbs";
 
 const Orders = () => {
   const handleRefresh = () => {
@@ -15,8 +16,15 @@ const Orders = () => {
 
   return (
     <>
-      <div className="flex justify-between items-center py-2 sticky top-0 z-10 bg-background">
-        <h4 className="text-base font-bold">Orders</h4>
+      <div className="flex justify-between items-center py-2 sticky top-16 z-10 bg-background">
+        <Breadcrumbs
+          items={[
+            {
+              label: "Orders",
+              isPage: true,
+            },
+          ]}
+        />
 
         <div className="flex space-x-2">
           <Button variant="outline" className="px-2" onClick={handleRefresh}>

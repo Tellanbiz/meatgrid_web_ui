@@ -1,8 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { Coupon } from "../../../types/Coupon";
-import { fetchCoupons } from "../../../store/features/coupons/couponSlice.ts";
 import {
   DataTableStyle,
   TableHeaderStyle,
@@ -10,11 +8,12 @@ import {
 import StatusBadge from "../../../components/StatusBadge";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks.ts";
 import ProgressIndicator from "../../../components/ProgressIndicator.tsx";
+import { fetchCoupons } from "../../../store/features/coupons/couponThunks.ts";
+import { Coupon } from "../../../store/features/coupons/couponTypes.ts";
 
 const CouponsTable = () => {
   const dispatch = useAppDispatch();
   const { coupons, status, error } = useAppSelector((state) => state.coupons);
-  const [selectedCoupons, setSelectedCoupons] = useState<Coupon[]>([]);
 
   useEffect(() => {
     if (status === "idle") {
@@ -33,8 +32,17 @@ const CouponsTable = () => {
     />
   );
 
-  const dateTemplate = (rowData: Coupon) =>
-    new Date(rowData.created_at).toLocaleString();
+  const dateTemplate = (rowData: Coupon) => {
+    const formattedDate = new Date(rowData.created_at).toLocaleString("en-US", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+    return <span>{formattedDate}</span>;
+  };
 
   const amountTemplate = (rowData: Coupon) => (
     <span>KES {rowData.amount.toFixed(2)}</span>
@@ -56,15 +64,11 @@ const CouponsTable = () => {
     <div className="bg-white h-screen rounded">
       <DataTable
         value={coupons}
-        dataKey="coupon_key"
+        dataKey="id"
         tableStyle={DataTableStyle}
-        selection={selectedCoupons}
+        selection={[]}
         size="small"
-        selectionMode="multiple"
-        onSelectionChange={(e) => {
-          const selected = Array.isArray(e.value) ? e.value : [e.value];
-          setSelectedCoupons(selected);
-        }}
+        selectionMode="checkbox"
         paginator
         rows={10}
         rowsPerPageOptions={[10, 20, 50]}
@@ -72,7 +76,6 @@ const CouponsTable = () => {
         scrollHeight="500px"
         className="flex-grow"
       >
-        <Column selectionMode="multiple" headerStyle={TableHeaderStyle} />
         <Column field="name" header="Name" headerStyle={TableHeaderStyle} />
         <Column
           field="description"
