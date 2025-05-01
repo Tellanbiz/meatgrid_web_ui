@@ -9,12 +9,12 @@ import {
 import { Product } from "../../../store/features/products/productTypes";
 import { Badge } from "../../../components/ui/badge";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { fetchProducts } from "../../../store/features/products/productSlice";
+import { fetchProducts } from "../../../store/features/products/productThunks";
 import { ProgressBar } from "primereact/progressbar";
 import { toast } from "sonner";
 import { fetchCategories } from "../../../store/features/categories/categoryThunks";
 import { fetchTags } from "../../../store/features/tags/tagThunks";
-import { Eye, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import {
   DropdownMenu,
@@ -23,8 +23,12 @@ import {
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu";
 import React from "react";
+import { resetProductState } from "../../../store/features/products/productSlice";
+import { useNavigate } from "react-router-dom";
 const ProductsTable = () => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
   const { products, status, error } = useAppSelector((state) => state.products);
   const { categories } = useAppSelector((state) => state.categories);
 
@@ -40,8 +44,9 @@ const ProductsTable = () => {
   useEffect(() => {
     if (status == "failed") {
       toast.error(error);
+      dispatch(resetProductState());
     }
-  }, [status, error]);
+  }, [status, error, dispatch]);
 
   const dropdownOptions = [
     { label: "All", value: "All" },
@@ -109,12 +114,6 @@ const ProductsTable = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem
-            onSelect={() => handleView(rowData)}
-            className="flex items-center gap-2"
-          >
-            <Eye className="h-4 w-4" /> View
-          </DropdownMenuItem>
-          <DropdownMenuItem
             onSelect={() => handleEdit(rowData)}
             className="flex items-center gap-2"
           >
@@ -131,30 +130,23 @@ const ProductsTable = () => {
     );
   };
 
-  const handleDeleteClicked = () => {};
-  const handleEditClicked = () => {};
-  const handleView = (rowData: Product) => {
-    // Logic for viewing product
-  };
-
   const handleEdit = (rowData: Product) => {
-    // Logic for editing product
+    navigate(`/products/${rowData.id}/edit`);
   };
 
   const handleDelete = (rowData: Product) => {
-    // Logic for deleting product
+    console.log("Delete product", rowData);
   };
 
   return (
     <div>
-      <div className="card bg-background">
-        {status === "loading" && (
-          <ProgressBar
-            mode="indeterminate"
-            style={{ height: "6px" }}
-          ></ProgressBar>
-        )}
-
+      {status === "loading" && (
+        <ProgressBar
+          mode="indeterminate"
+          style={{ height: "6px" }}
+        ></ProgressBar>
+      )}
+      <div className="card bg-background h-[100vh]">
         {status !== "loading" && (
           <DataTable
             ref={dt}
@@ -167,7 +159,7 @@ const ProductsTable = () => {
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
             scrollable
-            scrollHeight="500px"
+            scrollHeight="flex"
             size="small"
             globalFilter={globalFilter}
             header={
@@ -177,8 +169,6 @@ const ProductsTable = () => {
                 selectedStatus={null}
                 onStatusChange={() => null}
                 dropdownOptions={dropdownOptions}
-                onDeleteClicked={handleDeleteClicked}
-                onEditClicked={handleEditClicked}
               />
             }
           >

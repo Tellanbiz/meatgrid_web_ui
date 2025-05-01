@@ -1,18 +1,24 @@
 import ProductsTable from "./components/ProductsTable";
 import Breadcrumbs from "../../components/breadcrumbs";
-import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { Download, Plus } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 import { Button } from "../../components/ui/button";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { selectIsFetchingProducts } from "../../store/features/products/productSelectors";
+import { fetchProducts } from "../../store/features/products/productThunks";
 
 const Products = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  const isFetchingProducts = useAppSelector(selectIsFetchingProducts);
+
   const handleAddProduct = () => {
     navigate("/products/new");
   };
 
-  const handleExport = () => {
-    toast.success("Export successfully");
+  const handleRefresh = () => {
+    dispatch(fetchProducts());
   };
 
   return (
@@ -27,9 +33,16 @@ const Products = () => {
           ]}
         />
         <div className="flex space-x-2">
-          <Button variant="outline" onClick={handleExport}>
-            <Download className="h-4 w-4" />
-            <span>Export</span>
+          <Button
+            variant="outline"
+            onClick={handleRefresh}
+            disabled={isFetchingProducts}
+            className="items-center gap-2"
+          >
+            <RefreshCw
+              className={`size-4 ${isFetchingProducts ? "animate-spin" : null}`}
+            />
+            Refresh
           </Button>
 
           <Button onClick={handleAddProduct}>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Plus, RefreshCcw } from "lucide-react";
 import Breadcrumbs from "../../components/breadcrumbs";
 import { Button } from "../../components/ui/button";
@@ -23,8 +23,6 @@ const StorageTypesPage = () => {
   const storageTypes = useAppSelector(selectStorageTypes);
   const isLoading = useAppSelector(selectIsFetchingStorageTypes);
   const error = useAppSelector(selectStorageError);
-
-  const [isFormLoading, setIsFormLoading] = useState(false);
 
   useEffect(() => {
     dispatch(fetchStorageTypes());
@@ -86,7 +84,7 @@ const StorageTypesPage = () => {
 
       <StorageTypeTable
         storageTypes={storageTypes}
-        isLoading={isLoading || isFormLoading}
+        isLoading={isLoading}
         onEdit={handleEditStorageType}
         onDelete={handleDeleteStorageType}
       />

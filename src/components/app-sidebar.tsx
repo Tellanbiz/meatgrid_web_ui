@@ -9,8 +9,6 @@ import {
   BarChart2,
   Star,
   BookOpen,
-  Book,
-  Bell,
   User,
   Settings,
   Tags,

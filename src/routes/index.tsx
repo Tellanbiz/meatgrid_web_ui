@@ -19,7 +19,6 @@ import OrderDetails from "../pages/orders/OrderDetails.js";
 import TagsPage from "../pages/tags/TagsPage.js";
 import SupplierPage from "../pages/suppliers/SupplierPage.js";
 import StocksPage from "../pages/stocks/StocksPage.js";
-import AddProductPage from "../pages/products/AddProductPage.js";
 import WareHousePage from "../pages/warehouses/WareHousePage.js";
 import ManageWareHousePage from "../pages/warehouses/ManageWareHousePage.js";
 import PaymentMethodsPage from "../pages/payment-methods/PaymentMethodsPage.js";
@@ -29,6 +28,7 @@ import ManageCategoryPage from "../pages/categories/ManageCategoryPage.js";
 import CategoriesPage from "../pages/categories/CategoriesPage.js";
 import StorageTypesPage from "../pages/storage-types/StorageTypesPage.js";
 import ManageStorageTypesPage from "../pages/storage-types/ManageStorageTypesPage.js";
+import ManageProductPage from "../pages/products/ManageProductPage.js";
 
 const routes: RouteObject[] = [
   {
@@ -69,7 +69,11 @@ const routes: RouteObject[] = [
       },
       {
         path: "products/new",
-        element: <AddProductPage />,
+        element: <ManageProductPage />,
+      },
+      {
+        path: "products/:productId/edit",
+        element: <ManageProductPage />,
       },
       {
         path: "reports",
@@ -150,16 +154,16 @@ const routes: RouteObject[] = [
       },
       {
         path: "storage-types",
-        element: <StorageTypesPage/>,
+        element: <StorageTypesPage />,
       },
-      { 
+      {
         path: "storage-types/new",
-        element: <ManageStorageTypesPage/>,
+        element: <ManageStorageTypesPage />,
       },
-      
-      { 
+
+      {
         path: "storage-types/:storageTypeId/edit",
-        element: <ManageStorageTypesPage/>,
+        element: <ManageStorageTypesPage />,
       },
       {
         path: "settings",

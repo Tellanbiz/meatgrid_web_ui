@@ -1,8 +1,6 @@
 import React from "react";
 import { Dropdown } from "primereact/dropdown";
-import { FiEdit3, FiSearch } from "react-icons/fi";
-import { IconButton } from "../../../components/Button";
-import { AiOutlineDelete } from "react-icons/ai";
+import { FiSearch } from "react-icons/fi";
 
 interface ProductsTableHeaderProps {
   searchTerm: string;
@@ -10,8 +8,6 @@ interface ProductsTableHeaderProps {
   selectedStatus: string | null;
   onStatusChange: (e: { value: string | null }) => void;
   dropdownOptions: { label: string; value: string | null }[];
-  onDeleteClicked: () => void;
-  onEditClicked: () => void;
 }
 
 const ProductsTableHeader: React.FC<ProductsTableHeaderProps> = ({
@@ -20,8 +16,6 @@ const ProductsTableHeader: React.FC<ProductsTableHeaderProps> = ({
   selectedStatus,
   onStatusChange,
   dropdownOptions,
-  onDeleteClicked,
-  onEditClicked,
 }) => {
   return (
     <div className="flex flex-col md:flex-row justify-between items-center p-2 rounded-t">
@@ -43,19 +37,6 @@ const ProductsTableHeader: React.FC<ProductsTableHeaderProps> = ({
             className="w-full pl-8 pr-4 py-2 h-10 border border-gray-300 rounded focus:outline-none text-sm font-light"
           />
         </div>
-      </div>
-
-      <div className="flex gap-x-3">
-        <IconButton
-          icon={<FiEdit3 />}
-          onClick={onEditClicked}
-          className="h-10 w-10 border border-gray-300 rounded flex items-center justify-center"
-        />
-        <IconButton
-          icon={<AiOutlineDelete />}
-          onClick={onDeleteClicked}
-          className="h-10 w-10 border border-gray-300 rounded flex items-center justify-center"
-        />
       </div>
     </div>
   );

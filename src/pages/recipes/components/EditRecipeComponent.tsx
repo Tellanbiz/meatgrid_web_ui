@@ -17,9 +17,10 @@ import ImageThumbnail from "../../../components/ImageThumbnail";
 import ProgressIndicator from "../../../components/ProgressIndicator";
 import { EditRecipeRequest } from "../../../types/EditRecipeRequest";
 import IngredientItem from "./IngredientItem";
-import { fetchProducts } from "../../../store/features/products/productSlice";
+import { fetchProducts } from "../../../store/features/products/productThunks";
 import { ApiError } from "../../../types/ApiError";
 import { uploadImages } from "../../../store/features/uploads/uploadThunks";
+import { selectProducts } from "../../../store/features/products/productSelectors";
 
 const EditRecipeComponent = () => {
   const dispatch = useAppDispatch();
@@ -30,7 +31,7 @@ const EditRecipeComponent = () => {
   const { status: recipeStatus, error } = useAppSelector(
     (state) => state.recipes
   );
-  const { products } = useAppSelector((state) => state.products);
+  const products = useAppSelector(selectProducts)
 
   const {
     images,

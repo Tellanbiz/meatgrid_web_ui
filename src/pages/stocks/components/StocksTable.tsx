@@ -28,7 +28,7 @@ const StocksTable = () => {
     dispatch(fetchStocks());
   }, [dispatch]);
 
-  const statusTemplate = (rowData: any) => {
+  const statusTemplate = (rowData: Stock) => {
     return (
       <span
         className={`text-xs font-semibold px-2 py-1 rounded ${
@@ -44,6 +44,7 @@ const StocksTable = () => {
 
   const handleEdit = (stock: Stock) => {
     // Logic for editing product
+    console.log("Edit stock:", stock);
   };
 
   const actionsBodyTemplate = (stock: Stock) => {
