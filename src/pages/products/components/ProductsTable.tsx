@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import ProductsTableHeader from "./ProductsTableHeader";
@@ -25,17 +25,50 @@ import {
 import React from "react";
 import { resetProductState } from "../../../store/features/products/productSlice";
 import { useNavigate } from "react-router-dom";
+import { selectCategories } from "../../../store/features/categories/categorySelectors";
+import { selectStores } from "../../../store/features/stores/storeSelectors";
+import { fetchStores } from "../../../store/features/stores/storeThunks";
+import { Store } from "../../../store/features/stores/storeTypes";
+import { selectProducts } from "../../../store/features/products/productSelectors";
 const ProductsTable = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const { products, status, error } = useAppSelector((state) => state.products);
-  const { categories } = useAppSelector((state) => state.categories);
+  const { status, error } = useAppSelector((state) => state.products);
 
-  const [globalFilter, setGlobalFilter] = useState<string>("");
-  const dt = useRef<DataTable<Product[]>>(null!);
+  const products = useAppSelector(selectProducts);
+  const categories = useAppSelector(selectCategories);
+  const stores = useAppSelector(selectStores);
+
+  const [searchString, setSearchString] = useState<string>("");
+  const [selectedStore, setSelectedStore] = useState<string | null>(null);
+
+  const storeOptions = [
+    { label: "All Stores", value: "all" },
+    ...stores.map((store: Store) => ({
+      label: store.name,
+      value: store.id,
+    })),
+  ];
+
+  const handleStoreChange = (e: { value: string }) => {
+    const storeId = e.value;
+    if (storeId === "all") {
+      setSelectedStore(null);
+      dispatch(fetchProducts());
+      return;
+    }
+    
+    setSelectedStore(storeId);
+    dispatch(fetchProducts({ store_id: storeId }));
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchString(e.target.value);
+  };
 
   useEffect(() => {
+    dispatch(fetchStores());
     dispatch(fetchProducts());
     dispatch(fetchTags());
     dispatch(fetchCategories());
@@ -47,14 +80,6 @@ const ProductsTable = () => {
       dispatch(resetProductState());
     }
   }, [status, error, dispatch]);
-
-  const dropdownOptions = [
-    { label: "All", value: "All" },
-    { label: "Ready", value: "Ready" },
-    { label: "Shipped", value: "Shipped" },
-    { label: "Received", value: "Received" },
-    { label: "Cancelled", value: "Cancelled" },
-  ];
 
   const getCategoryById = (categoryId: string) => {
     return categories.find((cat) => cat.id === categoryId);
@@ -146,10 +171,10 @@ const ProductsTable = () => {
           style={{ height: "6px" }}
         ></ProgressBar>
       )}
-      <div className="card bg-background h-[100vh]">
+
+      <div className="card bg-background">
         {status !== "loading" && (
           <DataTable
-            ref={dt}
             value={products}
             dataKey="id"
             tableStyle={DataTableStyle}
@@ -161,14 +186,14 @@ const ProductsTable = () => {
             scrollable
             scrollHeight="flex"
             size="small"
-            globalFilter={globalFilter}
+            globalFilter={searchString}
             header={
               <ProductsTableHeader
-                searchTerm={globalFilter}
-                onSearchChange={(e) => setGlobalFilter(e.target.value)}
-                selectedStatus={null}
-                onStatusChange={() => null}
-                dropdownOptions={dropdownOptions}
+                searchString={searchString}
+                onSearchChange={handleSearchChange}
+                selectedStore={selectedStore}
+                onStoreChange={handleStoreChange}
+                storeOptions={storeOptions}
               />
             }
           >

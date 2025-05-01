@@ -23,7 +23,7 @@ const Products = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center py-2 sticky top-0 z-10 bg-background">
+      <div className="flex justify-between items-center py-2 sticky top-16 z-10 bg-background">
         <Breadcrumbs
           items={[
             {

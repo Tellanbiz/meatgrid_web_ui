@@ -4,14 +4,28 @@ import { ApiError } from "../../../types/ApiError";
 import { Product } from "./productTypes";
 import { CreateProductRequest } from "./requests/CreateProductRequest";
 import { UpdateProductRequest } from "./requests/UpdateProductRequest";
+import { FetchProductsRequest } from "./requests/FetchProductsRequest";
 
 export const fetchProducts = createAsyncThunk<
   Product[],
-  void,
+  FetchProductsRequest | undefined,
   { rejectValue: string }
->("products/fetchProducts", async (_, { rejectWithValue }) => {
+>("products/fetchProducts", async (fetchParams, { rejectWithValue }) => {
   try {
-    const response = await axios.get("/admin/products");
+    const queryParams = fetchParams
+      ? new URLSearchParams(
+          Object.entries(fetchParams).reduce((acc, [key, value]) => {
+            if (value !== undefined && value !== null) {
+              acc[key] = String(value);
+            }
+            return acc;
+          }, {} as Record<string, string>)
+        ).toString()
+      : "";
+
+    const response = await axios.get(
+      `/admin/products${queryParams ? `?${queryParams}` : ""}`
+    );
     return response.data;
   } catch (err: unknown) {
     const error = err as ApiError;
