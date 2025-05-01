@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import TextField from "../../../components/TextField";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { PrimaryButton, SecondaryButton } from "../../../components/Button";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { CreateCouponRequest } from "../../../store/features/coupons/requests/CreateCouponRequest.ts";
 import { toast } from "sonner";
@@ -13,6 +12,8 @@ import {
 } from "../../../store/features/coupons/couponThunks.ts";
 import { selectCouponError } from "../../../store/features/coupons/couponSelectors.ts";
 import { resetCouponsState } from "../../../store/features/coupons/couponSlice.ts";
+import { Button } from "../../../components/ui/button.tsx";
+import { Loader2 } from "lucide-react";
 
 const AddCouponComponent = () => {
   const dispatch = useAppDispatch();
@@ -62,8 +63,6 @@ const AddCouponComponent = () => {
 
   return (
     <div className="bg-white rounded-xl w-full mx-auto space-y-6">
-      <h3 className="text-lg font-semibold">Coupon Information</h3>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextField
           label="Coupon Name"
@@ -123,16 +122,21 @@ const AddCouponComponent = () => {
       />
 
       <div className="flex justify-end space-x-4 mt-6">
-        <SecondaryButton
-          text="Cancel"
-          onClick={handleCancel}
+        <Button variant="outline" className="px-6" onClick={handleCancel}>
+          Cancel
+        </Button>
+
+        <Button
+          variant="default"
           className="px-6"
-        />
-        <PrimaryButton
-          text={status === "loading" ? "Saving..." : "Save"}
           onClick={handleSave}
-          className="px-6"
-        />
+          disabled={status === "loading"}
+        >
+          {status === "loading" ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : null}
+          Save
+        </Button>
       </div>
     </div>
   );

@@ -3,20 +3,28 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Plus, RefreshCcw } from "lucide-react";
 import Breadcrumbs from "../../components/breadcrumbs";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { fetchCoupons } from "../../store/features/coupons/couponThunks";
+import { selectIsFetchingCoupons } from "../../store/features/coupons/couponSelectors";
 
 const Coupons = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch()
+
+  const isFetchingCoupons = useAppSelector(selectIsFetchingCoupons);
+
   const handleAddNewCoupon = () => {
     navigate("/coupons/new");
   };
+
   const handleRefresh = () => {
-    // Logic to refresh the coupons list
-    console.log("Refresh coupons list");
+    dispatch(fetchCoupons())
   };
+
 
   return (
     <>
-      <div className="flex justify-between items-center py-2 bg-background sticky top-0 z-10">
+      <div className="flex justify-between items-center py-2 bg-background sticky top-16 z-10">
         <Breadcrumbs
           items={[
             {
@@ -32,7 +40,7 @@ const Coupons = () => {
             className="items-center gap-2"
             onClick={handleRefresh}
           >
-            <RefreshCcw className="size-4" />
+            <RefreshCcw className={`size-4 ${isFetchingCoupons? "animate-spin": ""}`} />
             Refresh
           </Button>
 
@@ -47,7 +55,7 @@ const Coupons = () => {
         </div>
       </div>
 
-      <div className="mt-4 p-4 bg-white rounded h-full">
+      <div className="mt-2">
         <CouponsTable />
       </div>
     </>

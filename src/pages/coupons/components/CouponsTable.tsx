@@ -7,9 +7,9 @@ import {
 } from "../../../constants/TableStyles";
 import StatusBadge from "../../../components/StatusBadge";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks.ts";
-import ProgressIndicator from "../../../components/ProgressIndicator.tsx";
 import { fetchCoupons } from "../../../store/features/coupons/couponThunks.ts";
 import { Coupon } from "../../../store/features/coupons/couponTypes.ts";
+import LoadingPage from "../../../components/LoadingPage.tsx";
 
 const CouponsTable = () => {
   const dispatch = useAppDispatch();
@@ -49,11 +49,7 @@ const CouponsTable = () => {
   );
 
   if (status === "loading") {
-    return (
-      <div className="p-4 flex justify-center items-center h-full">
-        <ProgressIndicator />
-      </div>
-    );
+    return <LoadingPage />;
   }
 
   if (status === "failed") {
@@ -61,7 +57,7 @@ const CouponsTable = () => {
   }
 
   return (
-    <div className="bg-white h-screen rounded">
+    <div className="bg-white h-[80vh] rounded">
       <DataTable
         value={coupons}
         dataKey="id"
@@ -73,7 +69,7 @@ const CouponsTable = () => {
         rows={10}
         rowsPerPageOptions={[10, 20, 50]}
         scrollable
-        scrollHeight="500px"
+        scrollHeight="flex"
         className="flex-grow"
       >
         <Column field="name" header="Name" headerStyle={TableHeaderStyle} />
