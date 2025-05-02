@@ -29,8 +29,8 @@ import {
 import { CreateSupplierRequest } from "../../../store/features/suppliers/request/CreateSupplierRequest";
 import { Supplier } from "../../../store/features/suppliers/supplierTypes";
 import {
-  selectIsCreateSupplierLoading,
-  selectIsUpdateSupplierLoading,
+  selectIsCreatingSupplier,
+  selectIsUpdatingSupplier,
 } from "../../../store/features/suppliers/supplierSelectors";
 
 interface SupplierDialogProps {
@@ -78,8 +78,8 @@ const SupplierDialog = ({
     (state) => state.suppliers
   );
 
-  const isCreateSupplierLoading = useAppSelector(selectIsCreateSupplierLoading);
-  const isUpdateSupplierLoading = useAppSelector(selectIsUpdateSupplierLoading);
+  const isCreateSupplierLoading = useAppSelector(selectIsCreatingSupplier);
+  const isUpdateSupplierLoading = useAppSelector(selectIsUpdatingSupplier);
 
   useEffect(() => {
     if (initialValues) {

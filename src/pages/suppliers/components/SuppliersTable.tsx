@@ -24,7 +24,13 @@ import { toast } from "sonner";
 import DeleteDialog from "../../../components/DeleteDialog";
 import { DeleteSupplierRequest } from "../../../store/features/suppliers/request/DeleteSupplierRequest";
 import { resetSupplierState } from "../../../store/features/suppliers/supplierSlice";
-import { selectIsFetchingSuppliers } from "../../../store/features/suppliers/supplierSelectors";
+import {
+  selectIsDeletingSupplier,
+  selectIsFetchingSuppliers,
+  selectSupplierError,
+  selectSuppliers,
+  selectSupplierSuccessMessage,
+} from "../../../store/features/suppliers/supplierSelectors";
 
 interface SuppliersTableProps {
   onEdit: (supplier: Supplier) => void;
@@ -32,59 +38,36 @@ interface SuppliersTableProps {
 
 const SuppliersTable = ({ onEdit }: SuppliersTableProps) => {
   const dispatch = useAppDispatch();
-  const { suppliers, status, error, currentOperation } = useAppSelector(
-    (state) => state.suppliers
-  );
+
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [supplierToDelete, setSupplierToDelete] = useState<Supplier | null>(
     null
   );
-  const isFetching = useAppSelector(selectIsFetchingSuppliers);
+  const suppliers = useAppSelector(selectSuppliers)
+  const isFetchingSuppliers = useAppSelector(selectIsFetchingSuppliers);
+  const isDeletingSupplier = useAppSelector(selectIsDeletingSupplier);
+  const supplierError = useAppSelector(selectSupplierError);
+  const supplierSuccessMessage = useAppSelector(selectSupplierSuccessMessage);
 
   useEffect(() => {
     dispatch(fetchSuppliers());
   }, [dispatch]);
 
   useEffect(() => {
-    if (
-      (status === "succeeded" || status === "failed") &&
-      currentOperation === "delete"
-    ) {
-      if (status === "succeeded") {
-        toast.success("Supplier deleted successfully");
-      } else if (status === "failed" && error) {
-        toast.error(error);
-      }
+    if (supplierSuccessMessage) {
+      toast.success(supplierSuccessMessage);
       setDeleteDialogOpen(false);
       dispatch(resetSupplierState());
     }
-  }, [status, error, currentOperation, dispatch]);
+  }, [supplierSuccessMessage, dispatch]);
 
-  const actionsBodyTemplate = (rowData: Supplier) => {
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon">
-            <MoreVertical className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            onSelect={() => onEdit(rowData)} // Call the onEdit prop
-            className="flex items-center gap-2"
-          >
-            <Pencil className="h-4 w-4" /> Edit
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onSelect={() => handleDelete(rowData)}
-            className="flex items-center gap-2 text-red-600"
-          >
-            <Trash2 className="h-4 w-4" /> Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  };
+  useEffect(() => {
+    if (supplierError) {
+      toast.error(supplierError);
+      setDeleteDialogOpen(false);
+      dispatch(resetSupplierState());
+    }
+  }, [supplierError, dispatch]);
 
   const handleDelete = (rowData: Supplier) => {
     setSupplierToDelete(rowData);
@@ -98,10 +81,35 @@ const SuppliersTable = ({ onEdit }: SuppliersTableProps) => {
     dispatch(deleteSupplier(payload));
   };
 
+  const actionsBodyTemplate = (supplier: Supplier) => {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon">
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            onSelect={() => onEdit(supplier)}
+            className="flex items-center gap-2"
+          >
+            <Pencil className="h-4 w-4" /> Edit
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={() => handleDelete(supplier)}
+            className="flex items-center gap-2 text-red-600"
+          >
+            <Trash2 className="h-4 w-4" /> Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
   return (
     <>
       <div className="h-full">
-        {isFetching && (
+        {isFetchingSuppliers && (
           <ProgressBar
             mode="indeterminate"
             style={{ height: "6px" }}
@@ -165,7 +173,7 @@ const SuppliersTable = ({ onEdit }: SuppliersTableProps) => {
         </DataTable>
       </div>
       <DeleteDialog
-        isLoading={status === "loading" && currentOperation === "delete"}
+        isLoading={isDeletingSupplier}
         onConfirm={handleConfirmDelete}
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
