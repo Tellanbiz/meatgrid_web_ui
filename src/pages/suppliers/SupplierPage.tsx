@@ -8,6 +8,7 @@ import { Supplier } from "../../store/features/suppliers/supplierTypes";
 import { useModal } from "../../hooks/use-modal";
 import { useState } from "react";
 import { selectIsFetchingSuppliers } from "../../store/features/suppliers/supplierSelectors";
+import Breadcrumbs from "../../components/breadcrumbs";
 
 const SupplierPage = () => {
   const { isOpen: isDialogOpen, openModal, closeModal } = useModal();
@@ -40,9 +41,10 @@ const SupplierPage = () => {
 
   return (
     <>
-      <div className="h-full overflow-hidden">
-        <div className="flex justify-between items-center relative">
-          <h4 className="text-md">Suppliers</h4>
+      <div>
+        <div className="flex justify-between items-center py-2 sticky top-16 z-10 bg-background">
+          <Breadcrumbs items={[{ label: "Suppliers", isPage: true }]} />
+
           <div className="flex space-x-2">
             <Button variant="outline" className="" onClick={handleRefresh}>
               <RefreshCcw className={`${isFetching && "animate-spin"}`} />

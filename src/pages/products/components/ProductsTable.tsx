@@ -30,22 +30,23 @@ import { selectStores } from "../../../store/features/stores/storeSelectors";
 import { fetchStores } from "../../../store/features/stores/storeThunks";
 import { Store } from "../../../store/features/stores/storeTypes";
 import { selectProducts } from "../../../store/features/products/productSelectors";
+import { Category } from "../../../store/features/categories/categoryTypes";
 const ProductsTable = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const { status, error } = useAppSelector((state) => state.products);
 
-  const products = useAppSelector(selectProducts);
-  const categories = useAppSelector(selectCategories);
-  const stores = useAppSelector(selectStores);
+  const products: Product[] = useAppSelector(selectProducts);
+  const categories: Category[] = useAppSelector(selectCategories);
+  const stores: Store[] = useAppSelector(selectStores);
 
   const [searchString, setSearchString] = useState<string>("");
   const [selectedStore, setSelectedStore] = useState<string | null>(null);
 
   const storeOptions = [
     { label: "All Stores", value: "all" },
-    ...stores.map((store: Store) => ({
+    ...stores.map((store) => ({
       label: store.name,
       value: store.id,
     })),
@@ -58,7 +59,7 @@ const ProductsTable = () => {
       dispatch(fetchProducts());
       return;
     }
-    
+
     setSelectedStore(storeId);
     dispatch(fetchProducts({ store_id: storeId }));
   };
