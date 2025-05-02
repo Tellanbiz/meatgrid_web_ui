@@ -1,9 +1,9 @@
 import { FormEvent, useEffect, useState } from "react";
-import { FaFacebook } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "../../store/hooks.ts";
 import { loginUser, resetStatus } from "../../store/features/auth/authSlice.ts";
+import { Button } from "../../components/ui/button.tsx";
 
 const LoginPage = () => {
   const [phone, setPhone] = useState("");
@@ -35,18 +35,9 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-sm">
-        <h2 className="text-4xl font-bold mb-1 text-center text-gray-800">
-          Sign In
+        <h2 className="text-4xl font-bold mb-5 text-center text-gray-800">
+          Welcome Back!
         </h2>
-
-        <div className="mb-6 space-x-3 flex items-center justify-center">
-          <span className="text-base text-m-secondary">
-            New to Our Product?
-          </span>
-          <Link to="/register" className="text-base text-primary">
-            Create Account
-          </Link>
-        </div>
 
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
@@ -96,17 +87,15 @@ const LoginPage = () => {
             </label>
           </div>
 
-          <button
+          <Button
             type="submit"
-            className={`w-full ${
-              status === "loading" ? "bg-gray-400" : "bg-primary-500"
-            } text-white py-2 rounded-md hover:bg-blue-900 transition duration-200`}
+            className="w-full py-2 rounded-md text-white"
             disabled={status === "loading"}
           >
-            {status === "loading" ? "Logging in..." : "Login"}
-          </button>
+            <span>{status === "loading" ? "Logging in..." : "Login"}</span>
+          </Button>
 
-          <div className="mx-10 flex justify-center">
+          <div className="flex justify-end">
             <span className="text-center text-sm text-gray-600">
               <Link to="/reset-password" className="text-primary">
                 Forgot your password?
@@ -124,11 +113,6 @@ const LoginPage = () => {
                 className="h-5 w-5"
               />
               <span>Continue with Google</span>
-            </button>
-
-            <button className="w-full border border-gray-300 text-primary py-2 rounded-md hover:bg-gray-100 transition duration-200 flex items-center justify-center space-x-2">
-              <FaFacebook className="h-5 w-5 text-blue-600" />
-              <span>Continue with Facebook</span>
             </button>
           </div>
         </form>
