@@ -1,12 +1,15 @@
 import { useEffect } from "react";
-import { Download, Plus } from "lucide-react";
+import { Plus, RefreshCcw } from "lucide-react";
 import Breadcrumbs from "../../components/breadcrumbs";
 import CategoryCard from "./components/CategoryCard";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchCategories } from "../../store/features/categories/categoryThunks";
 import { ProgressBar } from "primereact/progressbar";
 import { Button } from "../../components/ui/button";
-import { selectCategories } from "../../store/features/categories/categorySelectors";
+import {
+  selectCategories,
+  selectIsFetchingCategories,
+} from "../../store/features/categories/categorySelectors";
 import { useNavigate } from "react-router-dom";
 
 const CategoriesPage = () => {
@@ -15,13 +18,14 @@ const CategoriesPage = () => {
   const { status, error } = useAppSelector((state) => state.categories);
 
   const categories = useAppSelector(selectCategories);
+  const isFetchingCategories = useAppSelector(selectIsFetchingCategories);
 
   useEffect(() => {
     dispatch(fetchCategories());
   }, [dispatch]);
 
-  const handleExport = () => {
-    // Handle export logic
+  const handleRefresh = () => {
+    dispatch(fetchCategories());
   };
 
   const handleAddCategory = () => {
@@ -36,13 +40,19 @@ const CategoriesPage = () => {
       <div className="flex justify-between items-center py-3 sticky top-16 z-20 bg-background">
         <Breadcrumbs items={[{ label: "Categories", isPage: true }]} />
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExport}>
-            <Download className="h-4 w-4 mr-2" />
-            Export
+          <Button
+            variant="outline"
+            onClick={handleRefresh}
+            disabled={isFetchingCategories}
+          >
+            <RefreshCcw
+              className={`size-4 ${isFetchingCategories ? "animate-spin" : ""}`}
+            />
+            Refresh
           </Button>
 
           <Button variant="default" onClick={handleAddCategory}>
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4" />
             Add Category
           </Button>
         </div>
