@@ -82,10 +82,6 @@ const ProductsTable = () => {
     }
   }, [status, error, dispatch]);
 
-  const getCategoryById = (categoryId: string) => {
-    return categories.find((cat) => cat.id === categoryId);
-  };
-
   const formatCurrency = (value: number) => {
     return value.toLocaleString("en-US", {
       style: "currency",
@@ -116,18 +112,52 @@ const ProductsTable = () => {
     return formatCurrency(rowData.regular_price);
   };
 
-  const inventoryBodyTemplate = (rowData: Product) => {
-    const inStock = rowData.stock_info.total_instock > 0;
+  const getTotalInStock = (product: Product) => {
+    const stockInfo = product.stock_info;
+    const totalIn = stockInfo.total_instock + stockInfo.total_reclaim;
+
+    const totalOut =
+      stockInfo.total_correction +
+      stockInfo.total_damaged +
+      stockInfo.total_migrated +
+      stockInfo.total_processed +
+      stockInfo.total_sold;
+    return totalIn - totalOut;
+  };
+
+  const getTotalConsumed = (product: Product) => {
+    const stockInfo = product.stock_info;
+    const totalOut =
+      stockInfo.total_correction +
+      stockInfo.total_damaged +
+      stockInfo.total_migrated +
+      stockInfo.total_processed +
+      stockInfo.total_sold;
+    return totalOut;
+  };
+
+  const statusBodyTemplate = (product: Product) => {
+    const inStock = getTotalInStock(product) > 0;
 
     return inStock ? (
       <Badge variant="default" className="bg-green-600 hover:bg-green-600">
-        {rowData.stock_info.total_instock.toLocaleString()} in stock
+        In stock
       </Badge>
     ) : (
       <Badge variant="default" className="bg-red-600 hover:bg-red-600">
         Out of stock
       </Badge>
     );
+  };
+
+  const totalConsumedBodyTemplate = (product: Product) => {
+    const totalOut = getTotalConsumed(product);
+    return `${totalOut.toLocaleString()} ${product.unit_type}`;
+  };
+
+  const totalInStockBodyTemplate = (product: Product) => {
+    const totalIn = getTotalInStock(product);
+    return `${totalIn.toLocaleString()} ${product.unit_type}`;
   };
 
   const actionsBodyTemplate = (rowData: Product) => {
@@ -165,7 +195,7 @@ const ProductsTable = () => {
   };
 
   return (
-    <div>
+    <div className="h-full">
       {status === "loading" && (
         <ProgressBar
           mode="indeterminate"
@@ -173,69 +203,75 @@ const ProductsTable = () => {
         ></ProgressBar>
       )}
 
-      <div className="card bg-background">
-        {status !== "loading" && (
-          <DataTable
-            value={products}
-            dataKey="id"
-            tableStyle={DataTableStyle}
-            paginator
-            rows={10}
-            rowsPerPageOptions={[5, 10, 25]}
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
-            scrollable
-            scrollHeight="flex"
-            size="small"
-            globalFilter={searchString}
-            header={
-              <ProductsTableHeader
-                searchString={searchString}
-                onSearchChange={handleSearchChange}
-                selectedStore={selectedStore}
-                onStoreChange={handleStoreChange}
-                storeOptions={storeOptions}
-              />
-            }
-          >
-            <Column
-              field="name"
-              header="Product"
-              body={imageBodyTemplate}
-              headerStyle={TableHeaderStyle}
+      {status !== "loading" && (
+        <DataTable
+          value={products}
+          dataKey="id"
+          tableStyle={DataTableStyle}
+          paginator
+          rows={10}
+          rowsPerPageOptions={[5, 10, 25]}
+          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+          scrollable
+          scrollHeight="flex"
+          size="small"
+          globalFilter={searchString}
+          header={
+            <ProductsTableHeader
+              searchString={searchString}
+              onSearchChange={handleSearchChange}
+              selectedStore={selectedStore}
+              onStoreChange={handleStoreChange}
+              storeOptions={storeOptions}
             />
-            <Column
-              field="unit_type"
-              header="Unit Type"
-              headerStyle={TableHeaderStyle}
-            />
-            <Column
-              header="Category"
-              body={(rowData) =>
-                getCategoryById(rowData.category_id)?.name ?? "-"
-              }
-              headerStyle={TableHeaderStyle}
-            />
-            <Column
-              header="Inventory"
-              body={inventoryBodyTemplate}
-              sortable
-              headerStyle={TableHeaderStyle}
-            />
-            <Column
-              header="Regular Price"
-              body={priceBodyTemplate}
-              sortable
-              headerStyle={TableHeaderStyle}
-            />
-            <Column
-              header="Actions"
-              body={actionsBodyTemplate}
-              headerStyle={TableHeaderStyle}
-            />
-          </DataTable>
-        )}
-      </div>
+          }
+        >
+          <Column
+            field="name"
+            header="Product"
+            body={imageBodyTemplate}
+            headerStyle={TableHeaderStyle}
+          />
+
+          <Column
+            field="unit_type"
+            header="Unit Type"
+            headerStyle={TableHeaderStyle}
+          />
+
+          <Column
+            header="Regular Price"
+            body={priceBodyTemplate}
+            sortable
+            headerStyle={TableHeaderStyle}
+          />
+
+          <Column
+            header="Status"
+            body={statusBodyTemplate}
+            headerStyle={TableHeaderStyle}
+          />
+
+          <Column
+            header="Total Instock"
+            body={totalInStockBodyTemplate}
+            headerStyle={TableHeaderStyle}
+          />
+
+          <Column
+            header="Total Consumed"
+            body={totalConsumedBodyTemplate}
+            headerStyle={TableHeaderStyle}
+          />
+
+          <Column
+            header="Actions"
+            body={actionsBodyTemplate}
+            headerStyle={TableHeaderStyle}
+          />
+        </DataTable>
+      )}
     </div>
   );
 };

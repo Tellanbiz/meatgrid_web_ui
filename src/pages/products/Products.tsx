@@ -37,12 +37,12 @@ const Products = () => {
             variant="outline"
             onClick={handleRefresh}
             disabled={isFetchingProducts}
-            className="items-center gap-2"
+            className="flex items-center gap-2"
           >
             <RefreshCw
               className={`size-4 ${isFetchingProducts ? "animate-spin" : null}`}
             />
-            Refresh
+            <span>Refresh</span>
           </Button>
 
           <Button onClick={handleAddProduct}>
@@ -52,7 +52,7 @@ const Products = () => {
         </div>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-2 card h-[calc(100vh-10rem)]">
         <ProductsTable />
       </div>
     </div>

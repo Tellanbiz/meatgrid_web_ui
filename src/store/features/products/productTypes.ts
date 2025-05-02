@@ -15,12 +15,13 @@ export interface Product {
   is_raw_material: boolean;
   is_product: boolean;
   stock_info: {
+    total_instock: number;
+    total_reclaim: number;
+
     total_correction: number;
     total_damaged: number;
-    total_instock: number;
     total_migrated: number;
     total_processed: number;
-    total_reclaim: number;
     total_sold: number;
   };
 }

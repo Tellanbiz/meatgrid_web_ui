@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { Recipe } from "../../../types/Recipe";
-import {
-  deleteRecipe,
-  fetchRecipes,
-} from "../../../store/features/recipe/recipeSlice.ts";
+
 import {
   DataTableStyle,
   TableHeaderStyle,
@@ -25,6 +21,11 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import {
+  deleteRecipe,
+  fetchRecipes,
+} from "../../../store/features/recipe/recipeThunks.ts";
+import { Recipe } from "../../../store/features/recipe/recipeTypes.ts";
 
 const RecipeTable = () => {
   const dispatch = useAppDispatch();
@@ -38,7 +39,6 @@ const RecipeTable = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [recipeToDelete, setRecipeToDelete] = useState<Recipe | null>(null);
   const [deletionInProgress, setDeletionInProgress] = useState(false);
-
 
   useEffect(() => {
     dispatch(fetchRecipes());
@@ -85,13 +85,13 @@ const RecipeTable = () => {
 
   const handleDeleteConfirm = () => {
     if (recipeToDelete) {
-      setDeletionInProgress(true)
+      setDeletionInProgress(true);
       dispatch(deleteRecipe(recipeToDelete.id));
     }
   };
 
   return (
-    <div className="bg-white h-screen rounded">
+    <div className="h-full">
       <DataTable
         value={recipes}
         dataKey="id"
@@ -107,8 +107,7 @@ const RecipeTable = () => {
         rows={10}
         rowsPerPageOptions={[10, 20, 50]}
         scrollable
-        scrollHeight="500px"
-        className="flex-grow"
+        scrollHeight="flex"
       >
         <Column selectionMode="multiple" headerStyle={TableHeaderStyle} />
         <Column

@@ -76,17 +76,6 @@ const data = {
     },
 
     {
-      title: "User Management",
-      url: "#",
-      icon: Users,
-      items: [
-        { title: "Customers", url: "/customers" },
-        { title: "Staff Members", url: "/staffs" },
-        { title: "Riders", url: "/riders" },
-      ],
-    },
-
-    {
       title: "Marketing",
       url: "#",
       icon: Tags,
@@ -95,6 +84,17 @@ const data = {
         { title: "Coupons", url: "/coupons", icon: Star },
         { title: "Banners", url: "/banners" },
         { title: "Promotion Tags", url: "/tags" },
+      ],
+    },
+
+    {
+      title: "User Management",
+      url: "#",
+      icon: Users,
+      items: [
+        { title: "Customers", url: "/customers" },
+        { title: "Staff Members", url: "/staffs" },
+        { title: "Riders", url: "/riders" },
       ],
     },
     {

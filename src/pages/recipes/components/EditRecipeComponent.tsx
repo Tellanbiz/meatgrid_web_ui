@@ -2,25 +2,23 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import {
-  clearSelectedRecipe,
-  fetchRecipeById,
-  updateRecipe,
-} from "../../../store/features/recipe/recipeSlice";
-import {
-  resetUploadState,
-} from "../../../store/features/uploads/uploadSlice";
+import { resetUploadState } from "../../../store/features/uploads/uploadSlice";
 import TextField from "../../../components/TextField";
 import { PrimaryButton, SecondaryButton } from "../../../components/Button";
 import MarkdownEditor from "@uiw/react-md-editor";
 import ImageThumbnail from "../../../components/ImageThumbnail";
 import ProgressIndicator from "../../../components/ProgressIndicator";
-import { EditRecipeRequest } from "../../../types/EditRecipeRequest";
 import IngredientItem from "./IngredientItem";
 import { fetchProducts } from "../../../store/features/products/productThunks";
 import { ApiError } from "../../../types/ApiError";
 import { uploadImages } from "../../../store/features/uploads/uploadThunks";
 import { selectProducts } from "../../../store/features/products/productSelectors";
+import {
+  fetchRecipeById,
+  updateRecipe,
+} from "../../../store/features/recipe/recipeThunks";
+import { EditRecipeRequest } from "../../../store/features/recipe/requests/EditRecipeReqest";
+import { clearSelectedRecipe } from "../../../store/features/recipe/recipeSlice";
 
 const EditRecipeComponent = () => {
   const dispatch = useAppDispatch();
@@ -31,7 +29,7 @@ const EditRecipeComponent = () => {
   const { status: recipeStatus, error } = useAppSelector(
     (state) => state.recipes
   );
-  const products = useAppSelector(selectProducts)
+  const products = useAppSelector(selectProducts);
 
   const {
     images,

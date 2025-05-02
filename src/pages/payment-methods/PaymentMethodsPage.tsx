@@ -188,7 +188,8 @@ const PaymentMethodsPage = () => {
           </Button>
         </div>
       </div>
-      <div className="mt-4 card h-11/12">
+
+      <div className="mt-2 card h-[calc(100vh-10rem)]">
         {isLoadingPaymentMethods && (
           <ProgressBar mode="indeterminate" style={{ height: "6px" }} />
         )}
@@ -197,10 +198,9 @@ const PaymentMethodsPage = () => {
           <DataTable
             value={paymentMethods}
             loading={isLoadingPaymentMethods}
-            className="h-full"
             dataKey="id"
             paginator
-            rows={20}
+            rows={25}
             rowsPerPageOptions={[10, 25, 50]}
             emptyMessage="No payment methods found."
             loadingIcon="pi pi-spin pi-spinner"
@@ -208,7 +208,6 @@ const PaymentMethodsPage = () => {
             rowHover
             scrollable
             scrollHeight="flex"
-            paginatorPosition="bottom"
             size="small"
             tableStyle={DataTableStyle}
           >

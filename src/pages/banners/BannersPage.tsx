@@ -70,10 +70,6 @@ const BannersPage = () => {
           items={[
             {
               label: "Banners",
-              to: "/banners",
-            },
-            {
-              label: "Manage Banners",
               isPage: true,
             },
           ]}

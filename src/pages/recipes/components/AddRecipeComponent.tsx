@@ -2,21 +2,21 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import {
-  createRecipe,
-  fetchRecipes,
-} from "../../../store/features/recipe/recipeSlice";
 import { resetUploadState } from "../../../store/features/uploads/uploadSlice";
 import TextField from "../../../components/TextField";
 import { PrimaryButton, SecondaryButton } from "../../../components/Button";
 import MarkdownEditor from "@uiw/react-md-editor";
-import { CreateRecipeRequest } from "../../../types/CreateRecipeRequest";
+import { CreateRecipeRequest } from "../../../store/features/recipe/requests/CreateRecipeRequest";
 import ImageThumbnail from "../../../components/ImageThumbnail";
 import ProgressIndicator from "../../../components/ProgressIndicator";
 import IngredientItem from "./IngredientItem";
 import { fetchProducts } from "../../../store/features/products/productThunks";
 import { ApiError } from "../../../types/ApiError";
 import { uploadImages } from "../../../store/features/uploads/uploadThunks";
+import {
+  createRecipe,
+  fetchRecipes,
+} from "../../../store/features/recipe/recipeThunks";
 
 const AddRecipeComponent = () => {
   const dispatch = useAppDispatch();

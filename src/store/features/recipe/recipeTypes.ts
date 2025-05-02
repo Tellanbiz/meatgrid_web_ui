@@ -1,4 +1,9 @@
-import { Recipe } from "./Recipe";
+export interface Recipe {
+  id: string;
+  image: string;
+  name: string;
+  short_description: string;
+}
 
 export interface RecipeWithDetails extends Recipe {
   description: string;
