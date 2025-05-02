@@ -68,7 +68,7 @@ const StocksTable = () => {
   };
 
   return (
-    <div className="card bg-background">
+    <div className="h-full">
       {status === "loading" && currentOperation === "fetch" && (
         <ProgressBar mode="indeterminate" style={{ height: "6px" }} />
       )}

@@ -70,18 +70,20 @@ const ManageProductPage = () => {
       if (isEditMode) {
         const updateRequest: UpdateProductRequest = {
           id: productId!,
-          name: formData.name,
-          description: formData.description || "",
-          regular_price: formData.regular_price,
-          unit_type: formData.unit_type,
-          weight: formData.package_quantity,
-          allow_cart_weight: formData.allow_editable_weight,
-          category_id: formData.category_id!,
-          tag_id: formData.tag_id!,
-          images: allImageUrls,
-          is_product: formData.is_product,
-          is_raw_material: formData.is_raw_material,
-          minimum_stock_quantity: formData.min_stock_quantity,
+          data: {
+            name: formData.name,
+            description: formData.description || "",
+            regular_price: formData.regular_price,
+            unit_type: formData.unit_type,
+            weight: formData.package_quantity,
+            allow_cart_weight: formData.allow_editable_weight,
+            category_id: formData.category_id!,
+            tag_id: formData.tag_id!,
+            images: allImageUrls,
+            is_product: formData.is_product,
+            is_raw_material: formData.is_raw_material,
+            minimum_stock_quantity: formData.min_stock_quantity,
+          },
         };
 
         await dispatch(updateProduct(updateRequest)).unwrap();
@@ -123,7 +125,7 @@ const ManageProductPage = () => {
     dispatch(fetchCategories());
     dispatch(fetchProducts());
   }, [dispatch]);
-  
+
   return (
     <div className="">
       <div className="sticky top-16 z-10 bg-background py-3">

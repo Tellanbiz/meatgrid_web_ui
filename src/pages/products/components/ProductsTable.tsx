@@ -24,13 +24,11 @@ import {
 } from "../../../components/ui/dropdown-menu";
 import React from "react";
 import { resetProductState } from "../../../store/features/products/productSlice";
-import { useNavigate } from "react-router-dom";
-import { selectCategories } from "../../../store/features/categories/categorySelectors";
 import { selectStores } from "../../../store/features/stores/storeSelectors";
 import { fetchStores } from "../../../store/features/stores/storeThunks";
 import { Store } from "../../../store/features/stores/storeTypes";
 import { selectProducts } from "../../../store/features/products/productSelectors";
-import { Category } from "../../../store/features/categories/categoryTypes";
+import { useNavigate } from "react-router-dom";
 const ProductsTable = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -38,7 +36,6 @@ const ProductsTable = () => {
   const { status, error } = useAppSelector((state) => state.products);
 
   const products: Product[] = useAppSelector(selectProducts);
-  const categories: Category[] = useAppSelector(selectCategories);
   const stores: Store[] = useAppSelector(selectStores);
 
   const [searchString, setSearchString] = useState<string>("");

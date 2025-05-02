@@ -29,7 +29,7 @@ const StocksPage = () => {
         </div>
       </div>
 
-      <div className="mt-2">
+      <div className="mt-2 card h-[calc(100vh-10rem)] ">
         <StocksTable />
       </div>
     </>
