@@ -38,7 +38,7 @@ const Orders = () => {
         </div>
       </div>
 
-      <div className="mt-2">
+      <div className="mt-2 card h-table">
         <OrdersTable />
       </div>
     </>

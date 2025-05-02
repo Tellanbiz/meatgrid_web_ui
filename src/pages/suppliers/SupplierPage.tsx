@@ -60,7 +60,7 @@ const SupplierPage = () => {
           </div>
         </div>
 
-        <div className="pt-4">
+        <div className="mt-2 card h-table">
           <SuppliersTable
             onEdit={(supplier) => handleOpenDialog(true, supplier)}
           />

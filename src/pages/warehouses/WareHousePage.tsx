@@ -78,6 +78,7 @@ const WareHousePage = () => {
           <Button
             variant="outline"
             className="hover:bg-gray-200"
+            disabled={isFetchingStores}
             onClick={handleRefresh}
           >
             <RefreshCcw
@@ -95,7 +96,7 @@ const WareHousePage = () => {
         </div>
       </div>
 
-      <div className="mt-4 h-full mb-2">
+      <div className="mt-2 card h-table">
         {isFetchingStores && <LoadingPage />}
 
         {!isFetchingStores && (
@@ -103,7 +104,6 @@ const WareHousePage = () => {
             value={stores}
             paginator
             rows={10}
-            className="bg-background h-full"
             emptyMessage="No warehouses found."
             loading={false}
             loadingIcon="pi pi-spin pi-spinner"

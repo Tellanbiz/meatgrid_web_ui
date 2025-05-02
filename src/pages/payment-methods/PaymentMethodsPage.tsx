@@ -189,7 +189,7 @@ const PaymentMethodsPage = () => {
         </div>
       </div>
 
-      <div className="mt-2 card h-[calc(100vh-10rem)]">
+      <div className="mt-2 card h-table">
         {isLoadingPaymentMethods && (
           <ProgressBar mode="indeterminate" style={{ height: "6px" }} />
         )}

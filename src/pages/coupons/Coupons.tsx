@@ -39,6 +39,7 @@ const Coupons = () => {
             variant="outline"
             className="items-center gap-2"
             onClick={handleRefresh}
+            disabled={isFetchingCoupons}
           >
             <RefreshCcw className={`size-4 ${isFetchingCoupons? "animate-spin": ""}`} />
             Refresh
@@ -55,7 +56,7 @@ const Coupons = () => {
         </div>
       </div>
 
-      <div className="mt-2">
+      <div className="mt-2 card h-table">
         <CouponsTable />
       </div>
     </>

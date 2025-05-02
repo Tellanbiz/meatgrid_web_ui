@@ -100,7 +100,7 @@ const SuppliersTable = ({ onEdit }: SuppliersTableProps) => {
 
   return (
     <>
-      <div className="card bg-background">
+      <div className="h-full">
         {isFetching && (
           <ProgressBar
             mode="indeterminate"
@@ -117,7 +117,7 @@ const SuppliersTable = ({ onEdit }: SuppliersTableProps) => {
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} suppliers"
           scrollable
-          scrollHeight="500px"
+          scrollHeight="flex"
           size="small"
         >
           <Column

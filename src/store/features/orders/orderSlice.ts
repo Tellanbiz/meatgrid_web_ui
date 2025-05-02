@@ -15,6 +15,7 @@ interface OrderState {
   orders: Order[];
   selectedOrderNumber: string | null;
   selectedOrderState: OperationState;
+  currentOperation: "create" | "fetch" | "update" | "delete" | "cancel" | null;
   status: LoadingStatus;
   error: string | null;
   successMessage: string | null;
@@ -29,6 +30,7 @@ interface OrderState {
 const initialState: OrderState = {
   orders: [],
   selectedOrderNumber: null,
+  currentOperation: null,
   selectedOrderState: "idle",
   status: LoadingState.Idle,
   error: null,
@@ -52,15 +54,16 @@ const orderSlice = createSlice({
       state.successMessage = null;
     },
     resetUpdateOrderStatusState: (state) => {
-      state.updateStatus.status = "idle"
-      state.updateStatus.error = null
-      state.updateStatus.successMessage = null
-    }
+      state.updateStatus.status = "idle";
+      state.updateStatus.error = null;
+      state.updateStatus.successMessage = null;
+    },
   },
   extraReducers: (builder) => {
     builder
       // Fech Orders
       .addCase(fetchOrders.pending, (state) => {
+        state.currentOperation = "fetch";
         state.status = "loading";
         state.error = null;
       })
@@ -77,6 +80,8 @@ const orderSlice = createSlice({
       })
       // Cancel Order
       .addCase(cancelOrder.pending, (state, action) => {
+        state.currentOperation = "cancel";
+        state.status = "loading";
         state.selectedOrderNumber = action.meta.arg.order_id;
         state.selectedOrderState = "cancelling";
       })
@@ -94,8 +99,8 @@ const orderSlice = createSlice({
       })
       // Order Details
       .addCase(fetchOrderById.pending, (state) => {
+        state.currentOperation = "fetch";
         state.status = "loading";
-        state.error = null;
         state.selectedOrderDetails = null;
       })
       .addCase(
@@ -111,6 +116,7 @@ const orderSlice = createSlice({
       })
       // Update Order Status
       .addCase(updateOrderStatus.pending, (state) => {
+        state.currentOperation = "update";
         state.updateStatus.status = "loading";
       })
       .addCase(
@@ -122,11 +128,12 @@ const orderSlice = createSlice({
       )
       .addCase(updateOrderStatus.rejected, (state, action) => {
         state.updateStatus.status = "failed";
-        state.updateStatus.error = action.error.message ?? "Failed to update status";
+        state.updateStatus.error = action.payload ?? "Failed to update status";
       });
   },
 });
 
-export const { resetCancelOrderState, resetUpdateOrderStatusState } = orderSlice.actions;
+export const { resetCancelOrderState, resetUpdateOrderStatusState } =
+  orderSlice.actions;
 
 export default orderSlice.reducer;

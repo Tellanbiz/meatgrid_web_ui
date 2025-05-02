@@ -63,7 +63,7 @@ const StorageTypeTable: React.FC<StorageTypeTableProps> = ({
   }
 
   return (
-    <div className="mt-2 card bg-background h-11/12">
+    <div className="h-full">
       {!isLoading && (
         <DataTable
           value={storageTypes}

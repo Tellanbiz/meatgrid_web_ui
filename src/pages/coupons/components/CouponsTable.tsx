@@ -57,7 +57,7 @@ const CouponsTable = () => {
   }
 
   return (
-    <div className="bg-white h-[80vh] rounded">
+    <div className="h-full">
       <DataTable
         value={coupons}
         dataKey="id"
@@ -70,7 +70,6 @@ const CouponsTable = () => {
         rowsPerPageOptions={[10, 20, 50]}
         scrollable
         scrollHeight="flex"
-        className="flex-grow"
       >
         <Column field="name" header="Name" headerStyle={TableHeaderStyle} />
         <Column

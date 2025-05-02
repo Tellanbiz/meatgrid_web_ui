@@ -5,18 +5,6 @@
 
 @tailwind utilities;
 
-@layer components {
-  .card {
-    @apply bg-white rounded-md shadow-sm p-4 transition hover:shadow-md;
-  }
-  .text-m-secondary {
-    @apply text-gray-500
-  }
-  .btn {
-    @apply bg-primary hover:bg-blue-800 transition duration-300
-  }
-}
-
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -151,10 +139,26 @@
   }
 }
 
+@layer components {
+  .card {
+    @apply bg-white rounded-md shadow-sm p-4 transition hover:shadow-md;
+  }
+  .text-m-secondary {
+    @apply text-gray-500;
+  }
+  .btn {
+    @apply bg-primary hover:bg-blue-800 transition duration-300;
+  }
+
+  .h-table {
+    @apply h-[calc(100vh-10rem)];
+  }
+}
+
 @theme {
-  --color-primary: #1E5EFF;
+  --color-primary: #1e5eff;
   --color-primary-500: #1e2753;
   --color-primary-800: #070b1d;
   --color-success: #c4f8e2;
-  --color-background: #F5F6FA;
+  --color-background: #f5f6fa;
 }

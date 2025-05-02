@@ -82,12 +82,14 @@ const StorageTypesPage = () => {
         </div>
       </div>
 
-      <StorageTypeTable
-        storageTypes={storageTypes}
-        isLoading={isLoading}
-        onEdit={handleEditStorageType}
-        onDelete={handleDeleteStorageType}
-      />
+      <div className="mt-2 card h-table">
+        <StorageTypeTable
+          storageTypes={storageTypes}
+          isLoading={isLoading}
+          onEdit={handleEditStorageType}
+          onDelete={handleDeleteStorageType}
+        />
+      </div>
     </div>
   );
 };

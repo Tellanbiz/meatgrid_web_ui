@@ -229,7 +229,7 @@ const OrdersTable = () => {
   }
 
   return (
-    <div>
+    <div className="h-full">
       <DataTable
         value={filteredOrders}
         dataKey="id"
@@ -242,7 +242,7 @@ const OrdersTable = () => {
         rows={10}
         rowsPerPageOptions={[10, 20, 50]}
         scrollable
-        scrollHeight="500px"
+        scrollHeight="flex"
         header={
           <OrdersTableHeader
             searchTerm={searchTerm}
