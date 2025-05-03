@@ -2,8 +2,9 @@ import { FormEvent, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "../../store/hooks.ts";
-import { loginUser, resetStatus } from "../../store/features/auth/authSlice.ts";
+import { resetStatus } from "../../store/features/auth/authSlice.ts";
 import { Button } from "../../components/ui/button.tsx";
+import { loginUser } from "../../store/features/auth/authThunks.ts";
 
 const LoginPage = () => {
   const [phone, setPhone] = useState("");
