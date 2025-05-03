@@ -27,6 +27,18 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import {
+  selectAuthUser,
+  selectIsFetchingAdminAccount,
+  selectIsLoggingOut,
+  selectLogoutSuccess,
+} from "../store/features/auth/authSelectors";
+import {
+  fetchAdminAccount,
+  logoutUser,
+} from "../store/features/auth/authThunks";
+import { useNavigate } from "react-router-dom";
 
 const data = {
   company: {
@@ -107,14 +119,40 @@ const data = {
       ],
     },
   ],
-  user: {
-    name: "Samwel Njuguna",
-    email: "snjuguna@tellanbusiness.com",
-    avatar: "/avatars/samwel.jpg",
-  },
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectAuthUser);
+  const isFetchingAdminAccount = useAppSelector(selectIsFetchingAdminAccount);
+  const isLoggingOut = useAppSelector(selectIsLoggingOut);
+  const logoutSuccess = useAppSelector(selectLogoutSuccess);
+
+  React.useEffect(() => {
+    if (!user) {
+      dispatch(fetchAdminAccount());
+    }
+  }, [dispatch, isFetchingAdminAccount, user]);
+
+  React.useEffect(() => {
+    if (logoutSuccess) {
+      navigate("/login");
+    }
+  }, [logoutSuccess, navigate]);
+
+  const handleAccountClick = () => {
+    console.log("Account clicked");
+  };
+
+  const handleNotificationClick = () => {
+    console.log("Notifications clicked");
+  };
+
+  const handleLogoutClick = () => {
+    dispatch(logoutUser());
+  };
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -124,7 +162,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser
+          user={user}
+          isLoggingOut={isLoggingOut}
+          onAccountClick={handleAccountClick}
+          onNotificationClick={handleNotificationClick}
+          onLogoutClick={handleLogoutClick}
+        />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
