@@ -68,7 +68,8 @@ const TransferStockPage = () => {
     ProductToTransfer[]
   >([]);
 
-  const [selectedProduct, setSelectedProduct] = useState<string>("");
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProductId, setSelectedProductId] = useState<string>("");
   const [productQuantity, setProductQuantity] = useState<number>(1);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -98,14 +99,15 @@ const TransferStockPage = () => {
   };
 
   const handleSelectProduct = (product: Product) => {
-    setSelectedProduct(product.id);
+    setSelectedProduct(product);
+    setSelectedProductId(product.id);
     setProductQuantity(1);
   };
 
   const handleAddProduct = () => {
     if (!selectedProduct || productQuantity <= 0) return;
 
-    const product = products.find((p) => p.id === selectedProduct);
+    const product = products.find((p) => p.id === selectedProductId);
     if (!product) return;
 
     const newProduct: ProductToTransfer = {
@@ -116,7 +118,8 @@ const TransferStockPage = () => {
     };
 
     setProductsToTransfer([...productsToTransfer, newProduct]);
-    setSelectedProduct("");
+    setSelectedProduct(null);
+    setSelectedProductId("");
     setProductQuantity(1);
     setIsAddDialogOpen(false);
   };
@@ -160,8 +163,8 @@ const TransferStockPage = () => {
       };
 
       await dispatch(transferStock(transferRequest)).unwrap();
-      toast.success("Stock transfer completed successfully!");
       navigate("/stock");
+      toast.success("Stock transfer completed successfully!");
     } catch (error) {
       console.error("Failed to transfer stock:", error);
     }
@@ -294,7 +297,7 @@ const TransferStockPage = () => {
                     <div className="space-y-2">
                       <Label htmlFor="product">Product</Label>
                       <Select
-                        value={selectedProduct}
+                        value={selectedProductId}
                         onValueChange={(value) => {
                           const product = products.find((p) => p.id === value);
                           if (product) {
@@ -320,7 +323,12 @@ const TransferStockPage = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="quantity">Quantity</Label>
+                      <Label htmlFor="quantity">
+                        Quantity{" "}
+                        {selectedProduct
+                          ? `(${selectedProduct.unit_type})`
+                          : ""}
+                      </Label>
                       <Input
                         id="quantity"
                         type="number"
@@ -426,7 +434,8 @@ const TransferStockPage = () => {
             <div className="py-4">
               <div className="space-y-2">
                 <Label htmlFor="edit-quantity">
-                  Quantity ({editingProduct?.unit_type})
+                  Quantity
+                  {editingProduct ? ` (${editingProduct.unit_type})` : ""}
                 </Label>
                 <Input
                   id="edit-quantity"
