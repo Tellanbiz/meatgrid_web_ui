@@ -13,6 +13,10 @@ export const selectIsUpdatingStock = (state: RootState) =>
   state.stocks.status === "loading" &&
   state.stocks.currentOperation === "update";
 
+export const selectIsRestockingInventory = (state: RootState) =>
+  state.stocks.status === "loading" &&
+  state.stocks.currentOperation === "restockInventory";
+
 export const selectIsTransferringStock = (state: RootState) =>
   state.stocks.status === "loading" &&
   state.stocks.currentOperation === "transferStock";

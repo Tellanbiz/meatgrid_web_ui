@@ -1,4 +1,4 @@
-import { Forward, Plus, RefreshCcw } from "lucide-react";
+import { Forward, Plus, RedoDot, RefreshCcw } from "lucide-react";
 import Breadcrumbs from "../../components/breadcrumbs";
 import StocksTable from "./components/StocksTable";
 import { Button } from "../../components/ui/button";
@@ -18,6 +18,10 @@ const StocksPage = () => {
 
   const handleTransferStock = () => {
     navigate("/stock/transfer");
+  };
+
+  const handleRestock = () => {
+    navigate("/stock/restock");
   };
 
   return (
@@ -42,6 +46,11 @@ const StocksPage = () => {
               className={`h-4 w-4 ${isFetchingStocks && "animate-spin"}`}
             />
             Refresh
+          </Button>
+
+          <Button variant="outline" className="px-2" onClick={handleRestock}>
+            <RedoDot className="h-4 w-4" />
+            Restock
           </Button>
 
           <Button
