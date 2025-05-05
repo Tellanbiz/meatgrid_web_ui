@@ -17,7 +17,7 @@ const SupplierPage = () => {
     null
   );
 
-  const isFetching = useAppSelector(selectIsFetchingSuppliers);
+  const isFetchingSuppliers = useAppSelector(selectIsFetchingSuppliers);
 
   const dispatch = useAppDispatch();
 
@@ -46,8 +46,15 @@ const SupplierPage = () => {
           <Breadcrumbs items={[{ label: "Suppliers", isPage: true }]} />
 
           <div className="flex space-x-2">
-            <Button variant="outline" className="" onClick={handleRefresh}>
-              <RefreshCcw className={`${isFetching && "animate-spin"}`} />
+            <Button
+              variant="outline"
+              className=""
+              onClick={handleRefresh}
+              disabled={isFetchingSuppliers}
+            >
+              <RefreshCcw
+                className={`${isFetchingSuppliers && "animate-spin"}`}
+              />
               Refresh
             </Button>
             <Button

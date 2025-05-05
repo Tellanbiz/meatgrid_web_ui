@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../../../service/api";
 import { Stock } from "./stockTypes";
 import { ApiError } from "../../../types/ApiError";
+import { UpdateStockQuantityRequest } from "./request/UpdateStockQuantityRequest";
 
 export const fetchStocks = createAsyncThunk<
   Stock[],
@@ -15,6 +16,22 @@ export const fetchStocks = createAsyncThunk<
     const error = err as ApiError;
     return rejectWithValue(
       error.response?.data?.error || "Failed to fetch stocks"
+    );
+  }
+});
+
+export const updateStockQuantity = createAsyncThunk<
+  string,
+  UpdateStockQuantityRequest,
+  { rejectValue: string }
+>("stocks/updateStockQuantity", async (data, { rejectWithValue }) => {
+  try {
+    const res = await axios.post(`/stocks/update`, data);
+    return res.data.message;
+  } catch (err: unknown) {
+    const error = err as ApiError;
+    return rejectWithValue(
+      error.response?.data?.error || "Failed to update stock quantity"
     );
   }
 });

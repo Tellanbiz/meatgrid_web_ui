@@ -1,4 +1,5 @@
 import { OrderStatus } from "../store/features/orders/orderTypes";
+import { StockStatus } from "../store/features/stock/stockTypes";
 
 export type StatusColors = { [key: string]: string };
 
@@ -24,4 +25,12 @@ export const orderStatusColors: Record<OrderStatus, string> = {
   [OrderStatus.Dispatch]: "bg-purple-200 text-purple-800",
   [OrderStatus.Delivered]: "bg-green-500 text-white",
   [OrderStatus.Cancelled]: "bg-red-200 text-red-800",
+};
+
+export const stockStatusColors: Record<StockStatus, string> = {
+  [StockStatus.InStock]: "bg-green-500 text-white",
+  [StockStatus.Sold]: "bg-blue-500 text-white",
+  [StockStatus.Reclaim]: "bg-yellow-500 text-white",
+  [StockStatus.Processed]: "bg-purple-500 text-white",
+  [StockStatus.Migrated]: "bg-red-500 text-white",
 };

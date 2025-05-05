@@ -9,10 +9,18 @@ export interface StockStore {
   name: string;
 }
 
+export enum StockStatus {
+  InStock = "instock",
+  Sold = "sold",
+  Reclaim = "reclaim",
+  Processed = "processed",
+  Migrated = "migrated",
+}
+
 export interface Stock {
   id: string;
   quantity: number;
-  status: string;
+  status: StockStatus;
   product: StockProduct;
   store?: StockStore;
   created_at: string;

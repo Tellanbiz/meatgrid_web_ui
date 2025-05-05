@@ -6,8 +6,11 @@ import {
   TableHeaderStyle,
 } from "../../../constants/TableStyles";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { useEffect } from "react";
-import { fetchStocks } from "../../../store/features/stock/stockThunks";
+import { useEffect, useState } from "react";
+import {
+  fetchStocks,
+  updateStockQuantity,
+} from "../../../store/features/stock/stockThunks";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,34 +20,67 @@ import {
 import { MoreVertical, Pencil } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Stock } from "../../../store/features/stock/stockTypes";
+import { stockStatusColors } from "../../../constants/StatusColors";
+import { Badge } from "../../../components/ui/badge";
+import {
+  selectIsFetchingStocks,
+  selectStocks,
+} from "../../../store/features/stock/stockSelectors";
+import { useModal } from "../../../hooks/use-modal";
+import UpdateStockDialog from "./UpdateStockDialog";
+import { toast } from "sonner";
+import { UpdateStockQuantityRequest } from "../../../store/features/stock/request/UpdateStockQuantityRequest";
 
 const StocksTable = () => {
   const dispatch = useAppDispatch();
-  const { stocks, status, currentOperation } = useAppSelector(
-    (state) => state.stocks
-  );
-
+  const isFetchingStocks = useAppSelector(selectIsFetchingStocks);
+  const stocks = useAppSelector(selectStocks);
+  const { isOpen, openModal, closeModal } = useModal();
+  const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  console.log("render");
   useEffect(() => {
     dispatch(fetchStocks());
   }, [dispatch]);
 
   const statusTemplate = (rowData: Stock) => {
+    const colorClass = stockStatusColors[rowData.status] || "bg-gray-500";
     return (
-      <span
-        className={`text-xs font-semibold px-2 py-1 rounded ${
-          rowData.status === "available"
-            ? "bg-green-100 text-green-800"
-            : "bg-red-100 text-red-800"
-        }`}
-      >
+      <Badge variant="outline" className={`${colorClass}`}>
         {rowData.status}
-      </span>
+      </Badge>
     );
   };
 
   const handleEdit = (stock: Stock) => {
-    // Logic for editing product
-    console.log("Edit stock:", stock);
+    setSelectedStock(stock);
+    openModal();
+  };
+  const handleUpdateStock = async (newQuantity: number) => {
+    setIsLoading(true);
+    try {
+      if (!selectedStock) {
+        return;
+      }
+
+      const request: UpdateStockQuantityRequest = {
+        id: selectedStock.id,
+        quantity: newQuantity,
+      };
+
+      const message = await dispatch(updateStockQuantity(request)).unwrap();
+      toast.success(message);
+      closeModal();
+      dispatch(fetchStocks());
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An error occurred while updating the stock.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const actionsBodyTemplate = (stock: Stock) => {
@@ -60,7 +96,7 @@ const StocksTable = () => {
             onSelect={() => handleEdit(stock)}
             className="flex items-center gap-2"
           >
-            <Pencil className="h-4 w-4" /> Edit
+            <Pencil className="h-4 w-4" /> Update Stock
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -69,7 +105,7 @@ const StocksTable = () => {
 
   return (
     <div className="h-full">
-      {status === "loading" && currentOperation === "fetch" && (
+      {isFetchingStocks && (
         <ProgressBar mode="indeterminate" style={{ height: "6px" }} />
       )}
 
@@ -95,8 +131,10 @@ const StocksTable = () => {
           headerStyle={TableHeaderStyle}
         />
         <Column
-          field="quantity"
           header="Quantity"
+          body={(stock: Stock) =>
+            `${stock.quantity.toLocaleString()} ${stock.product.unit_type}`
+          }
           headerStyle={TableHeaderStyle}
         />
         <Column
@@ -122,6 +160,14 @@ const StocksTable = () => {
           headerStyle={TableHeaderStyle}
         ></Column>
       </DataTable>
+
+      <UpdateStockDialog
+        isLoading={isLoading}
+        open={isOpen}
+        onClose={closeModal}
+        onUpdate={handleUpdateStock}
+        stock={selectedStock}
+      />
     </div>
   );
 };
