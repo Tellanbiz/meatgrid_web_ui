@@ -1,17 +1,23 @@
-import { Plus, RefreshCcw } from "lucide-react";
+import { Forward, Plus, RefreshCcw } from "lucide-react";
 import Breadcrumbs from "../../components/breadcrumbs";
 import StocksTable from "./components/StocksTable";
 import { Button } from "../../components/ui/button";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchStocks } from "../../store/features/stock/stockThunks";
 import { selectIsFetchingStocks } from "../../store/features/stock/stockSelectors";
+import { useNavigate } from "react-router-dom";
 
 const StocksPage = () => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const isFetchingStocks = useAppSelector(selectIsFetchingStocks);
 
   const handleRefresh = () => {
     dispatch(fetchStocks());
+  };
+
+  const handleTransferStock = () => {
+    navigate("/stock/transfer");
   };
 
   return (
@@ -36,6 +42,15 @@ const StocksPage = () => {
               className={`h-4 w-4 ${isFetchingStocks && "animate-spin"}`}
             />
             Refresh
+          </Button>
+
+          <Button
+            variant="outline"
+            className="px-2"
+            onClick={handleTransferStock}
+          >
+            <Forward className="h-4 w-4" />
+            Transfer Stock
           </Button>
 
           <Button variant="default" className="px-2" onClick={() => null}>

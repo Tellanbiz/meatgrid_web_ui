@@ -1,11 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchStocks, updateStockQuantity } from "./stockThunks";
+import { fetchStocks, transferStock, updateStockQuantity } from "./stockThunks";
 import { Stock } from "./stockTypes";
 import { LoadingStatus } from "../../../types/LoadingStatus";
 
 interface StocksState {
   stocks: Stock[];
-  currentOperation: "create" | "fetch" | "update" | "delete" | null;
+  currentOperation:
+    | "create"
+    | "fetch"
+    | "update"
+    | "delete"
+    | "transferStock"
+    | null;
   status: LoadingStatus;
   error: string | null;
   successMessage: string | null;
@@ -48,6 +54,19 @@ const stockSlice = createSlice({
         state.successMessage = action.payload;
       })
       .addCase(updateStockQuantity.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Unknown error";
+      })
+      .addCase(transferStock.pending, (state) => {
+        state.currentOperation = "transferStock";
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(transferStock.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.successMessage = action.payload;
+      })
+      .addCase(transferStock.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || "Unknown error";
       });

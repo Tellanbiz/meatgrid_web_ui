@@ -29,6 +29,7 @@ import CategoriesPage from "../pages/categories/CategoriesPage.js";
 import StorageTypesPage from "../pages/storage-types/StorageTypesPage.js";
 import ManageStorageTypesPage from "../pages/storage-types/ManageStorageTypesPage.js";
 import ManageProductPage from "../pages/products/ManageProductPage.js";
+import TransferStockPage from "../pages/stocks/TransferStockPage.js";
 
 const routes: RouteObject[] = [
   {
@@ -135,6 +136,10 @@ const routes: RouteObject[] = [
       {
         path: "stock",
         element: <StocksPage />,
+      },
+      {
+        path: "stock/transfer",
+        element: <TransferStockPage />,
       },
       {
         path: "warehouses",
