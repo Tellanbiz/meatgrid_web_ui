@@ -1,19 +1,16 @@
-import { FiSettings, FiDollarSign, FiShoppingCart } from "react-icons/fi";
+import { FiDollarSign, FiShoppingCart } from "react-icons/fi";
 import StatisticsBox from "./components/StatisticsBox";
 import OrderStatistics from "./components/OrdersStatistics";
 import Last7DaysSales from "./components/Last7DaysSales";
 import RecentTransactions from "../../components/RecentTransactions";
 import TopProducts from "./components/TopProducts";
+import Breadcrumbs from "../../components/breadcrumbs";
 
 const Dashboard = () => {
   return (
-    <div className="w-full flex flex-col space-y-8 p-2">
-      <div className="flex justify-between items-center p-4 rounded">
-        <h2 className="text-lg font-semibold text-black">Dashboard</h2>
-        <button className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 font-medium">
-          <FiSettings className="text-lg mr-2" />
-          <span>Manage</span>
-        </button>
+    <div className="w-full flex flex-col space-y-8 p-1">
+      <div className="flex justify-between items-center sticky top-16 bg-background py-3">
+        <Breadcrumbs items={[{ label: "Dashboard", isPage: true }]} />
       </div>
 
       <div className="space-y-4 m">

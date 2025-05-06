@@ -149,7 +149,7 @@ const RestockPage = () => {
       const restockRequest = {
         store_id: selectedStore,
         storage_type_id: selectedStorageType,
-        supplier_id: selectedSupplier || undefined, // Make it optional
+        supplier_id: selectedSupplier || undefined,
         products: productsToRestock.map((product) => ({
           product_id: product.id,
           quantity: product.quantity,
