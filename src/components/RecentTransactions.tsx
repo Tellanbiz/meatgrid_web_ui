@@ -25,35 +25,24 @@ const RecentTransactions = () => {
 
   return (
     <>
-      <div className="bg-white rounded w-full p-4 text-black">
-        <h3 className="font-bold text-base">Recent Transactions</h3>
+      <div className="card h-full w-full">
+        <h3 className="text-base font-medium">Recent Transactions</h3>
 
-        <div className="mt-4">
-          <DataTable
-            value={transactions}
-            tableStyle={{ ...DataTableStyle, minWidth: "5rem" }}
-          >
-            <Column
-              field="name"
-              header="Name"
-              headerStyle={TableHeaderStyle}
-            ></Column>
-            <Column
-              field="date"
-              header="Date"
-              headerStyle={TableHeaderStyle}
-            ></Column>
+        <div className="mt-2">
+          <DataTable value={transactions} tableStyle={DataTableStyle}>
+            <Column field="name" header="Name" headerStyle={TableHeaderStyle} />
+            <Column field="date" header="Date" headerStyle={TableHeaderStyle} />
             <Column
               field="amount"
               header="Amount"
               headerStyle={TableHeaderStyle}
-            ></Column>
+            />
             <Column
               field="status"
               header="Status"
               body={statusTemplate}
               headerStyle={TableHeaderStyle}
-            ></Column>
+            />
           </DataTable>
         </div>
       </div>
