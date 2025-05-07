@@ -1,4 +1,4 @@
-import { Forward, Plus, RedoDot, RefreshCcw } from "lucide-react";
+import { Forward, Plus, RedoDot, RefreshCcw, WandSparkles } from "lucide-react";
 import Breadcrumbs from "../../components/breadcrumbs";
 import StocksTable from "./components/StocksTable";
 import { Button } from "../../components/ui/button";
@@ -22,6 +22,10 @@ const StocksPage = () => {
 
   const handleRestock = () => {
     navigate("/stock/restock");
+  };
+
+  const handleProcessProducts = () => {
+    navigate("/stock/process");
   };
 
   return (
@@ -60,6 +64,15 @@ const StocksPage = () => {
           >
             <Forward className="h-4 w-4" />
             Transfer Stock
+          </Button>
+
+          <Button
+            variant="outline"
+            className="px-2"
+            onClick={handleProcessProducts}
+          >
+            <WandSparkles className="h-4 w-4" />
+            Process Products
           </Button>
 
           <Button variant="default" className="px-2" onClick={() => null}>
