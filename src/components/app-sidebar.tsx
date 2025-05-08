@@ -43,7 +43,7 @@ import { useNavigate } from "react-router-dom";
 const data = {
   company: {
     name: "MeatGrid",
-    logo: "/images/tellan-logo.png",
+    logo: "/images/logo.png",
   },
   navMain: [
     {

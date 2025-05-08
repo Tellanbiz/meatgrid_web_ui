@@ -19,16 +19,22 @@ export function CompanyHeader({
       <SidebarMenuItem>
         <SidebarMenuButton
           size="lg"
-          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground
+          justify-start p-2
+          h-16
+          "
         >
-          <div className="flex aspect-square w-32 h-12 p-2 items-center justify-center rounded bg-primary-500 text-sidebar-primary-foreground">
+          <div className="flex p-2 items-center justify-start text-sidebar-primary-foreground h-40 space-x-4">
             <img
               src={company.logo}
               alt={company.name}
-              className="w-32 h-auto object-cover"
+              className="w-16 h-40 object-cover"
             />
+            <span className="font-medium text-xl text-red-500">
+              {" "}
+              | MeatGrid
+            </span>
           </div>
-          <span className="font-medium"> | MeatGrid</span>
         </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>
