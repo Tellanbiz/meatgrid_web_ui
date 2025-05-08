@@ -2,7 +2,7 @@ import ProgressIndicator from "./ProgressIndicator";
 
 const LoadingPage = () => {
   return (
-    <div className="w-full h-screen p-4 flex justify-center items-center">
+    <div className="w-full h-full p-4 flex justify-center items-center">
       <ProgressIndicator />
     </div>
   );

@@ -31,6 +31,8 @@ import ManageStorageTypesPage from "../pages/storage-types/ManageStorageTypesPag
 import ManageProductPage from "../pages/products/ManageProductPage.js";
 import TransferStockPage from "../pages/stocks/TransferStockPage.js";
 import RestockPage from "../pages/stocks/RestockPage.js";
+import ProcessProductsPage from "../pages/stocks/ProcessProductsPage.js";
+import SelectProductsPage from "../pages/stocks/SelectProductsPage.js";
 
 const routes: RouteObject[] = [
   {
@@ -145,6 +147,14 @@ const routes: RouteObject[] = [
       {
         path: "stock/restock",
         element: <RestockPage />,
+      },
+      {
+        path: "stock/process",
+        element: <ProcessProductsPage />,
+      },
+      {
+        path: "stock/process/select-products",
+        element: <SelectProductsPage />,
       },
       {
         path: "warehouses",

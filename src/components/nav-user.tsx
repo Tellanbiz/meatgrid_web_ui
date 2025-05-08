@@ -48,14 +48,14 @@ export function NavUser({
     if (!fullName) {
       return "";
     }
-    const words = fullName.split(" ");
-    let initials = "";
-    for (const word of words) {
-      if (word.length > 0) {
-        initials += word.charAt(0).toUpperCase();
-      }
+    const words = fullName.split(" ").filter((word) => word.length > 0);
+    if (words.length === 1) {
+      return words[0].charAt(0).toUpperCase();
     }
-    return initials;
+    return (
+      words[0].charAt(0).toUpperCase() +
+      words[words.length - 1].charAt(0).toUpperCase()
+    );
   }
 
   return (

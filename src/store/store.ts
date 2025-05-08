@@ -13,6 +13,8 @@ import paymentMethodReducer from "./features/payment-methods/paymentMethodSlice"
 import storeReducer from "./features/stores/storeSlice";
 import bannerReducer from "./features/banners/bannerSlice";
 import storageReducer from "./features/storages/storageSlice";
+import reportReducer from "./features/reports/reportSlice";
+import processProductReducer from "./features/process-products/processProductSlice";
 
 export const store = configureStore({
   reducer: {
@@ -30,6 +32,8 @@ export const store = configureStore({
     stores: storeReducer,
     banners: bannerReducer,
     storages: storageReducer,
+    reports: reportReducer,
+    processProducts: processProductReducer,
   },
   devTools: process.env.NODE_ENV != "production",
 });
