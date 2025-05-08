@@ -21,15 +21,12 @@ export const fetchAccounts = createAsyncThunk<
 });
 
 export const updateUserRole = createAsyncThunk<
-  string, 
+  string,
   UpdateUserRoleRequest,
   { rejectValue: string }
 >("accounts/updateUserRole", async (payload, { rejectWithValue }) => {
   try {
-    const response = await axios.post(
-      `/admin/roles`,
-      payload
-    );
+    const response = await axios.post(`/admin/roles`, payload);
     return response.data.message;
   } catch (err: unknown) {
     const error = err as ApiError;

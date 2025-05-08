@@ -25,10 +25,14 @@ import { Badge } from "../../components/ui/badge";
 import { formatDate } from "../../utils/dateUtils";
 import UpdateUserRoleDialog from "./components/UpdateUserRoleDialog";
 import { useModal } from "../../hooks/use-modal";
+import UpdateStaffPermissionsDialog from "./components/UpdateStaffPermissionsDialog";
+import { selectStores } from "../../store/features/stores/storeSelectors";
+import { fetchStores } from "../../store/features/stores/storeThunks";
 
 const AccountsPage = () => {
   const dispatch = useAppDispatch();
   const accounts = useAppSelector(selectAccounts);
+  const stores = useAppSelector(selectStores);
   const isFetchingAccounts = useAppSelector(selectIsFetchingAccounts);
   const accountError = useAppSelector(selectAccountError);
 
@@ -37,9 +41,11 @@ const AccountsPage = () => {
   );
 
   const [isRoleDialogOpen, setIsRoleDialogOpen] = useModal();
+  const [isStaffDialogOpen, setIsStaffDialogOpen] = useModal();
 
   useEffect(() => {
     dispatch(fetchAccounts());
+    dispatch(fetchStores());
   }, [dispatch]);
 
   useEffect(() => {
@@ -64,12 +70,18 @@ const AccountsPage = () => {
           <DropdownMenuItem onClick={() => handleUpdateRole(rowData)}>
             Update Role
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => handleUpdateStaffStatus(rowData)}>
-            Update Staff Status
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => handleUpdateRiderStatus(rowData)}>
-            Update Rider Status
-          </DropdownMenuItem>
+
+          {rowData.role != "indivual" && (
+            <DropdownMenuItem onClick={() => handleUpdateStaffStatus(rowData)}>
+              Update Staff Permissions
+            </DropdownMenuItem>
+          )}
+
+          {rowData.role === "organization" && (
+            <DropdownMenuItem onClick={() => handleUpdateRiderStatus(rowData)}>
+              Update Rider Status
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     );
@@ -83,15 +95,14 @@ const AccountsPage = () => {
   const handleUpdateSuccess = () => {
     dispatch(fetchAccounts());
   };
-  
+
   const handleUpdateStaffStatus = (account: UserAccount) => {
     setSelectedAccount(account);
-    toast.info(`Update Staff Status for ${account.full_name}`);
+    setIsStaffDialogOpen(true);
   };
 
   const handleUpdateRiderStatus = (account: UserAccount) => {
     setSelectedAccount(account);
-    toast.info(`Update Rider Status for ${account.full_name}`);
   };
 
   // Updated name template with verification badge
@@ -227,6 +238,14 @@ const AccountsPage = () => {
         open={isRoleDialogOpen}
         onOpenChange={setIsRoleDialogOpen}
         account={selectedAccount}
+        onUpdateSuccess={handleUpdateSuccess}
+      />
+
+      <UpdateStaffPermissionsDialog
+        open={isStaffDialogOpen}
+        onOpenChange={setIsStaffDialogOpen}
+        account={selectedAccount}
+        stores={stores}
         onUpdateSuccess={handleUpdateSuccess}
       />
     </div>

@@ -70,10 +70,10 @@ const UpdateUserRoleDialog = ({
     if (successMessage) {
       toast.success(successMessage);
       dispatch(clearAccountMessages());
+      onOpenChange(false);
       if (onUpdateSuccess) {
         onUpdateSuccess();
       }
-      onOpenChange(false);
     }
   }, [successMessage, dispatch, onOpenChange, onUpdateSuccess]);
 
@@ -121,8 +121,8 @@ const UpdateUserRoleDialog = ({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="indivual">Individual</SelectItem>
-                  <SelectItem value="organization">Organization</SelectItem>
                   <SelectItem value="staff">Staff</SelectItem>
+                  <SelectItem value="organization">Organization</SelectItem>
                   <SelectItem value="adminstrator">Administrator</SelectItem>
                 </SelectContent>
               </Select>

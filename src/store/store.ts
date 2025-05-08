@@ -16,6 +16,7 @@ import storageReducer from "./features/storages/storageSlice";
 import reportReducer from "./features/reports/reportSlice";
 import processProductReducer from "./features/process-products/processProductSlice";
 import accountSlice from "./features/accounts/accountSlice";
+import staffReducer from "./features/staff/staffSlice";
 
 export const store = configureStore({
   reducer: {
@@ -36,6 +37,7 @@ export const store = configureStore({
     reports: reportReducer,
     processProducts: processProductReducer,
     accounts: accountSlice,
+    staff: staffReducer,
   },
   devTools: process.env.NODE_ENV != "production",
 });
