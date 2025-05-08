@@ -1,4 +1,4 @@
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Loader2, RefreshCcw } from "lucide-react";
 import Breadcrumbs from "../../components/breadcrumbs";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -11,7 +11,10 @@ import {
 } from "../../components/ui/dialog";
 import { Label } from "../../components/ui/label";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { selectProducts } from "../../store/features/products/productSelectors";
+import {
+  selectIsFetchingProducts,
+  selectProducts,
+} from "../../store/features/products/productSelectors";
 import { fetchProducts } from "../../store/features/products/productThunks";
 import { useEffect, useState } from "react";
 import { Product } from "../../store/features/products/productTypes";
@@ -23,16 +26,43 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
+import {
+  selectStore,
+  selectStorageType,
+  selectSuppliers,
+  selectIsProcesssingProducts,
+  selectProcessProductSuccessMessage,
+  selectProcessProductError,
+} from "../../store/features/process-products/processProductSelectors";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { ProcessProductRequest } from "../../store/features/process-products/requests/ProcessProductRequest";
+import { processProducts } from "../../store/features/process-products/processProductThunks";
+import { resetProcessProductState } from "../../store/features/process-products/processProductSlice";
+import LoadingPage from "../../components/LoadingPage";
+
 const SelectProductsPage = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const products: Product[] = useAppSelector(selectProducts);
+
+  const selectedStore = useAppSelector(selectStore);
+  const selectedStorageType = useAppSelector(selectStorageType);
+  const selectedSuppliers = useAppSelector(selectSuppliers);
+  const isProcessingProducts = useAppSelector(selectIsProcesssingProducts);
+  const processingProductsError = useAppSelector(selectProcessProductError);
+  const processingProductsSuccessMessage = useAppSelector(
+    selectProcessProductSuccessMessage
+  );
+  const isFetchingProducts = useAppSelector(selectIsFetchingProducts);
 
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState<string>("");
   const [addAs, setAddAs] = useState<"raw_material" | "product">(
     "raw_material"
-  ); // Dropdown state
+  );
   const [rawMaterials, setRawMaterials] = useState<
     (Product & { quantity: string })[]
   >([]);
@@ -42,13 +72,43 @@ const SelectProductsPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
+    if (
+      !selectedStore ||
+      !selectedStorageType ||
+      selectedSuppliers.length === 0
+    ) {
+      navigate("/stock");
+    }
+  }, [selectedStore, selectedStorageType, selectedSuppliers, navigate]);
+
+  useEffect(() => {
+    if (products.length === 0) {
+      dispatch(fetchProducts());
+    }
+  }, [dispatch, products.length]);
+
+  useEffect(() => {
+    if (processingProductsError) {
+      toast.error(processingProductsError);
+    }
+  }, [processingProductsError]);
+
+  useEffect(() => {
+    if (processingProductsSuccessMessage) {
+      toast.success("Products processed successfully");
+      dispatch(resetProcessProductState());
+      navigate("/stock");
+    }
+  }, [processingProductsSuccessMessage, dispatch, navigate]);
 
   const handleAddProduct = (product: Product) => {
     setSelectedProduct(product);
-    setAddAs("raw_material"); // Default to raw material
+    setAddAs("raw_material");
     setIsDialogOpen(true);
+  };
+
+  const handleRefreshProducts = () => {
+    dispatch(fetchProducts());
   };
 
   const handleConfirmAdd = () => {
@@ -130,8 +190,26 @@ const SelectProductsPage = () => {
   );
 
   const handleProcessProducts = () => {
-    console.log("Processing products...", { rawMaterials, processedProducts });
+    const request: ProcessProductRequest = {
+      suppliers: selectedSuppliers,
+      raw_materials: rawMaterials.map((item) => ({
+        quantity: parseFloat(item.quantity),
+        product_id: item.id,
+        store_id: selectedStore || "",
+      })),
+      processed_products: processedProducts.map((item) => ({
+        quantity: parseFloat(item.quantity),
+        product_id: item.id,
+        store_id: selectedStore || "",
+        storage_type_id: selectedStorageType || "",
+      })),
+    };
+
+    dispatch(processProducts(request));
   };
+
+  const isFinishDisabled =
+    rawMaterials.length === 0 || processedProducts.length === 0;
 
   return (
     <div>
@@ -153,54 +231,77 @@ const SelectProductsPage = () => {
           ]}
         />
 
-        <Button onClick={handleProcessProducts} className="px-2">
-          <CheckCircle className="size-4" />
-          Finish
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            onClick={handleRefreshProducts}
+            className="p-2"
+            disabled={isFetchingProducts}
+          >
+            <RefreshCcw
+              className={`size-4 ${isFetchingProducts && "animate-spin"}`}
+            />
+            Refresh
+          </Button>
+
+          <Button
+            onClick={handleProcessProducts}
+            className="px-2"
+            disabled={isFinishDisabled || isProcessingProducts}
+          >
+            {isProcessingProducts ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <CheckCircle className="size-4" />
+            )}
+            Finish
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-4 mt-2">
-        <div className="space-y-2">
-          <Label htmlFor="search" className="font-normal text-base">
-            Search Products
-          </Label>
+        <div className="space-y-2 h-table">
           <Input
             id="search"
             placeholder="Search products..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <div className="h-[70vh] overflow-y-auto border rounded-md p-2 space-y-2">
-            {filteredProducts.map((product) => (
-              <div
-                key={product.id}
-                className="flex items-center justify-between p-2 rounded-md hover:bg-gray-100"
-              >
-                <div>
-                  <p className="text-sm font-medium">{product.name}</p>
-                  <p className="text-xs text-gray-500">
-                    {product.is_raw_material && product.is_product
-                      ? "Raw Material | Product"
-                      : product.is_raw_material
-                      ? "Raw Material"
-                      : "Product"}
-                  </p>
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleAddProduct(product)}
+          <div className="h-full overflow-y-auto border rounded-md p-2 space-y-2">
+            {isFetchingProducts ? (
+              <LoadingPage />
+            ) : (
+              filteredProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="flex items-center justify-between p-2 rounded-md hover:bg-gray-100"
                 >
-                  Add
-                </Button>
-              </div>
-            ))}
+                  <div>
+                    <p className="text-sm font-medium">{product.name}</p>
+                    <p className="text-xs text-gray-500">
+                      {product.is_raw_material && product.is_product
+                        ? "Raw Material | Product"
+                        : product.is_raw_material
+                        ? "Raw Material"
+                        : "Product"}
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleAddProduct(product)}
+                  >
+                    Add
+                  </Button>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
         <div className="space-y-2">
           <Label className="font-normal text-base">Raw Materials</Label>
-          <div className="h-[70vh] overflow-y-auto border rounded-md p-2 space-y-2">
+          <div className="h-table overflow-y-auto border rounded-md p-2 space-y-2">
             {rawMaterials.length > 0 ? (
               rawMaterials.map((material) => (
                 <ProductItem
@@ -221,7 +322,7 @@ const SelectProductsPage = () => {
 
         <div className="space-y-2">
           <Label className="font-normal text-base">Processed Products</Label>
-          <div className="h-[70vh] overflow-y-auto border rounded-md p-2 space-y-2">
+          <div className="h-table overflow-y-auto border rounded-md p-2 space-y-2">
             {processedProducts.length > 0 ? (
               processedProducts.map((product) => (
                 <ProductItem

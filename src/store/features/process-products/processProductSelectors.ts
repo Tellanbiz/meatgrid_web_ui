@@ -13,3 +13,13 @@ export const selectRawMaterials = (state: RootState) =>
 
 export const selectProcessedProducts = (state: RootState) =>
   state.processProducts.processed_products;
+
+export const selectIsProcesssingProducts = (state: RootState) =>
+  state.processProducts.status === "loading" &&
+  state.processProducts.currentOperation === "create";
+
+export const selectProcessProductError = (state: RootState) =>
+  state.processProducts.error;
+
+export const selectProcessProductSuccessMessage = (state: RootState) =>
+  state.processProducts.successMessage;
