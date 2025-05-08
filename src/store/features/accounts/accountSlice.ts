@@ -1,11 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { UserAccount } from "./accountTypes";
-import { fetchAccounts } from "./accountThunks";
+import { fetchAccounts, updateUserRole } from "./accountThunks";
 import { LoadingStatus } from "../../../types/LoadingStatus";
 
 interface AccountState {
   accounts: UserAccount[];
-  currentOperation: "fetch" | null;
+  currentOperation: "fetch" | "updateRole" | null;
   status: LoadingStatus;
   error: string | null;
   successMessage: string | null;
@@ -30,6 +30,11 @@ const accountSlice = createSlice({
       state.error = null;
       state.successMessage = null;
     },
+
+    clearAccountMessages: (state) => {
+      state.error = null;
+      state.successMessage = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -46,10 +51,25 @@ const accountSlice = createSlice({
       .addCase(fetchAccounts.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || "Failed to fetch accounts";
+      })
+
+      .addCase(updateUserRole.pending, (state) => {
+        state.currentOperation = "updateRole";
+        state.status = "loading";
+        state.error = null;
+        state.successMessage = null;
+      })
+      .addCase(updateUserRole.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.successMessage = action.payload;
+      })
+      .addCase(updateUserRole.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Failed to update user role";
       });
   },
 });
 
-export const { resetAccountState } = accountSlice.actions;
+export const { resetAccountState, clearAccountMessages } = accountSlice.actions;
 
 export default accountSlice.reducer;

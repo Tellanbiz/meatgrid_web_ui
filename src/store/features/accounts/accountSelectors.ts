@@ -9,6 +9,10 @@ export const selectIsFetchingAccounts = (state: RootState) =>
   state.accounts.status === "loading" &&
   state.accounts.currentOperation === "fetch";
 
+export const selectIsUpdatingUserRole = (state: RootState) =>
+  state.accounts.status === "loading" &&
+  state.accounts.currentOperation === "updateRole";
+
 export const selectAccountError = (state: RootState) => state.accounts.error;
 
 export const selectAccountSuccessMessage = (state: RootState) =>

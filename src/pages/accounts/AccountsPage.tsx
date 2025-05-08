@@ -23,6 +23,8 @@ import { CheckCircle, MoreVertical, RefreshCcw, XCircle } from "lucide-react";
 import { DataTableStyle, TableHeaderStyle } from "../../constants/TableStyles";
 import { Badge } from "../../components/ui/badge";
 import { formatDate } from "../../utils/dateUtils";
+import UpdateUserRoleDialog from "./components/UpdateUserRoleDialog";
+import { useModal } from "../../hooks/use-modal";
 
 const AccountsPage = () => {
   const dispatch = useAppDispatch();
@@ -33,6 +35,8 @@ const AccountsPage = () => {
   const [selectedAccount, setSelectedAccount] = useState<UserAccount | null>(
     null
   );
+
+  const [isRoleDialogOpen, setIsRoleDialogOpen] = useModal();
 
   useEffect(() => {
     dispatch(fetchAccounts());
@@ -73,9 +77,13 @@ const AccountsPage = () => {
 
   const handleUpdateRole = (account: UserAccount) => {
     setSelectedAccount(account);
-    toast.info(`Update Role for ${account.full_name}`);
+    setIsRoleDialogOpen(true);
   };
 
+  const handleUpdateSuccess = () => {
+    dispatch(fetchAccounts());
+  };
+  
   const handleUpdateStaffStatus = (account: UserAccount) => {
     setSelectedAccount(account);
     toast.info(`Update Staff Status for ${account.full_name}`);
@@ -214,6 +222,13 @@ const AccountsPage = () => {
           </DataTable>
         )}
       </div>
+
+      <UpdateUserRoleDialog
+        open={isRoleDialogOpen}
+        onOpenChange={setIsRoleDialogOpen}
+        account={selectedAccount}
+        onUpdateSuccess={handleUpdateSuccess}
+      />
     </div>
   );
 };
