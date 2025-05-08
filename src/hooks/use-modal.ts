@@ -1,17 +1,16 @@
 import { useState } from "react";
 
 export const useModal = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, _setIsOpen] = useState(false);
 
-  const openModal = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 30));
-    setIsOpen(true);
+  const setIsOpen = async (state: boolean) => {
+    await new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(true);
+      }, 0);
+    });
+    _setIsOpen(state);
   };
 
-  const closeModal = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 30));
-    setIsOpen(false);
-  };
-
-  return { isOpen, openModal, closeModal };
+  return [isOpen, setIsOpen] as const;
 };

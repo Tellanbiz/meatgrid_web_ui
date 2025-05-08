@@ -107,7 +107,7 @@ const data = {
       url: "#",
       icon: Users,
       items: [
-        { title: "Customers", url: "/customers" },
+        { title: "Accounts", url: "/accounts" },
         { title: "Staff Members", url: "/staffs" },
         { title: "Riders", url: "/riders" },
       ],

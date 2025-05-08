@@ -33,6 +33,7 @@ import TransferStockPage from "../pages/stocks/TransferStockPage.js";
 import RestockPage from "../pages/stocks/RestockPage.js";
 import ProcessProductsPage from "../pages/stocks/ProcessProductsPage.js";
 import SelectProductsPage from "../pages/stocks/SelectProductsPage.js";
+import AccountsPage from "../pages/accounts/AccountsPage.js";
 
 const routes: RouteObject[] = [
   {
@@ -184,6 +185,10 @@ const routes: RouteObject[] = [
       {
         path: "storage-types/:storageTypeId/edit",
         element: <ManageStorageTypesPage />,
+      },
+      {
+        path: "accounts",
+        element: <AccountsPage />,
       },
       {
         path: "settings",
