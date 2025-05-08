@@ -51,3 +51,16 @@ export const getDateRange = (duration: DurationOption): DateRange => {
     end_date: format(end),
   };
 };
+
+
+export const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleString("en-US", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  });
+}

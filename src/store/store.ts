@@ -15,6 +15,7 @@ import bannerReducer from "./features/banners/bannerSlice";
 import storageReducer from "./features/storages/storageSlice";
 import reportReducer from "./features/reports/reportSlice";
 import processProductReducer from "./features/process-products/processProductSlice";
+import accountSlice from "./features/accounts/accountSlice";
 
 export const store = configureStore({
   reducer: {
@@ -34,6 +35,7 @@ export const store = configureStore({
     storages: storageReducer,
     reports: reportReducer,
     processProducts: processProductReducer,
+    accounts: accountSlice,
   },
   devTools: process.env.NODE_ENV != "production",
 });
