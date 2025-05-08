@@ -70,6 +70,7 @@ const data = {
       title: "Order Management",
       url: "#",
       icon: ShoppingCart,
+      isActive: true,
       items: [
         { title: "Orders", url: "/orders" },
         { title: "Payment Methods", url: "/payment-methods" },
@@ -79,6 +80,7 @@ const data = {
       title: "Inventory Management",
       url: "#",
       icon: Store,
+      isActive: true,
       items: [
         { title: "Stock", url: "/stock" },
         { title: "Suppliers", url: "/suppliers" },
@@ -91,6 +93,7 @@ const data = {
       title: "Marketing",
       url: "#",
       icon: Tags,
+      isActive: true,
       items: [
         { title: "Recipes", url: "/recipes", icon: BookOpen },
         { title: "Coupons", url: "/coupons", icon: Star },

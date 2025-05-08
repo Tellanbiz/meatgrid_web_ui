@@ -20,7 +20,7 @@ export function CompanyHeader({
         <SidebarMenuButton
           size="lg"
           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground
-          justify-start p-2
+          justify-start
           h-16
           "
         >
