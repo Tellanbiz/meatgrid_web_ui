@@ -5,48 +5,145 @@ import {
   DataTableStyle,
   TableHeaderStyle,
 } from "../../../constants/TableStyles";
-import StatusBadge from "../../../components/StatusBadge";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks.ts";
 import { fetchCoupons } from "../../../store/features/coupons/couponThunks.ts";
 import { Coupon } from "../../../store/features/coupons/couponTypes.ts";
 import LoadingPage from "../../../components/LoadingPage.tsx";
+import { useNavigate } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../../components/ui/dropdown-menu.tsx";
+import { Button } from "../../../components/ui/button.tsx";
+import { MoreVertical, Pencil } from "lucide-react";
 
 const CouponsTable = () => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
   const { coupons, status, error } = useAppSelector((state) => state.coupons);
 
   useEffect(() => {
-    if (status === "idle") {
-      dispatch(fetchCoupons());
-    }
-  }, [status, dispatch]);
+    dispatch(fetchCoupons());
+  }, [dispatch]);
 
-  const activeTemplate = (rowData: Coupon) => (
-    <StatusBadge
-      text={rowData.active ? "Active" : "Used"}
-      className={
-        rowData.active
-          ? "bg-green-500 text-white font-extrabold"
-          : "bg-red-400 text-white"
-      }
-    />
-  );
+  const activeTemplate = (rowData: Coupon) => {
+    const isActive = rowData.active;
+
+    return (
+      <div className="flex items-center">
+        {/* Status indicator dot */}
+        <div
+          className={`w-2 h-2 rounded-full mr-2 ${
+            isActive ? "bg-green-500" : "bg-gray-400"
+          }`}
+        />
+
+        {/* Status text */}
+        <span
+          className={`text-sm ${
+            isActive ? "text-green-700 font-medium" : "text-gray-600"
+          }`}
+        >
+          {isActive ? "Active" : "Inactive"}
+        </span>
+      </div>
+    );
+  };
 
   const dateTemplate = (rowData: Coupon) => {
-    const formattedDate = new Date(rowData.created_at).toLocaleString("en-US", {
+    // Format the date part (more prominent)
+    const date = new Date(rowData.created_at).toLocaleDateString("en-US", {
       day: "2-digit",
       month: "short",
       year: "numeric",
+    });
+
+    // Format the time part (less prominent)
+    const time = new Date(rowData.created_at).toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: true,
     });
-    return <span>{formattedDate}</span>;
+
+    return (
+      <div className="flex flex-col">
+        <span className="textxs font-medium">{date}</span>
+        <span className="text-xs text-gray-500">{time}</span>
+      </div>
+    );
   };
 
   const amountTemplate = (rowData: Coupon) => (
     <span>KES {rowData.amount.toFixed(2)}</span>
   );
+
+  const usageTemplate = (rowData: Coupon) => {
+    if (!rowData.max_used) {
+      return <span>{rowData.used || 0} / Unlimited</span>;
+    }
+
+    const usagePercentage = ((rowData.used || 0) / rowData.max_used) * 100;
+
+    const getProgressBarColor = () => {
+      if (usagePercentage >= 100) {
+        return "bg-red-500"; // Full usage - red
+      } else if (usagePercentage > 90) {
+        return "bg-amber-500"; // Near full usage - amber/yellow
+      } else {
+        return "bg-blue-600"; // Normal usage - blue
+      }
+    };
+
+    return (
+      <div>
+        <div>
+          <span>
+            {(rowData.used || 0).toLocaleString()} /{" "}
+            {rowData.max_used.toLocaleString()}
+          </span>
+          {usagePercentage >= 100 && (
+            <span className="ml-2 text-xs font-medium text-red-500">
+              (Used)
+            </span>
+          )}
+        </div>
+
+        {rowData.max_used > 0 && (
+          <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+            <div
+              className={`${getProgressBarColor()} h-2 rounded-full`}
+              style={{
+                width: `${Math.min(usagePercentage, 100)}%`,
+              }}
+            />
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const actionsBodyTemplate = (rowData: Coupon) => {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon">
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            onClick={() => navigate(`/coupons/edit/${rowData.id}`)}
+            className="flex items-center gap-2"
+          >
+            <Pencil className="h-4 w-4" /> Edit Coupon
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
 
   if (status === "loading") {
     return <LoadingPage />;
@@ -73,13 +170,19 @@ const CouponsTable = () => {
       >
         <Column field="name" header="Name" headerStyle={TableHeaderStyle} />
         <Column
+          field="coupon_key"
+          header="Coupon Key"
+          headerStyle={TableHeaderStyle}
+        />
+        <Column
           field="description"
           header="Description"
           headerStyle={TableHeaderStyle}
         />
         <Column
-          field="coupon_key"
-          header="Coupon Key"
+          field="amount"
+          header="Amount"
+          body={amountTemplate}
           headerStyle={TableHeaderStyle}
         />
         <Column
@@ -89,22 +192,22 @@ const CouponsTable = () => {
           headerStyle={TableHeaderStyle}
         />
         <Column
-          field="amount"
-          header="Amount"
-          body={amountTemplate}
+          header="Usage"
+          body={usageTemplate}
           headerStyle={TableHeaderStyle}
         />
-        <Column field="used" header="Used" headerStyle={TableHeaderStyle} />
-        <Column
-          field="max_used"
-          header="Max Used"
-          headerStyle={TableHeaderStyle}
-        />
+
         <Column
           field="created_at"
           header="Created At"
           body={dateTemplate}
           headerStyle={TableHeaderStyle}
+        />
+        <Column
+          header="Actions"
+          body={actionsBodyTemplate}
+          headerStyle={TableHeaderStyle}
+          style={{ width: "100px" }}
         />
       </DataTable>
     </div>

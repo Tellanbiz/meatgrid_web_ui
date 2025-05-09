@@ -13,7 +13,7 @@ export const selectIsCreatingCoupon = (state: RootState) =>
   state.coupons.status === "loading" &&
   state.coupons.currentOperation === "create";
 
-export const isUpdatingCoupon = (state: RootState) =>
+export const selectIsUpdatingCoupon = (state: RootState) =>
   state.coupons.status === "loading" &&
   state.coupons.currentOperation === "update";
 

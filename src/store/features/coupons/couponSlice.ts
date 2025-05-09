@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { Coupon } from "./couponTypes";
-import { createCoupon, fetchCoupons } from "./couponThunks";
+import { createCoupon, fetchCoupons, updateCoupon } from "./couponThunks";
 
 interface CouponsState {
   coupons: Coupon[];
@@ -29,6 +29,10 @@ const couponsSlice = createSlice({
       state.successMessage = null;
       state.currentOperation = null;
     },
+    clearCouponMessages: (state) => {
+      state.error = null;
+      state.successMessage = null;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -36,6 +40,7 @@ const couponsSlice = createSlice({
         state.currentOperation = "fetch";
         state.status = "loading";
         state.error = null;
+        state.successMessage = null;
       })
       .addCase(
         fetchCoupons.fulfilled,
@@ -53,6 +58,7 @@ const couponsSlice = createSlice({
         state.currentOperation = "create";
         state.status = "loading";
         state.error = null;
+        state.successMessage = null;
       })
       .addCase(createCoupon.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -61,9 +67,24 @@ const couponsSlice = createSlice({
       .addCase(createCoupon.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || "Failed to create coupon";
+      })
+      // update coupons
+      .addCase(updateCoupon.pending, (state) => {
+        state.currentOperation = "update";
+        state.status = "loading";
+        state.error = null;
+        state.successMessage = null;
+      })
+      .addCase(updateCoupon.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.successMessage = action.payload;
+      })
+      .addCase(updateCoupon.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Failed to update coupon";
       });
   },
 });
 
-export const { resetCouponsState } = couponsSlice.actions;
+export const { resetCouponsState, clearCouponMessages } = couponsSlice.actions;
 export default couponsSlice.reducer;

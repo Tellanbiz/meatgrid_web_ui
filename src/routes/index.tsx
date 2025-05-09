@@ -10,7 +10,6 @@ import LoginPage from "../pages/login/LoginPage.js";
 import RegisterPage from "../pages/register/RegisterPage.js";
 import ResetPassword from "../pages/reset-pasword/ResetPassword";
 import Coupons from "../pages/coupons/Coupons";
-import AddCoupon from "../pages/coupons/AddCoupon";
 import Recipes from "../pages/recipes/Recipes";
 import AddRecipe from "../pages/recipes/AddRecipe";
 import EditRecipe from "../pages/recipes/EditRecipe";
@@ -36,6 +35,8 @@ import SelectProductsPage from "../pages/stocks/SelectProductsPage.js";
 import AccountsPage from "../pages/accounts/AccountsPage.js";
 import StaffsPage from "../pages/staff/StaffsPage.js";
 import RidersPage from "../pages/riders/RidersPage.js";
+import EditCouponPage from "../pages/coupons/EditCouponPage.js";
+import AddCouponPage from "../pages/coupons/AddCouponPage.js";
 
 const routes: RouteObject[] = [
   {
@@ -103,6 +104,14 @@ const routes: RouteObject[] = [
         element: <Coupons />,
       },
       {
+        path: "coupons/new",
+        element: <AddCouponPage />,
+      },
+      {
+        path: "coupons/edit/:id",
+        element: <EditCouponPage />,
+      },
+      {
         path: "recipes",
         element: <Recipes />,
       },
@@ -113,11 +122,6 @@ const routes: RouteObject[] = [
       {
         path: "recipes/:id/edit",
         element: <EditRecipe />,
-      },
-
-      {
-        path: "coupons/new",
-        element: <AddCoupon />,
       },
       {
         path: "tags",
