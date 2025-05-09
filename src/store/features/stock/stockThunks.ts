@@ -10,10 +10,25 @@ export const fetchStocks = createAsyncThunk<
   Stock[],
   void,
   { rejectValue: string }
->("stocks/fetchStocks", async (_, { rejectWithValue }) => {
+>("stock/fetchStocks", async (_, { rejectWithValue }) => {
   try {
-    const res = await axios.get<Stock[]>("/stocks");
-    return res.data;
+    const response = await axios.get("/stocks");
+    const stocks = response.data;
+
+    return stocks.map((stock: Stock) => {
+      const isKilogramUnit =
+        stock.product.unit_type === "kilograms" ||
+        stock.product.unit_type === "kilogram";
+
+      if (isKilogramUnit) {
+        return {
+          ...stock,
+          quantity: stock.quantity / 1000,
+        };
+      }
+
+      return stock;
+    });
   } catch (err: unknown) {
     const error = err as ApiError;
     return rejectWithValue(
