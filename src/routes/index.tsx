@@ -34,6 +34,7 @@ import RestockPage from "../pages/stocks/RestockPage.js";
 import ProcessProductsPage from "../pages/stocks/ProcessProductsPage.js";
 import SelectProductsPage from "../pages/stocks/SelectProductsPage.js";
 import AccountsPage from "../pages/accounts/AccountsPage.js";
+import StaffsPage from "../pages/staff/StaffsPage.js";
 
 const routes: RouteObject[] = [
   {
@@ -189,6 +190,10 @@ const routes: RouteObject[] = [
       {
         path: "accounts",
         element: <AccountsPage />,
+      },
+      {
+        path: "staffs",
+        element: <StaffsPage />,
       },
       {
         path: "settings",
