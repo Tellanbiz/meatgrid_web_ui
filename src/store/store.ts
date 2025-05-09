@@ -17,6 +17,7 @@ import reportReducer from "./features/reports/reportSlice";
 import processProductReducer from "./features/process-products/processProductSlice";
 import accountSlice from "./features/accounts/accountSlice";
 import staffReducer from "./features/staff/staffSlice";
+import riderReducer from "./features/riders/riderSlice";
 
 export const store = configureStore({
   reducer: {
@@ -38,6 +39,7 @@ export const store = configureStore({
     processProducts: processProductReducer,
     accounts: accountSlice,
     staff: staffReducer,
+    riders: riderReducer,
   },
   devTools: process.env.NODE_ENV != "production",
 });
