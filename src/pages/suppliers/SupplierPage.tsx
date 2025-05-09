@@ -11,7 +11,7 @@ import { selectIsFetchingSuppliers } from "../../store/features/suppliers/suppli
 import Breadcrumbs from "../../components/breadcrumbs";
 
 const SupplierPage = () => {
-  const { isOpen: isDialogOpen, openModal, closeModal } = useModal();
+  const [isSupplierDialogOpen, setIsSupplierDialogOpen] = useModal();
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(
     null
@@ -31,12 +31,12 @@ const SupplierPage = () => {
   ) => {
     setIsEditMode(isEdit);
     setSelectedSupplier(supplier);
-    await openModal();
+    setIsSupplierDialogOpen(true);
   };
 
   const handleCloseDialog = async () => {
     setSelectedSupplier(null);
-    closeModal();
+    setIsSupplierDialogOpen(false);
   };
 
   return (
@@ -74,7 +74,7 @@ const SupplierPage = () => {
         </div>
 
         <SupplierDialog
-          open={isDialogOpen}
+          open={isSupplierDialogOpen}
           onOpenChange={handleCloseDialog}
           isEditMode={isEditMode}
           initialValues={selectedSupplier || undefined}

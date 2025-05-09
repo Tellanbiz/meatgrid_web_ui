@@ -46,7 +46,7 @@ const PaymentMethodsPage = () => {
     selectIsFetchingPaymentMethods
   );
 
-  const { isOpen: isDialogOpen, openModal, closeModal } = useModal();
+  const [isDialogOpen, setIsDialogOpen] = useModal();
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<
     string | null
@@ -92,12 +92,12 @@ const PaymentMethodsPage = () => {
   ) => {
     setIsEditMode(isEdit);
     setSelectedPaymentMethodId(paymentMethodId);
-    openModal();
+    setIsDialogOpen(true);
   };
 
   const handleCloseDialog = () => {
     setIsFormLoading(false);
-    closeModal();
+    setIsDialogOpen(false);
     setSelectedPaymentMethodId(null);
   };
 
@@ -242,7 +242,7 @@ const PaymentMethodsPage = () => {
       </div>
 
       {/* Dialog for Create/Edit */}
-      <Dialog open={isDialogOpen} onOpenChange={closeModal}>
+      <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>

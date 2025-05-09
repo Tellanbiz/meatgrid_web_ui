@@ -35,7 +35,7 @@ const StocksTable = () => {
   const dispatch = useAppDispatch();
   const isFetchingStocks = useAppSelector(selectIsFetchingStocks);
   const stocks = useAppSelector(selectStocks);
-  const { isOpen, openModal, closeModal } = useModal();
+  const [isModalOpen, setIsModalOpen] = useModal();
   const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   console.log("render");
@@ -54,7 +54,11 @@ const StocksTable = () => {
 
   const handleEdit = (stock: Stock) => {
     setSelectedStock(stock);
-    openModal();
+    setIsModalOpen(true);
+  };
+  const handleCloseModal = () => {
+    setSelectedStock(null);
+    setIsModalOpen(false);
   };
   const handleUpdateStock = async (newQuantity: number) => {
     setIsLoading(true);
@@ -70,7 +74,7 @@ const StocksTable = () => {
 
       const message = await dispatch(updateStockQuantity(request)).unwrap();
       toast.success(message);
-      closeModal();
+      setIsModalOpen(false);
       dispatch(fetchStocks());
     } catch (error) {
       if (error instanceof Error) {
@@ -163,8 +167,8 @@ const StocksTable = () => {
 
       <UpdateStockDialog
         isLoading={isLoading}
-        open={isOpen}
-        onClose={closeModal}
+        open={isModalOpen}
+        onClose={handleCloseModal}
         onUpdate={handleUpdateStock}
         stock={selectedStock}
       />
