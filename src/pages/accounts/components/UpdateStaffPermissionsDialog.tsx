@@ -23,7 +23,6 @@ import {
   fetchStaff,
 } from "../../../store/features/staff/staffThunks";
 import { clearStaffMessages } from "../../../store/features/staff/staffSlice";
-import { UserAccount } from "../../../store/features/accounts/accountTypes";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -39,10 +38,15 @@ interface Store {
   name: string;
 }
 
+interface StaffMinimal {
+  id: string;
+  full_name?: string;
+}
+
 interface UpdateStaffPermissionsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  account: UserAccount | null;
+  account: StaffMinimal | null;
   stores: Store[];
   onUpdateSuccess?: () => void;
 }
@@ -73,8 +77,6 @@ const UpdateStaffPermissionsDialog = ({
       dispatch(fetchStaff({ user_id: account.id }))
         .unwrap()
         .catch(() => {
-          // If there's an error, it might be because the user is not yet a staff member
-          // Just reset the form in this case
           setSelectedStoreId("");
           setCanClaim(false);
           setCanDispatch(false);
@@ -83,7 +85,6 @@ const UpdateStaffPermissionsDialog = ({
     }
   }, [open, account, dispatch]);
 
-  // Update form when staff data is fetched
   useEffect(() => {
     if (currentStaff) {
       setSelectedStoreId(currentStaff.store.id);
@@ -93,10 +94,8 @@ const UpdateStaffPermissionsDialog = ({
     }
   }, [currentStaff]);
 
-  // Handle error messages
   useEffect(() => {
     if (error) {
-      // Only display some errors as toast messages
       if (!error.includes("not found")) {
         toast.error(error);
       }

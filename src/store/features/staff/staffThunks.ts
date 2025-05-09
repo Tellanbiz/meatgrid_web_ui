@@ -11,7 +11,7 @@ export const fetchStaffs = createAsyncThunk<
   { rejectValue: string }
 >("staff/fetchStaffs", async (_, { rejectWithValue }) => {
   try {
-    const response = await axios.get<Staff[]>("/staff");
+    const response = await axios.get<Staff[]>("/staffs");
     return response.data;
   } catch (err: unknown) {
     const error = err as ApiError;
