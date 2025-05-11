@@ -2,7 +2,6 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Order, OrderFilters } from "./orderTypes";
 import axios from "../../../service/api";
 import { CancelOrderRequest } from "./request/CancelOrderRequest";
-import { CancelOrderResponse } from "./request/response/CancelOrderResponse";
 import { OrderDetails } from "./request/response/FetchOrderByIdResponse";
 import { UpdateOrderStatusRequest } from "./request/UpdateOrderStatusRequest";
 import { ApiError } from "../../../types/ApiError";
@@ -13,15 +12,7 @@ export const fetchOrders = createAsyncThunk<
   { rejectValue: string }
 >("orders/fetchOrders", async (filters, { rejectWithValue }) => {
   try {
-    const params = new URLSearchParams();
-
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined) {
-        params.append(key, value);
-      }
-    });
-
-    const response = await axios.get(`/admin/orders?${params.toString()}`);
+    const response = await axios.get(`/admin/orders`, { params: filters });
     return response.data;
   } catch (err: unknown) {
     const error = err as ApiError;
@@ -32,13 +23,13 @@ export const fetchOrders = createAsyncThunk<
 });
 
 export const cancelOrder = createAsyncThunk<
-  CancelOrderResponse,
+  string,
   CancelOrderRequest,
   { rejectValue: string }
 >("orders/cancelOrder", async (payload, { rejectWithValue }) => {
   try {
     const response = await axios.post(`/orders/cancel`, payload);
-    return response.data;
+    return response.data.message;
   } catch (err: unknown) {
     const error = err as ApiError;
     return rejectWithValue(

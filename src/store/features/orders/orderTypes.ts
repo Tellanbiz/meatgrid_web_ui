@@ -40,6 +40,9 @@ export enum DeliveryMethod {
 export interface OrderFilters {
   start_date?: string;
   end_date?: string;
+  status?: OrderStatus;
+  store_id?: string;
+  payment_method_id?: string;
 }
 
 export interface Order {
@@ -55,5 +58,3 @@ export interface Order {
   is_dispatched: boolean;
   created_at: string;
 }
-
-

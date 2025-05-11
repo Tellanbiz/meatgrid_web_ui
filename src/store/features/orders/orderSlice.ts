@@ -8,7 +8,6 @@ import {
   fetchOrders,
   updateOrderStatus,
 } from "./orderThunks";
-import { CancelOrderResponse } from "./request/response/CancelOrderResponse";
 import { OrderDetails } from "./request/response/FetchOrderByIdResponse";
 
 interface OrderState {
@@ -66,16 +65,14 @@ const orderSlice = createSlice({
         state.currentOperation = "fetch";
         state.status = "loading";
         state.error = null;
+        state.successMessage = null;
       })
-      .addCase(
-        fetchOrders.fulfilled,
-        (state, action: PayloadAction<Order[]>) => {
-          state.status = "succeeded";
-          state.orders = action.payload;
-        }
-      )
+      .addCase(fetchOrders.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.orders = action.payload;
+      })
       .addCase(fetchOrders.rejected, (state, action) => {
-        state.status = LoadingState.Loading;
+        state.status = "failed";
         state.error = action.payload || "Failed to fetch orders";
       })
       // Cancel Order
@@ -85,15 +82,13 @@ const orderSlice = createSlice({
         state.selectedOrderNumber = action.meta.arg.order_id;
         state.selectedOrderState = "cancelling";
       })
-      .addCase(
-        cancelOrder.fulfilled,
-        (state, action: PayloadAction<CancelOrderResponse>) => {
-          state.selectedOrderNumber = null;
-          state.successMessage = action.payload.message;
-          state.selectedOrderState = "cancelled";
-        }
-      )
+      .addCase(cancelOrder.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.selectedOrderState = "cancelled";
+        state.successMessage = action.payload;
+      })
       .addCase(cancelOrder.rejected, (state, action) => {
+        state.status = "failed";
         state.selectedOrderState = "error";
         state.error = action.payload || "Failed to cancel order";
       })

@@ -51,7 +51,6 @@ export const DatePicker: React.FC<DatePickerProps> = ({
           selected={selectedDate}
           onSelect={onDateChange}
           disabled={(date) => isAfter(date, today)}
-          initialFocus
         />
       </PopoverContent>
     </Popover>

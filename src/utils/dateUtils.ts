@@ -1,16 +1,41 @@
-export type DurationOption = "this_month" | "last_month" | "this_week" | "last_week";
+export type DurationOption =
+  | "today"
+  | "last_7_days"
+  | "last_30_days"
+  | "this_month"
+  | "last_month"
+  | "this_week"
+  | "last_week"
+  | "custom";
 
 export interface DateRange {
   start_date: string;
   end_date: string;
 }
 
-export const getDateRange = (duration: DurationOption): DateRange => {
+export const getDateRange = (duration: DurationOption): [string, string] => {
   const today = new Date();
   const start = new Date(today);
   const end = new Date(today);
 
+  start.setHours(0, 0, 0, 0);
+  end.setHours(23, 59, 59, 999);
+
   switch (duration) {
+    case "today": {
+      break;
+    }
+
+    case "last_7_days": {
+      start.setDate(start.getDate() - 6);
+      break;
+    }
+
+    case "last_30_days": {
+      start.setDate(start.getDate() - 29);
+      break;
+    }
+
     case "this_month": {
       start.setDate(1);
       end.setMonth(end.getMonth() + 1);
@@ -34,24 +59,29 @@ export const getDateRange = (duration: DurationOption): DateRange => {
     }
 
     case "last_week": {
-      const prev = new Date(today);
-      prev.setDate(prev.getDate() - 7);
-      const prevDay = prev.getDay();
-      const prevDiff = prev.getDate() - prevDay + (prevDay === 0 ? -6 : 1);
-      start.setDate(prevDiff);
-      end.setDate(prevDiff + 6);
+      start.setDate(
+        start.getDate() - 7 - start.getDay() + (start.getDay() === 0 ? -6 : 1)
+      );
+      end.setDate(start.getDate() + 6);
       break;
+    }
+
+    case "custom": {
+      throw new Error(
+        '"custom" duration requires explicit start_date and end_date. Use a different function to handle custom ranges.'
+      );
     }
   }
 
-  const format = (date: Date): string => date.toISOString().split("T")[0];
-
-  return {
-    start_date: format(start),
-    end_date: format(end),
+  const format = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
-};
 
+  return [format(start), format(end)];
+};
 
 export const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
@@ -63,4 +93,4 @@ export const formatDate = (dateString: string): string => {
     minute: "numeric",
     hour12: true,
   });
-}
+};

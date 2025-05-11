@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import StatusBadge from "../../../components/StatusBadge";
-import OrdersTableHeader from "./OrdersTableHeader";
 import {
   DataTableStyle,
   TableHeaderStyle,
@@ -12,185 +11,248 @@ import { orderStatusColors } from "../../../constants/StatusColors";
 import {
   Order,
   OrderStatus,
-} from "../../../store/features/orders/orderTypes.ts";
-import { LoadingState } from "../../../types/LoadingStatus.ts";
-import LoadingPage from "../../../components/LoadingPage.tsx";
-import { DurationOption, getDateRange } from "../../../utils/dateUtils.ts";
+  OrderFilters,
+} from "../../../store/features/orders/orderTypes";
+import { DurationOption, getDateRange } from "../../../utils/dateUtils";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { EllipsisVertical, XCircle } from "lucide-react";
-import { Button } from "../../../components/ui/button.tsx";
-import {
-  cancelOrder,
-  fetchOrders,
-} from "../../../store/features/orders/orderThunks.ts";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks.ts";
-import ProgressIndicator from "../../../components/ProgressIndicator.tsx";
+import { EllipsisVertical, XCircle, Search } from "lucide-react";
+import { Button } from "../../../components/ui/button";
+import { fetchOrders } from "../../../store/features/orders/orderThunks";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import ProgressIndicator from "../../../components/ProgressIndicator";
 import { toast } from "sonner";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../../../components/ui/form.tsx";
-
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { NavLink } from "react-router-dom";
-import { resetCancelOrderState } from "../../../store/features/orders/orderSlice.ts";
+import { DatePicker } from "../../../components/DatePicker";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../../../components/ui/popover";
+
+import { selectStores } from "../../../store/features/stores/storeSelectors";
+import { selectPaymentMethods } from "../../../store/features/payment-methods/paymentMethodSelectors";
+import CancelOrderModal from "./CancelOrderModal";
+import { selectIsFetchingOrders } from "../../../store/features/orders/orderSelectors";
+import { ProgressBar } from "primereact/progressbar";
+import { fetchStores } from "../../../store/features/stores/storeThunks";
+import { fetchPaymentMethods } from "../../../store/features/payment-methods/paymentMethodThunks";
 
 const OrdersTable = () => {
   const dispatch = useAppDispatch();
-  const {
-    orders,
-    status,
-    error,
-    selectedOrderNumber,
-    selectedOrderState,
-    successMessage,
-  } = useAppSelector((state) => state.orders);
 
+  // Use proper selector pattern for orders state
+  const { orders, selectedOrderNumber, selectedOrderState } = useAppSelector(
+    (state) => state.orders
+  );
+  const isFetchingOrders = useAppSelector(selectIsFetchingOrders);
+
+  // Get data from selectors using the consistent pattern from other components
+  const stores = useAppSelector(selectStores);
+  const paymentMethods = useAppSelector(selectPaymentMethods);
+
+  // Existing states
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
-  const [selectedOrders, setSelectedOrders] = useState<Order[]>([]);
-  const [selectedDuration] = useState<DurationOption>("this_month");
+  const [selectedStatus, setSelectedStatus] = useState<OrderStatus | null>(
+    null
+  );
 
+  const [selectedOrders, setSelectedOrders] = useState<Order[]>([]);
+
+  // Filter states
+  const [selectedDuration, setSelectedDuration] =
+    useState<DurationOption>("this_month");
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [selectedStore, setSelectedStore] = useState<string | null>(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
+    string | null
+  >(null);
+
+  // Dropdown states
+  const [storeSearchTerm, setStoreSearchTerm] = useState("");
+  const [paymentMethodSearchTerm, setPaymentMethodSearchTerm] = useState("");
+  const [statusSearchTerm, setStatusSearchTerm] = useState("");
+
+  // Popover states
+  const [datePopoverOpen, setDatePopoverOpen] = useState(false);
+  const [storePopoverOpen, setStorePopoverOpen] = useState(false);
+  const [paymentMethodPopoverOpen, setPaymentMethodPopoverOpen] =
+    useState(false);
+  const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
+
+  // Cancel order states
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [orderToCancel, setOrderToCancel] = useState<Order | null>(null);
 
-  const cancelSchema = z.object({
-    reason: z.string().min(1, "Reason for cancelling order is required"),
-  });
-
-  type CancelFormVaues = z.infer<typeof cancelSchema>;
-  const form = useForm<CancelFormVaues>({
-    resolver: zodResolver(cancelSchema),
-    defaultValues: {
-      reason: "",
-    },
-  });
-
-  const orderStatusOptions = [
-    { label: "All", value: "All" },
-    ...Object.values(OrderStatus).map((status) => ({
-      label: status.charAt(0).toUpperCase() + status.slice(1),
-      value: status,
-    })),
+  // Date ranges for quick select
+  const quickDateOptions = [
+    { label: "Today", value: "today" },
+    { label: "Last 7 days", value: "last_7_days" },
+    { label: "Last 30 days", value: "last_30_days" },
+    { label: "This Month", value: "this_month" },
   ];
 
+  // Fetch orders with updated filters
   useEffect(() => {
-    const { start_date, end_date } = getDateRange(selectedDuration);
-    dispatch(fetchOrders({ start_date, end_date }));
-  }, [dispatch, selectedDuration]);
+    const filters: OrderFilters = {};
+
+    if (selectedDuration !== "custom") {
+      const [start_date, end_date] = getDateRange(selectedDuration);
+      filters.start_date = start_date;
+      filters.end_date = end_date;
+    } else if (startDate && endDate) {
+      filters.start_date = startDate.toISOString().split("T")[0];
+      filters.end_date = endDate.toISOString().split("T")[0];
+    }
+
+    if (selectedStore) {
+      filters.store_id = selectedStore;
+    }
+
+    if (selectedPaymentMethod) {
+      filters.payment_method_id = selectedPaymentMethod;
+    }
+
+    if (selectedStatus) {
+      filters.status = selectedStatus;
+    }
+
+    dispatch(fetchOrders(filters));
+  }, [
+    dispatch,
+    selectedDuration,
+    startDate,
+    endDate,
+    selectedStore,
+    selectedPaymentMethod,
+    selectedStatus,
+  ]);
 
   useEffect(() => {
     setFilteredOrders(orders);
   }, [orders]);
 
   const refreshOrders = useCallback(() => {
-    const { start_date, end_date } = getDateRange(selectedDuration);
-    dispatch(fetchOrders({ start_date, end_date }));
-  }, [dispatch, selectedDuration]);
+    const filters: OrderFilters = {};
+    console.log("Selected Duration:", selectedDuration);
+    console.log("Start Date:", startDate);
+    console.log("End Date:", endDate);
 
-  useEffect(() => {
-    if (selectedOrderState == "cancelled") {
-      setCancelDialogOpen(false);
-      form.reset();
-      toast.success(successMessage ?? "Order cancelled successfully");
-      dispatch(resetCancelOrderState());
-
-      refreshOrders();
+    if (selectedDuration !== "custom") {
+      const [start_date, end_date] = getDateRange(selectedDuration);
+      filters.start_date = start_date;
+      filters.end_date = end_date;
+    } else if (startDate && endDate) {
+      filters.start_date = startDate.toISOString().split("T")[0];
+      filters.end_date = endDate.toISOString().split("T")[0];
     }
 
-    if (selectedOrderState == "deleting") {
-      toast.success("Order deleted successfully");
+    if (selectedStore) {
+      filters.store_id = selectedStore;
     }
-    if (selectedOrderState == "error") {
-      toast.error(error);
+
+    if (selectedPaymentMethod) {
+      filters.payment_method_id = selectedPaymentMethod;
     }
+
+    if (selectedStatus) {
+      filters.status = selectedStatus;
+    }
+
+    dispatch(fetchOrders(filters));
   }, [
-    selectedOrderState,
-    error,
-    successMessage,
-    form,
-    refreshOrders,
     dispatch,
+    selectedDuration,
+    startDate,
+    endDate,
+    selectedStore,
+    selectedPaymentMethod,
+    selectedStatus,
   ]);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.toLowerCase();
-    setSearchTerm(value);
-    filterOrders(value, selectedStatus);
-  };
+  // Handle delete success message
+  useEffect(() => {
+    if (selectedOrderState === "deleting") {
+      toast.success("Order deleted successfully");
+    }
+  }, [selectedOrderState]);
 
-  const handleStatusChange = (e: { value: string | null }) => {
-    setSelectedStatus(e.value);
+  useEffect(() => {
+    dispatch(fetchStores());
+    dispatch(fetchPaymentMethods());
+  }, [dispatch]);
 
-    if (e.value === "All") {
-      setSearchTerm("");
-      setFilteredOrders(orders);
-    } else {
-      filterOrders(searchTerm, e.value);
+  // Handle date range selection
+  // Handle date range selection
+  const handleDateRangeChange = (value: DurationOption) => {
+    setSelectedDuration(value);
+    console.log("Selected Duration:", value);
+    if (value !== "custom") {
+      const [start_date, end_date] = getDateRange(value);
+      console.log("Start Date:", start_date);
+      console.log("End Date:", end_date);
+      // Convert string dates to Date objects for UI display
+      setStartDate(new Date(start_date));
+      setEndDate(new Date(end_date));
+      setDatePopoverOpen(false);
     }
   };
 
-  const filterOrders = (search: string, status: string | null) => {
-    let filtered = orders.filter(
-      (order) =>
-        order.order_id.toString().includes(search) ||
-        order.order_id.toString().includes(search)
-    );
-
-    if (status && status !== "All") {
-      filtered = filtered.filter((order) => order.status === status);
+  // Handle custom date range selection
+  const handleCustomDateChange = () => {
+    if (startDate && endDate) {
+      setSelectedDuration("custom");
+      setDatePopoverOpen(false);
     }
-
-    setFilteredOrders(filtered);
   };
 
+  const handleStatusChange = (value: OrderStatus | null) => {
+    setSelectedStatus(value);
+    setStatusPopoverOpen(false);
+  };
+
+  const handleStoreChange = (value: string | null) => {
+    setSelectedStore(value);
+    setStorePopoverOpen(false);
+  };
+
+  const handlePaymentMethodChange = (value: string | null) => {
+    setSelectedPaymentMethod(value);
+    setPaymentMethodPopoverOpen(false);
+  };
+
+  // Filter dropdown items
+  const filteredStores = stores?.filter((store) =>
+    store.name.toLowerCase().includes(storeSearchTerm.toLowerCase())
+  );
+
+  const filteredPaymentMethods = paymentMethods?.filter((method) =>
+    method.name.toLowerCase().includes(paymentMethodSearchTerm.toLowerCase())
+  );
+
+  // Filter order statuses for the dropdown
+  const filteredOrderStatuses = Object.values(OrderStatus).filter((status) =>
+    status.toLowerCase().includes(statusSearchTerm.toLowerCase())
+  );
+
+  // Order status badge template
   const statusTemplate = (rowData: Order) => {
     const colorClass = orderStatusColors[rowData.status];
     return <StatusBadge text={rowData.status} className={colorClass} />;
   };
 
+  // Cancel order handler
   const handleCancelOrder = (order: Order) => {
     setOrderToCancel(order);
     setTimeout(() => setCancelDialogOpen(true), 10);
   };
 
-  const handleConfirmCancelOrder = async (data: CancelFormVaues) => {
-    if (!orderToCancel) return;
-
-    await dispatch(
-      cancelOrder({
-        order_id: orderToCancel.id,
-        cancel_reason: data.reason,
-      })
-    );
-  };
-
-  const handleCancelForm = () => {
-    setCancelDialogOpen(false);
-    setOrderToCancel(null);
-    form.reset();
-  };
-
+  // Actions dropdown template
   const actionsTemplate = (order: Order) => {
     const isLoading =
       selectedOrderNumber === order.id &&
@@ -224,12 +286,288 @@ const OrdersTable = () => {
     );
   };
 
-  if (status == LoadingState.Loading) {
-    return <LoadingPage />;
-  }
+  // Get selected items labels for display
+  const getSelectedStoreLabel = () => {
+    if (!selectedStore) return "All Stores";
+    const store = stores?.find((s) => s.id === selectedStore);
+    return store?.name || "All Stores";
+  };
+
+  const getSelectedPaymentMethodLabel = () => {
+    if (!selectedPaymentMethod) return "All Methods";
+    const method = paymentMethods?.find((m) => m.id === selectedPaymentMethod);
+    return method?.name || "All Methods";
+  };
+
+  const getSelectedStatusLabel = () => {
+    if (!selectedStatus) return "All Status";
+    // Format status name for display (capitalize first letter)
+    return (
+      selectedStatus.charAt(0).toUpperCase() + selectedStatus.slice(1) ||
+      "All Status"
+    );
+  };
+
+  const getSelectedDateLabel = () => {
+    // Format function for consistent date display
+    const formatDate = (date: Date | string) => {
+      const dateObj = typeof date === "string" ? new Date(date) : date;
+      return dateObj.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    };
+
+    // For custom date selection
+    if (selectedDuration === "custom" && startDate && endDate) {
+      return `${formatDate(startDate)} - ${formatDate(endDate)}`;
+    }
+
+    // For quick selections, calculate and show the actual date range
+    const [start_date, end_date] = getDateRange(selectedDuration);
+
+    // Return formatted date range based on date strings from getDateRange
+    return `${formatDate(start_date)} - ${formatDate(end_date)}`;
+  };
+  // Format status display
+  const formatStatusName = (status: string) => {
+    return status.charAt(0).toUpperCase() + status.slice(1);
+  };
+
+  // Filter dropdowns
+  const filterDropdowns = (
+    <div className="flex flex-wrap gap-4 px-4 py-3 bg-gray-50 border-b">
+      {/* Date Range Filter */}
+      <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
+        <PopoverTrigger asChild>
+          <Button variant="outline" className="h-10 px-3 bg-white">
+            {getSelectedDateLabel()}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80 p-0" align="start">
+          <div className="p-2 border-b">
+            <div className="font-medium mb-2">Quick Select</div>
+            <div className="grid grid-cols-2 gap-2">
+              {quickDateOptions.map((option) => (
+                <Button
+                  key={option.value}
+                  variant={
+                    selectedDuration === option.value ? "default" : "outline"
+                  }
+                  size="sm"
+                  className="w-full"
+                  onClick={() =>
+                    handleDateRangeChange(option.value as DurationOption)
+                  }
+                >
+                  {option.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <div className="p-2">
+            <div className="font-medium mb-2">Custom Range</div>
+            <div className="grid gap-2">
+              <DatePicker
+                selectedDate={startDate}
+                onDateChange={setStartDate}
+                placeholder="Start Date"
+              />
+              <DatePicker
+                selectedDate={endDate}
+                onDateChange={setEndDate}
+                placeholder="End Date"
+              />
+              <Button
+                onClick={handleCustomDateChange}
+                disabled={!startDate || !endDate}
+                className="w-full"
+              >
+                Apply Range
+              </Button>
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
+
+      {/* Store Filter */}
+      <Popover open={storePopoverOpen} onOpenChange={setStorePopoverOpen}>
+        <PopoverTrigger asChild>
+          <Button variant="outline" className="h-10 px-3 bg-white">
+            {getSelectedStoreLabel()}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-64 p-0" align="start">
+          <div className="p-2 border-b">
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="w-full pl-8 pr-4 py-2 h-9 border rounded-md text-sm"
+                value={storeSearchTerm}
+                onChange={(e) => setStoreSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="max-h-60 overflow-auto py-1">
+            <div
+              className={`px-2 py-1.5 cursor-pointer hover:bg-gray-100 ${
+                !selectedStore ? "bg-blue-50" : ""
+              }`}
+              onClick={() => handleStoreChange(null)}
+            >
+              <div className="flex items-center">
+                <span>All Stores</span>
+                {!selectedStore && (
+                  <span className="ml-auto text-blue-600">✓</span>
+                )}
+              </div>
+            </div>
+
+            {filteredStores?.map((store) => (
+              <div
+                key={store.id}
+                className={`px-2 py-1.5 cursor-pointer hover:bg-gray-100 ${
+                  selectedStore === store.id ? "bg-blue-50" : ""
+                }`}
+                onClick={() => handleStoreChange(store.id)}
+              >
+                <div className="flex items-center">
+                  <span>{store.name}</span>
+                  {selectedStore === store.id && (
+                    <span className="ml-auto text-blue-600">✓</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </PopoverContent>
+      </Popover>
+
+      {/* Payment Method Filter */}
+      <Popover
+        open={paymentMethodPopoverOpen}
+        onOpenChange={setPaymentMethodPopoverOpen}
+      >
+        <PopoverTrigger asChild>
+          <Button variant="outline" className="h-10 px-3 bg-white">
+            {getSelectedPaymentMethodLabel()}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-64 p-0" align="start">
+          <div className="p-2 border-b">
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="w-full pl-8 pr-4 py-2 h-9 border rounded-md text-sm"
+                value={paymentMethodSearchTerm}
+                onChange={(e) => setPaymentMethodSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="max-h-60 overflow-auto py-1">
+            <div
+              className={`px-2 py-1.5 cursor-pointer hover:bg-gray-100 ${
+                !selectedPaymentMethod ? "bg-blue-50" : ""
+              }`}
+              onClick={() => handlePaymentMethodChange(null)}
+            >
+              <div className="flex items-center">
+                <span>All Methods</span>
+                {!selectedPaymentMethod && (
+                  <span className="ml-auto text-blue-600">✓</span>
+                )}
+              </div>
+            </div>
+
+            {filteredPaymentMethods?.map((method) => (
+              <div
+                key={method.id}
+                className={`px-2 py-1.5 cursor-pointer hover:bg-gray-100 ${
+                  selectedPaymentMethod === method.id ? "bg-blue-50" : ""
+                }`}
+                onClick={() => handlePaymentMethodChange(method.id)}
+              >
+                <div className="flex items-center">
+                  <span>{method.name}</span>
+                  {selectedPaymentMethod === method.id && (
+                    <span className="ml-auto text-blue-600">✓</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </PopoverContent>
+      </Popover>
+
+      {/* Status Filter */}
+      <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
+        <PopoverTrigger asChild>
+          <Button variant="outline" className="h-10 px-3 bg-white">
+            {getSelectedStatusLabel()}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-64 p-0" align="start">
+          <div className="p-2 border-b">
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="w-full pl-8 pr-4 py-2 h-9 border rounded-md text-sm"
+                value={statusSearchTerm}
+                onChange={(e) => setStatusSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="max-h-60 overflow-auto py-1">
+            <div
+              className={`px-2 py-1.5 cursor-pointer hover:bg-gray-100 ${
+                !selectedStatus ? "bg-blue-50" : ""
+              }`}
+              onClick={() => handleStatusChange(null)}
+            >
+              <div className="flex items-center">
+                <span>All Status</span>
+                {!selectedStatus && (
+                  <span className="ml-auto text-blue-600">✓</span>
+                )}
+              </div>
+            </div>
+
+            {filteredOrderStatuses.map((status) => (
+              <div
+                key={status}
+                className={`px-2 py-1.5 cursor-pointer hover:bg-gray-100 ${
+                  selectedStatus === status ? "bg-blue-50" : ""
+                }`}
+                onClick={() => handleStatusChange(status)}
+              >
+                <div className="flex items-center">
+                  <span>{formatStatusName(status)}</span>
+                  {selectedStatus === status && (
+                    <span className="ml-auto text-blue-600">✓</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
 
   return (
     <div className="h-full">
+      {isFetchingOrders && (
+        <ProgressBar mode="indeterminate" style={{ height: "6px" }} />
+      )}
+
+      {/* DataTable for orders */}
       <DataTable
         value={filteredOrders}
         dataKey="id"
@@ -243,15 +581,7 @@ const OrdersTable = () => {
         rowsPerPageOptions={[10, 20, 50]}
         scrollable
         scrollHeight="flex"
-        header={
-          <OrdersTableHeader
-            searchTerm={searchTerm}
-            onSearchChange={handleSearch}
-            selectedStatus={selectedStatus}
-            onStatusChange={handleStatusChange}
-            orderStatusOptions={orderStatusOptions}
-          />
-        }
+        header={filterDropdowns}
       >
         <Column
           header="Order ID"
@@ -313,65 +643,13 @@ const OrdersTable = () => {
         />
       </DataTable>
 
-      <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
-        <DialogContent className="sm:max-w-md transition-all duration-100 ease-in-out">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(handleConfirmCancelOrder)}
-              className="space-y-4"
-            >
-              <DialogHeader>
-                <DialogTitle>Cancel Order</DialogTitle>
-                <DialogDescription>
-                  Please provide a reason for cancelling order{" "}
-                  <span className="font-bold">MG{orderToCancel?.order_id}</span>
-                </DialogDescription>
-              </DialogHeader>
-
-              <FormField
-                control={form.control}
-                name="reason"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Reason</FormLabel>
-                    <FormControl>
-                      <textarea
-                        {...field}
-                        placeholder="Reason for cancellation"
-                        className="w-full h-24 p-2 border border-input rounded-md resize-none text-sm"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCancelForm}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit">
-                  {selectedOrderState == "cancelling" ? (
-                    <>
-                      <ProgressIndicator
-                        height="30px"
-                        width="30px"
-                        className="px-12 py-2"
-                      />
-                    </>
-                  ) : (
-                    "Confirm Cancel"
-                  )}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+      {/* Use the new CancelOrderModal component */}
+      <CancelOrderModal
+        open={cancelDialogOpen}
+        onOpenChange={setCancelDialogOpen}
+        order={orderToCancel}
+        onCancelled={refreshOrders}
+      />
     </div>
   );
 };

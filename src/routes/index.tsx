@@ -3,7 +3,6 @@ import NotFound from "../pages/NotFound";
 import { RouteObject } from "react-router-dom";
 import MainLayout from "../components/MainLayout.js";
 import Dashboard from "../pages/dashboard/Dashboard";
-import Orders from "../pages/orders/Orders";
 import Products from "../pages/products/Products";
 import Reports from "../pages/reports/Reports.jsx";
 import LoginPage from "../pages/login/LoginPage.js";
@@ -37,6 +36,7 @@ import StaffsPage from "../pages/staff/StaffsPage.js";
 import RidersPage from "../pages/riders/RidersPage.js";
 import EditCouponPage from "../pages/coupons/EditCouponPage.js";
 import AddCouponPage from "../pages/coupons/AddCouponPage.js";
+import OrdersPage from "../pages/orders/OrdersPage.js";
 
 const routes: RouteObject[] = [
   {
@@ -65,7 +65,7 @@ const routes: RouteObject[] = [
       },
       {
         path: "orders",
-        element: <Orders />,
+        element: <OrdersPage />,
       },
       {
         path: "orders/:orderId",
