@@ -31,7 +31,7 @@ pipelines:
                 SSH_USER: "root"
                 SERVER: "139.162.152.133"
                 COMMAND: >
-                  cd /var/www/meatgrid-admin &&
+                  cd /var/www/meatgrid-admin-dev &&
                   git fetch --all &&
                   git checkout develop &&
                   git pull origin develop &&
