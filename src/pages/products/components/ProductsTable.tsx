@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import ProductsTableHeader from "./ProductsTableHeader";
 import {
   DataTableStyle,
   TableHeaderStyle,
@@ -24,46 +23,24 @@ import {
 } from "../../../components/ui/dropdown-menu";
 import React from "react";
 import { resetProductState } from "../../../store/features/products/productSlice";
-import { selectStores } from "../../../store/features/stores/storeSelectors";
 import { fetchStores } from "../../../store/features/stores/storeThunks";
-import { Store } from "../../../store/features/stores/storeTypes";
 import { selectProducts } from "../../../store/features/products/productSelectors";
 import { useNavigate } from "react-router-dom";
-const ProductsTable = () => {
+
+interface ProductsTableProps {
+  searchString: string;
+  selectedStore: string | null;
+}
+
+const ProductsTable: React.FC<ProductsTableProps> = ({ 
+  searchString,
+  selectedStore
+}) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const { status, error } = useAppSelector((state) => state.products);
-
   const products: Product[] = useAppSelector(selectProducts);
-  const stores: Store[] = useAppSelector(selectStores);
-
-  const [searchString, setSearchString] = useState<string>("");
-  const [selectedStore, setSelectedStore] = useState<string | null>(null);
-
-  const storeOptions = [
-    { label: "All Stores", value: "all" },
-    ...stores.map((store) => ({
-      label: store.name,
-      value: store.id,
-    })),
-  ];
-
-  const handleStoreChange = (e: { value: string }) => {
-    const storeId = e.value;
-    if (storeId === "all") {
-      setSelectedStore(null);
-      dispatch(fetchProducts());
-      return;
-    }
-
-    setSelectedStore(storeId);
-    dispatch(fetchProducts({ store_id: storeId }));
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchString(e.target.value);
-  };
 
   useEffect(() => {
     dispatch(fetchStores());
@@ -88,16 +65,20 @@ const ProductsTable = () => {
 
   const imageBodyTemplate = (rowData: Product) => {
     return (
-      <div className="flex items-center">
-        <img
-          src={rowData.images[0]}
-          alt={rowData.name}
-          className="shadow-2 rounded size-10 object-cover mr-3"
-        />
-
-        <div>
-          <div className="text-gray-900">{rowData.name}</div>
-          <Badge variant="outline" className="mt-1">
+      <div className="flex items-center py-2">
+        <div className="flex-shrink-0">
+          <img
+            src={rowData.images[0] || "https://via.placeholder.com/40"}
+            alt={rowData.name}
+            className="h-10 w-10 rounded-md object-cover border border-gray-200"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = "https://via.placeholder.com/40";
+            }}
+          />
+        </div>
+        <div className="ml-3">
+          <div className="text-sm font-medium text-gray-900">{rowData.name}</div>
+          <Badge variant="outline" className="mt-1 text-xs">
             {rowData.category_tag}
           </Badge>
         </div>
@@ -106,7 +87,9 @@ const ProductsTable = () => {
   };
 
   const priceBodyTemplate = (rowData: Product) => {
-    return formatCurrency(rowData.regular_price);
+    return (
+      <div className="font-medium text-sm">{formatCurrency(rowData.regular_price)}</div>
+    );
   };
 
   const getTotalInStock = (product: Product) => {
@@ -137,11 +120,11 @@ const ProductsTable = () => {
     const inStock = getTotalInStock(product) > 0;
 
     return inStock ? (
-      <Badge variant="default" className="bg-green-600 hover:bg-green-600">
+      <Badge variant="default" className="bg-green-500 hover:bg-green-600">
         In stock
       </Badge>
     ) : (
-      <Badge variant="default" className="bg-red-600 hover:bg-red-600">
+      <Badge variant="default" className="bg-red-500 hover:bg-red-600">
         Out of stock
       </Badge>
     );
@@ -149,19 +132,31 @@ const ProductsTable = () => {
 
   const totalConsumedBodyTemplate = (product: Product) => {
     const totalOut = getTotalConsumed(product);
-    return `${totalOut.toLocaleString()} ${product.unit_type}`;
+    return (
+      <div className="text-sm">
+        {totalOut.toLocaleString()} {product.unit_type}
+      </div>
+    );
   };
 
   const totalInStockBodyTemplate = (product: Product) => {
     const totalIn = getTotalInStock(product);
-    return `${totalIn.toLocaleString()} ${product.unit_type}`;
+    return (
+      <div className="text-sm font-medium">
+        {totalIn.toLocaleString()} {product.unit_type}
+      </div>
+    );
+  };
+
+  const unitTypeBodyTemplate = (product: Product) => {
+    return <div className="text-sm">{product.unit_type}</div>;
   };
 
   const actionsBodyTemplate = (rowData: Product) => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="h-8 w-8">
             <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
@@ -191,84 +186,104 @@ const ProductsTable = () => {
     console.log("Delete product", rowData);
   };
 
+  const tableHeader = () => {
+    return (
+      <div className="flex justify-between items-center px-2 py-2">
+        <span className="text-sm font-semibold">Product List</span>
+        <span className="text-xs text-gray-500">
+          {products.length} products found
+        </span>
+      </div>
+    );
+  };
+
+  const rowClassName = () => {
+    return 'border-b border-gray-100 hover:bg-gray-50';
+  };
+
   return (
     <div className="h-full">
       {status === "loading" && (
         <ProgressBar
           mode="indeterminate"
-          style={{ height: "6px" }}
+          style={{ height: "4px" }}
+          className="mb-2"
         ></ProgressBar>
       )}
 
-      {status !== "loading" && (
-        <DataTable
-          value={products}
-          dataKey="id"
-          tableStyle={DataTableStyle}
-          paginator
-          rows={10}
-          rowsPerPageOptions={[5, 10, 25]}
-          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
-          scrollable
-          scrollHeight="flex"
-          size="small"
-          globalFilter={searchString}
-          header={
-            <ProductsTableHeader
-              searchString={searchString}
-              onSearchChange={handleSearchChange}
-              selectedStore={selectedStore}
-              onStoreChange={handleStoreChange}
-              storeOptions={storeOptions}
-            />
-          }
-        >
-          <Column
-            field="name"
-            header="Product"
-            body={imageBodyTemplate}
-            headerStyle={TableHeaderStyle}
-          />
+      <DataTable
+        value={products}
+        dataKey="id"
+        tableStyle={{ ...DataTableStyle, borderCollapse: "separate", borderSpacing: "0 4px" }}
+        paginator
+        rows={10}
+        rowsPerPageOptions={[5, 10, 25, 50]}
+        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+        scrollable
+        scrollHeight="flex"
+        size="small"
+        globalFilter={searchString}
+        emptyMessage="No products found"
+        header={tableHeader}
+        stripedRows
+        rowHover
+        className="p-datatable-sm"
+        rowClassName={rowClassName}
+      >
+        <Column
+          field="name"
+          header="Product"
+          body={imageBodyTemplate}
+          headerStyle={{ ...TableHeaderStyle, fontWeight: "600" }}
+          className="border-b border-gray-100"
+          sortable
+        />
 
-          <Column
-            field="unit_type"
-            header="Unit Type"
-            headerStyle={TableHeaderStyle}
-          />
+        <Column
+          field="unit_type"
+          header="Unit Type"
+          body={unitTypeBodyTemplate}
+          headerStyle={{ ...TableHeaderStyle, fontWeight: "600" }}
+          className="border-b border-gray-100"
+        />
 
-          <Column
-            header="Regular Price"
-            body={priceBodyTemplate}
-            sortable
-            headerStyle={TableHeaderStyle}
-          />
+        <Column
+          header="Price"
+          body={priceBodyTemplate}
+          sortable
+          headerStyle={{ ...TableHeaderStyle, fontWeight: "600" }}
+          className="border-b border-gray-100"
+        />
 
-          <Column
-            header="Status"
-            body={statusBodyTemplate}
-            headerStyle={TableHeaderStyle}
-          />
+        <Column
+          header="Status"
+          body={statusBodyTemplate}
+          headerStyle={{ ...TableHeaderStyle, fontWeight: "600" }}
+          className="border-b border-gray-100"
+        />
 
-          <Column
-            header="Total Instock"
-            body={totalInStockBodyTemplate}
-            headerStyle={TableHeaderStyle}
-          />
+        <Column
+          header="In Stock"
+          body={totalInStockBodyTemplate}
+          headerStyle={{ ...TableHeaderStyle, fontWeight: "600" }}
+          className="border-b border-gray-100"
+        />
 
-          <Column
-            header="Total Consumed"
-            body={totalConsumedBodyTemplate}
-            headerStyle={TableHeaderStyle}
-          />
+        <Column
+          header="Consumed"
+          body={totalConsumedBodyTemplate}
+          headerStyle={{ ...TableHeaderStyle, fontWeight: "600" }}
+          className="border-b border-gray-100"
+        />
 
-          <Column
-            header="Actions"
-            body={actionsBodyTemplate}
-            headerStyle={TableHeaderStyle}
-          />
-        </DataTable>
-      )}
+        <Column
+          header="Actions"
+          body={actionsBodyTemplate}
+          headerStyle={{ ...TableHeaderStyle, fontWeight: "600", width: "80px" }}
+          className="border-b border-gray-100"
+        />
+      </DataTable>
     </div>
   );
 };
