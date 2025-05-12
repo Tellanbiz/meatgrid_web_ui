@@ -1,7 +1,8 @@
 "use client";
 
-import { ChevronRight, type LucideIcon } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { Icon } from "@iconify/react";
 
 import {
   Collapsible,
@@ -24,11 +25,12 @@ export function NavMain({
   items: {
     title: string;
     url: string;
-    icon?: LucideIcon;
+    icon?: string;
     isActive?: boolean;
     items?: {
       title: string;
       url: string;
+      icon?: string;
     }[];
   }[];
 }) {
@@ -44,17 +46,23 @@ export function NavMain({
           >
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
-                  {item.icon && <item.icon />}
+                <SidebarMenuButton 
+                  tooltip={item.title} 
+                  className="text-white hover:bg-primary hover:text-white data-[active=true]:bg-primary data-[active=true]:text-white"
+                >
+                  {item.icon && <Icon icon={item.icon} width="20" height="20" />}
                   <span>{item.title}</span>
                   <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <SidebarMenuSub>
+                <SidebarMenuSub className="border-sidebar-border">
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton asChild>
+                      <SidebarMenuSubButton 
+                        asChild 
+                        className="text-white hover:bg-primary hover:text-white data-[active=true]:bg-primary data-[active=true]:text-white"
+                      >
                         <NavLink to={subItem.url}>
                           <span>{subItem.title}</span>
                         </NavLink>

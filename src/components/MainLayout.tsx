@@ -1,27 +1,28 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import { Separator } from "@/components/ui/separator";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+import { TopNavigation } from "@/components/TopNavigation";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset } from "@/components/SidebarInset";
 import { Outlet } from "react-router-dom";
+import { data } from "@/data/nav-data";
 
 export default function MainLayout() {
   return (
     <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 sticky top-0 z-20 bg-background">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-          </div>
-        </header>
-        <div className="flex flex-1 flex-col p-4 pt-0">
-          <Outlet />
+      <div className="fixed inset-0 flex h-screen overflow-hidden">
+        <div className="flex-shrink-0 h-full">
+          <AppSidebar />
         </div>
-      </SidebarInset>
+        <div className="flex-1 flex flex-col min-w-0 h-full">
+          <div className="flex-shrink-0">
+            <TopNavigation items={data.navMain} />
+          </div>
+          <SidebarInset className="flex-1 w-full overflow-auto">
+            <div className="flex flex-1 flex-col p-4 pt-4 w-full">
+              <Outlet />
+            </div>
+          </SidebarInset>
+        </div>
+      </div>
     </SidebarProvider>
   );
 }
