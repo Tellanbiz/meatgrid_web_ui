@@ -1,5 +1,6 @@
 import { FC, JSX, useState } from "react";
-import { DatePicker } from "@/components/DatePicker";
+import { DateRange } from "react-day-picker";
+import { DateRangePicker } from "../../../components/ui/date-range-picker";
 
 interface OrderStatusCardProps {
   title: string;
@@ -41,8 +42,10 @@ const OrderStatusCard: FC<OrderStatusCardProps> = ({
 );
 
 const OrderStatus: FC = () => {
-  const [startDate, setStartDate] = useState<Date | undefined>(new Date()); // Default to current day
-  const [endDate, setEndDate] = useState<Date | undefined>(new Date()); // Default to current day
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: new Date()
+  });
 
   const statuses = [
     {
@@ -116,16 +119,10 @@ const OrderStatus: FC = () => {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-medium">Order Status</h2>
         <div className="flex items-center gap-1">
-          <DatePicker
-            selectedDate={startDate}
-            onDateChange={setStartDate}
-            placeholder="Start Date"
-          />
-          -
-          <DatePicker
-            selectedDate={endDate}
-            onDateChange={setEndDate}
-            placeholder="End Date"
+          <DateRangePicker
+            date={dateRange}
+            onDateChange={setDateRange}
+            className="w-[300px]"
           />
         </div>
       </div>

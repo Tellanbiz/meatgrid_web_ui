@@ -20,7 +20,6 @@ const StatisticCard: FC<StatisticCardProps> = ({
   const backgroundColor = trendColor
     .replace("text-", "bg-")
     .replace(/-\d+/, "-100");
-  console.log("BG Color: ", backgroundColor);
 
   return (
     <div className="bg-white shadow rounded-lg p-4 flex flex-col gap-2 relative">

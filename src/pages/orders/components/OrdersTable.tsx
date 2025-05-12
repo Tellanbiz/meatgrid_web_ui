@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import StatusBadge from "../../../components/StatusBadge";
+import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
 import {
   DataTableStyle,
   TableHeaderStyle,
@@ -27,7 +29,7 @@ import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import ProgressIndicator from "../../../components/ProgressIndicator";
 import { toast } from "sonner";
 import { NavLink } from "react-router-dom";
-import { DatePicker } from "../../../components/DatePicker";
+
 import {
   Popover,
   PopoverContent,
@@ -41,6 +43,7 @@ import { selectIsFetchingOrders } from "../../../store/features/orders/orderSele
 import { ProgressBar } from "primereact/progressbar";
 import { fetchStores } from "../../../store/features/stores/storeThunks";
 import { fetchPaymentMethods } from "../../../store/features/payment-methods/paymentMethodThunks";
+import { DateRangePicker } from "../../../components/ui/date-range-picker";
 
 const OrdersTable = () => {
   const dispatch = useAppDispatch();
@@ -96,6 +99,8 @@ const OrdersTable = () => {
     { label: "Last 30 days", value: "last_30_days" },
     { label: "This Month", value: "this_month" },
   ];
+
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   // Fetch orders with updated filters
   useEffect(() => {
@@ -188,27 +193,28 @@ const OrdersTable = () => {
   }, [dispatch]);
 
   // Handle date range selection
-  // Handle date range selection
-  const handleDateRangeChange = (value: DurationOption) => {
-    setSelectedDuration(value);
-    console.log("Selected Duration:", value);
-    if (value !== "custom") {
-      const [start_date, end_date] = getDateRange(value);
-      console.log("Start Date:", start_date);
-      console.log("End Date:", end_date);
-      // Convert string dates to Date objects for UI display
-      setStartDate(new Date(start_date));
-      setEndDate(new Date(end_date));
+  const handleDateRangeChange = (range: DateRange | undefined) => {
+    setDateRange(range);
+    if (range?.from && range?.to) {
+      setSelectedDuration("custom");
+      setStartDate(range.from);
+      setEndDate(range.to);
       setDatePopoverOpen(false);
     }
   };
 
-  // Handle custom date range selection
-  const handleCustomDateChange = () => {
-    if (startDate && endDate) {
-      setSelectedDuration("custom");
-      setDatePopoverOpen(false);
-    }
+  const handleQuickDateSelect = (value: DurationOption) => {
+    setSelectedDuration(value);
+    const [start_date, end_date] = getDateRange(value);
+    const startDateObj = new Date(start_date);
+    const endDateObj = new Date(end_date);
+    setStartDate(startDateObj);
+    setEndDate(endDateObj);
+    setDateRange({
+      from: startDateObj,
+      to: endDateObj
+    });
+    setDatePopoverOpen(false);
   };
 
   const handleStatusChange = (value: OrderStatus | null) => {
@@ -309,27 +315,20 @@ const OrdersTable = () => {
   };
 
   const getSelectedDateLabel = () => {
-    // Format function for consistent date display
-    const formatDate = (date: Date | string) => {
-      const dateObj = typeof date === "string" ? new Date(date) : date;
-      return dateObj.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      });
-    };
-
-    // For custom date selection
-    if (selectedDuration === "custom" && startDate && endDate) {
-      return `${formatDate(startDate)} - ${formatDate(endDate)}`;
+    if (selectedDuration === "custom" && dateRange?.from && dateRange?.to) {
+      return `${format(dateRange.from, "LLL dd, y")} - ${format(
+        dateRange.to,
+        "LLL dd, y"
+      )}`;
     }
 
     // For quick selections, calculate and show the actual date range
     const [start_date, end_date] = getDateRange(selectedDuration);
-
-    // Return formatted date range based on date strings from getDateRange
-    return `${formatDate(start_date)} - ${formatDate(end_date)}`;
+    const startDate = new Date(start_date);
+    const endDate = new Date(end_date);
+    return `${format(startDate, "LLL dd, y")} - ${format(endDate, "LLL dd, y")}`;
   };
+
   // Format status display
   const formatStatusName = (status: string) => {
     return status.charAt(0).toUpperCase() + status.slice(1);
@@ -358,7 +357,7 @@ const OrdersTable = () => {
                   size="sm"
                   className="w-full"
                   onClick={() =>
-                    handleDateRangeChange(option.value as DurationOption)
+                    handleQuickDateSelect(option.value as DurationOption)
                   }
                 >
                   {option.label}
@@ -368,25 +367,11 @@ const OrdersTable = () => {
           </div>
           <div className="p-2">
             <div className="font-medium mb-2">Custom Range</div>
-            <div className="grid gap-2">
-              <DatePicker
-                selectedDate={startDate}
-                onDateChange={setStartDate}
-                placeholder="Start Date"
-              />
-              <DatePicker
-                selectedDate={endDate}
-                onDateChange={setEndDate}
-                placeholder="End Date"
-              />
-              <Button
-                onClick={handleCustomDateChange}
-                disabled={!startDate || !endDate}
-                className="w-full"
-              >
-                Apply Range
-              </Button>
-            </div>
+            <DateRangePicker
+              date={dateRange}
+              onDateChange={handleDateRangeChange}
+              className="w-full"
+            />
           </div>
         </PopoverContent>
       </Popover>
