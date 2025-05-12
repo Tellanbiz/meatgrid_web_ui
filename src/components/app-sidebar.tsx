@@ -35,7 +35,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const logoutSuccess = useAppSelector(selectLogoutSuccess);
 
   React.useEffect(() => {
-    if (!user) {
+    if (!user && !isFetchingAdminAccount) {
       dispatch(fetchAdminAccount());
     }
   }, [dispatch, isFetchingAdminAccount, user]);
