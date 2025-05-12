@@ -1,20 +1,6 @@
 "use client";
 
 import * as React from "react";
-import {
-  Home,
-  Tag,
-  Folder,
-  Users,
-  Star,
-  BookOpen,
-  User,
-  Settings,
-  Tags,
-  Store,
-  ShoppingCart,
-  Gift,
-} from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -38,87 +24,7 @@ import {
   logoutUser,
 } from "../store/features/auth/authThunks";
 import { useNavigate } from "react-router-dom";
-
-const data = {
-  company: {
-    name: "MeatGrid",
-    logo: "/images/logo.png",
-  },
-  navMain: [
-    {
-      title: "Main",
-      url: "#",
-      icon: Home,
-      isActive: true,
-      items: [{ title: "Dashboard", url: "/" }],
-    },
-    {
-      title: "Product Management",
-      url: "#",
-      icon: Gift,
-      isActive: true,
-      items: [
-        { title: "Products", url: "/products", icon: Tag },
-        { title: "Categories", url: "/categories", icon: Folder },
-      ],
-    },
-    {
-      title: "Order Management",
-      url: "#",
-      icon: ShoppingCart,
-      isActive: true,
-      items: [
-        { title: "Orders", url: "/orders" },
-        { title: "Payment Methods", url: "/payment-methods" },
-      ],
-    },
-    {
-      title: "Inventory Management",
-      url: "#",
-      icon: Store,
-      isActive: true,
-      items: [
-        { title: "Stock", url: "/stock" },
-        { title: "Suppliers", url: "/suppliers" },
-        { title: "Warehouses", url: "/warehouses" },
-        { title: "Storage Types", url: "/storage-types" },
-      ],
-    },
-
-    {
-      title: "Marketing",
-      url: "#",
-      icon: Tags,
-      isActive: true,
-      items: [
-        { title: "Recipes", url: "/recipes", icon: BookOpen },
-        { title: "Coupons", url: "/coupons", icon: Star },
-        { title: "Banners", url: "/banners" },
-        { title: "Promotion Tags", url: "/tags" },
-      ],
-    },
-
-    {
-      title: "User Management",
-      url: "#",
-      icon: Users,
-      items: [
-        { title: "Accounts", url: "/accounts" },
-        { title: "Staff Members", url: "/staffs" },
-        { title: "Riders", url: "/riders" },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings,
-      items: [
-        { title: "Personal Settings", url: "/personal-settings", icon: User },
-        { title: "Global Settings", url: "/global-settings", icon: Settings },
-      ],
-    },
-  ],
-};
+import { data } from "@/data/nav-data";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const navigate = useNavigate();
@@ -153,14 +59,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
+    <Sidebar 
+      variant="sidebar" 
+      collapsible="icon" 
+      className="bg-[#151922] text-white border-r-0 h-full"
+      {...props}
+    >
+      <SidebarHeader className="px-4 py-2 flex-shrink-0">
         <CompanyHeader company={data.company} />
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="px-2 overflow-y-auto">
         <NavMain items={data.navMain} />
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="mt-auto flex-shrink-0">
         <NavUser
           user={user}
           isLoggingOut={isLoggingOut}

@@ -19,21 +19,20 @@ export function CompanyHeader({
       <SidebarMenuItem>
         <SidebarMenuButton
           size="lg"
-          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground
+          className="data-[state=open]:bg-primary data-[state=open]:text-white
           justify-start
-          h-16
+          h-14
+          px-2
+          bg-transparent
+          hover:bg-transparent
+          hover:text-white
           "
         >
-          <div className="flex p-2 items-center justify-start text-sidebar-primary-foreground h-40 space-x-4">
-            <img
-              src={company.logo}
-              alt={company.name}
-              className="w-16 h-40 object-cover"
-            />
-            <span className="font-medium text-xl text-red-500">
-              {" "}
-              | MeatGrid
-            </span>
+          <div className="flex items-center justify-start h-full text-white space-x-2">
+            <div className="size-9 bg-accent flex items-center justify-center rounded-md">
+              <span className="text-xl font-bold">L</span>
+            </div>
+            <span className="font-medium text-lg">Lampo</span>
           </div>
         </SidebarMenuButton>
       </SidebarMenuItem>
