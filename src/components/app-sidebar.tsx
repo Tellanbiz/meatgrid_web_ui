@@ -6,7 +6,6 @@ import {
   Tag,
   Folder,
   Users,
-  BarChart2,
   Star,
   BookOpen,
   User,
@@ -51,10 +50,7 @@ const data = {
       url: "#",
       icon: Home,
       isActive: true,
-      items: [
-        { title: "Dashboard", url: "/" },
-        { title: "Reports", url: "/reports", icon: BarChart2 },
-      ],
+      items: [{ title: "Dashboard", url: "/" }],
     },
     {
       title: "Product Management",

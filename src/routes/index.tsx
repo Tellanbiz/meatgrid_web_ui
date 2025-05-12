@@ -4,7 +4,6 @@ import { RouteObject } from "react-router-dom";
 import MainLayout from "../components/MainLayout.js";
 import Dashboard from "../pages/dashboard/Dashboard";
 import Products from "../pages/products/Products";
-import Reports from "../pages/reports/Reports.jsx";
 import LoginPage from "../pages/login/LoginPage.js";
 import RegisterPage from "../pages/register/RegisterPage.js";
 import ResetPassword from "../pages/reset-pasword/ResetPassword";
@@ -82,10 +81,6 @@ const routes: RouteObject[] = [
       {
         path: "products/:productId/edit",
         element: <ManageProductPage />,
-      },
-      {
-        path: "reports",
-        element: <Reports />,
       },
       {
         path: "categories",

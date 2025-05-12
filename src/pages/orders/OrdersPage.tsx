@@ -1,21 +1,15 @@
 import OrdersTable from "./components/OrdersTable";
 import { Button } from "../../components/ui/button";
-import { Download, RefreshCcw } from "lucide-react";
+import { RefreshCcw } from "lucide-react";
 import Breadcrumbs from "../../components/breadcrumbs";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { useAppSelector } from "../../store/hooks";
 import { selectIsFetchingOrders } from "../../store/features/orders/orderSelectors";
 
 const OrdersPage = () => {
-  const dispatch = useAppDispatch();
   const isFetchingOrders = useAppSelector(selectIsFetchingOrders);
 
   const handleRefresh = () => {
     // dispatch(fetchOrders({}));
-  };
-
-  const handleExport = () => {
-    // Logic to export the orders
-    console.log("Orders exported");
   };
 
   return (
@@ -41,10 +35,6 @@ const OrdersPage = () => {
               className={`h-4 w-4 ${isFetchingOrders ? "animate-spin" : ""}`}
             />
             Refresh
-          </Button>
-          <Button className="px-2" onClick={handleExport}>
-            <Download className="h-4 w-4 mr-2" />
-            Export
           </Button>
         </div>
       </div>
