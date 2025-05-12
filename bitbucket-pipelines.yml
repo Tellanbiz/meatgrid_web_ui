@@ -7,14 +7,33 @@ pipelines:
           name: "SSH Deploy to VPS"
           deployment: production
           script:
-            - echo "🔐 Connecting to server and deploying..."
+            - echo "🔐 Connecting to server and deploying main..."
             - pipe: atlassian/ssh-run:0.4.0
               variables:
                 SSH_USER: "root"
                 SERVER: "139.162.152.133"
                 COMMAND: >
                   cd /var/www/meatgrid-admin &&
-                  git stash &&
+                  git fetch --all &&
+                  git checkout main &&
                   git pull origin main &&
                   docker compose -p meatgrid-admin -f docker-compose.yml up --build -d &&
-                  echo "✅ Vite app updated on server"
+                  echo "✅ Main branch deployed on server"
+
+    develop:
+      - step:
+          name: "SSH Deploy to VPS - Develop"
+          deployment: staging
+          script:
+            - echo "🔐 Connecting to server and deploying develop..."
+            - pipe: atlassian/ssh-run:0.4.0
+              variables:
+                SSH_USER: "root"
+                SERVER: "139.162.152.133"
+                COMMAND: >
+                  cd /var/www/meatgrid-admin &&
+                  git fetch --all &&
+                  git checkout develop &&
+                  git pull origin develop &&
+                  PORT=8001 docker compose -p meatgrid-admin-dev -f docker-compose.yml up --build -d &&
+                  echo "✅ Develop branch deployed on server"
