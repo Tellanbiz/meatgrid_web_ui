@@ -5,6 +5,7 @@ interface StatisticCardProps {
   value: string | number;
   trend: string;
   trendColor: string;
+  iconColor: string;
   icon: JSX.Element;
   additionalInfo: string;
 }
@@ -14,20 +15,17 @@ const StatisticCard: FC<StatisticCardProps> = ({
   value,
   trend,
   trendColor,
+  iconColor,
   icon,
   additionalInfo,
 }) => {
-  const backgroundColor = trendColor
-    .replace("text-", "bg-")
-    .replace(/-\d+/, "-100");
-
   return (
     <div className="bg-white shadow rounded-lg p-4 flex flex-col gap-2 relative">
       {/* Top Row: Icon and Trend */}
       <div className="flex justify-between items-center">
         <div className="flex gap-x-2 items-center">
           <div
-            className={`p-2 rounded-full w-10 h-10 flex items-center justify-center ${backgroundColor}`}
+            className={`p-2 rounded-full w-10 h-10 flex items-center justify-center ${iconColor}`}
           >
             {icon}
           </div>
@@ -52,50 +50,56 @@ const StatisticsGrid = () => {
   const stats = [
     {
       title: "Total Revenue",
-      value: "Ksh 56,7642",
-      trend: "+10.25%",
+      value: "Kes 256,7642",
+      trend: "+10.25",
       trendColor: "text-blue-500",
-      icon: <span className="text-blue-500">💰</span>,
+      iconColor: "bg-blue-500",
+      icon: <img src="/icons/total-revenue.svg" className="size-9" />,
       additionalInfo: "+1.01% this week",
     },
     {
-      title: "Total Orders",
-      value: "56,7642",
-      trend: "+10.25%",
-      trendColor: "text-green-500",
-      icon: <span className="text-green-500">🛒</span>,
+      title: "Total Refunds",
+      value: "Kes 5,000",
+      trend: "+10.25",
+      trendColor: "text-blue-500",
+      iconColor: "bg-blue-500",
+      icon: <img src="/icons/total-refunds.svg" className="size-9" />,
       additionalInfo: "+1.01% this week",
     },
     {
       title: "Total Products",
       value: "783",
-      trend: "+10.25%",
+      trend: "+10.25",
       trendColor: "text-yellow-500",
-      icon: <span className="text-yellow-500">📦</span>,
+      iconColor: "bg-yellow-500",
+      icon: <img src="/icons/total-products.svg" className="size-9" />,
+      additionalInfo: "+1.01% this week",
+    },
+    {
+      title: "Total Orders",
+      value: "56,7642",
+      trend: "+10.25",
+      trendColor: "text-green-500",
+      iconColor: "bg-green-500",
+      icon: <img src="/icons/total-orders.svg" className="size-9" />,
       additionalInfo: "+1.01% this week",
     },
     {
       title: "Out of Stock",
-      value: "56",
-      trend: "-10.25%",
+      value: "500",
+      trend: "+10.25",
       trendColor: "text-red-500",
-      icon: <span className="text-red-500">❌</span>,
-      additionalInfo: "+1.01% this week",
-    },
-    {
-      title: "Total Categories",
-      value: "56",
-      trend: "+10.25%",
-      trendColor: "text-purple-500",
-      icon: <span className="text-purple-500">📊</span>,
+      iconColor: "bg-red-500",
+      icon: <img src="/icons/out-of-stock.svg" className="size-9" />,
       additionalInfo: "+1.01% this week",
     },
     {
       title: "Total Customers",
-      value: "56,7642",
-      trend: "+10.25%",
+      value: "15000",
+      trend: "+10.25",
       trendColor: "text-orange-500",
-      icon: <span className="text-orange-500">👤</span>,
+      iconColor: "bg-orange-500",
+      icon: <img src="/icons/total-customers.svg" className="size-9" />,
       additionalInfo: "+1.01% this week",
     },
   ];

@@ -7,6 +7,7 @@ interface OrderStatusCardProps {
   value: number;
   trend: string;
   trendColor: string;
+  iconColor: string; // Add new prop for icon color
   icon: JSX.Element;
   additionalInfo: string;
 }
@@ -16,18 +17,16 @@ const OrderStatusCard: FC<OrderStatusCardProps> = ({
   value,
   trend,
   trendColor,
+  iconColor,
   icon,
   additionalInfo,
 }) => (
   <div className="bg-background shadow-xs rounded-lg p-4 flex flex-col gap-2">
     <div className="flex items-center gap-2">
       <div
-        className={`p-2 rounded-full ${trendColor.replace(
-          "text-",
-          "bg-"
-        )} bg-opacity-20 w-10 h-10 flex items-center justify-center`}
+        className={`p-2 rounded-full ${iconColor} w-10 h-10 flex items-center justify-center`}
       >
-        <span className={`${trendColor}`}>{icon}</span>
+        <span>{icon}</span>
       </div>
       <h3 className="text-sm font-medium text-gray-500">{title}</h3>
     </div>
@@ -44,32 +43,35 @@ const OrderStatusCard: FC<OrderStatusCardProps> = ({
 const OrderStatus: FC = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(),
-    to: new Date()
+    to: new Date(),
   });
 
   const statuses = [
     {
       title: "Pending",
-      value: 7642,
+      value: 75,
       trend: "+10.25",
-      trendColor: "text-orange-500",
-      icon: <span className="text-white">📦</span>,
+      trendColor: "text-yellow-500",
+      iconColor: "bg-yellow-500",
+      icon: <img src="/icons/order-pending.svg" className="w-5 h-5" />,
       additionalInfo: "+1.01% this week",
     },
     {
-      title: "Confirmed",
-      value: 9765,
-      trend: "+10.25",
-      trendColor: "text-green-500",
-      icon: <span className="text-white">✅</span>,
-      additionalInfo: "+1.01% this week",
-    },
-    {
-      title: "Packaging",
-      value: 742,
+      title: "Preparing",
+      value: 56,
       trend: "+10.25",
       trendColor: "text-blue-500",
-      icon: <span className="text-white">📦</span>,
+      iconColor: "bg-blue-500",
+      icon: <img src="/icons/order-preparing.svg" className="w-5 h-5" />,
+      additionalInfo: "+1.01% this week",
+    },
+    {
+      title: "Assigned Driver",
+      value: 78,
+      trend: "+10.25",
+      trendColor: "text-green-500",
+      iconColor: "bg-green-500",
+      icon: <img src="/icons/order-assigned-driver.svg" className="w-5 h-5" />,
       additionalInfo: "+1.01% this week",
     },
     {
@@ -77,15 +79,8 @@ const OrderStatus: FC = () => {
       value: 75,
       trend: "+10.25",
       trendColor: "text-purple-500",
-      icon: <span className="text-white">🚚</span>,
-      additionalInfo: "+1.01% this week",
-    },
-    {
-      title: "Delivered",
-      value: 94,
-      trend: "+10.25",
-      trendColor: "text-green-500",
-      icon: <span className="text-white">📬</span>,
+      iconColor: "bg-purple-500",
+      icon: <img src="/icons/order-out-for-delivery.svg" className="w-5 h-5" />,
       additionalInfo: "+1.01% this week",
     },
     {
@@ -93,23 +88,35 @@ const OrderStatus: FC = () => {
       value: 64,
       trend: "-10.25",
       trendColor: "text-red-500",
-      icon: <span className="text-white">❌</span>,
+      iconColor: "bg-red-500",
+      icon: <img src="/icons/order-canceled.svg" className="w-5 h-5" />,
       additionalInfo: "+1.01% this week",
     },
     {
-      title: "Returned",
+      title: "Delivered",
+      value: 94,
+      trend: "+10.25",
+      trendColor: "text-emerald-500",
+      iconColor: "bg-emerald-500",
+      icon: <img src="/icons/order-delivered.svg" className="w-5 h-5" />,
+      additionalInfo: "+1.01% this week",
+    },
+    {
+      title: "Returned/Faulty",
       value: 7,
       trend: "+10.25",
-      trendColor: "text-blue-500",
-      icon: <span className="text-white">🔄</span>,
+      trendColor: "text-sky-500",
+      iconColor: "bg-sky-500",
+      icon: <img src="/icons/order-returned.svg" className="w-5 h-5" />,
       additionalInfo: "+1.01% this week",
     },
     {
       title: "Delivery Failed",
       value: 21,
       trend: "-10.25",
-      trendColor: "text-orange-500",
-      icon: <span className="text-white">🚫</span>,
+      trendColor: "text-amber-500",
+      iconColor: "bg-amber-500",
+      icon: <img src="/icons/order-delivery-failed.svg" className="w-5 h-5" />,
       additionalInfo: "+1.01% this week",
     },
   ];
