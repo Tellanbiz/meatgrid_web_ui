@@ -44,10 +44,10 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
 
   useEffect(() => {
     dispatch(fetchStores());
-    dispatch(fetchProducts());
+    dispatch(fetchProducts(selectedStore ? { store_id: selectedStore } : undefined));
     dispatch(fetchTags());
     dispatch(fetchCategories());
-  }, [dispatch]);
+  }, [dispatch, selectedStore]);
 
   useEffect(() => {
     if (status == "failed") {
