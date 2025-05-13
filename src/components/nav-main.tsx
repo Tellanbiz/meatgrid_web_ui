@@ -3,7 +3,7 @@
 import { ChevronRight, FolderIcon } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Icon } from "@iconify/react";
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   SidebarGroup,
@@ -31,14 +31,16 @@ export function NavMain({
   }[];
 }) {
   const location = useLocation();
-  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(
+    {}
+  );
 
   const isActiveItem = (item: { url: string; items?: { url: string }[] }) => {
     // For direct menu items like Dashboard, check exact match
     if (!item.items?.length) {
       return location.pathname === item.url;
     }
-    
+
     // For menu sections (with #), check if any child route matches
     if (item.url === "#") {
       return item.items.some(
@@ -47,26 +49,26 @@ export function NavMain({
           location.pathname === subItem.url
       );
     }
-    
+
     return location.pathname.startsWith(item.url);
   };
 
   const toggleExpanded = (title: string) => {
-    setExpandedItems(prev => ({
+    setExpandedItems((prev) => ({
       ...prev,
-      [title]: !prev[title]
+      [title]: !prev[title],
     }));
   };
 
   // Initialize expanded state for active items
-  React.useEffect(() => {
+  useEffect(() => {
     const initialExpanded: Record<string, boolean> = {};
-    items.forEach(item => {
+    items.forEach((item) => {
       if (isActiveItem(item) || item.isActive) {
         initialExpanded[item.title] = true;
       }
     });
-    setExpandedItems(prev => ({...prev, ...initialExpanded}));
+    setExpandedItems((prev) => ({ ...prev, ...initialExpanded }));
   }, []);
 
   return (
@@ -118,11 +120,13 @@ export function NavMain({
                     />
                   )}
                   <span>{item.title}</span>
-                  <ChevronRight 
-                    className={`ml-auto size-4 transition-transform duration-200 ${expandedItems[item.title] ? 'rotate-90' : ''}`} 
+                  <ChevronRight
+                    className={`ml-auto size-4 transition-transform duration-200 ${
+                      expandedItems[item.title] ? "rotate-90" : ""
+                    }`}
                   />
                 </SidebarMenuButton>
-                
+
                 {expandedItems[item.title] && (
                   <SidebarMenuSub className="bg-[#32373c] mt-0.5">
                     {item.items?.map((subItem) => (
@@ -130,12 +134,16 @@ export function NavMain({
                         <SidebarMenuSubButton
                           asChild
                           className="text-[#eee]/90 transition-colors"
-                          data-active={location.pathname.startsWith(subItem.url)}
+                          data-active={location.pathname.startsWith(
+                            subItem.url
+                          )}
                         >
                           <NavLink
                             to={subItem.url}
                             className="w-full py-2.5 pl-3 pr-4 transition-colors data-[active=true]:text-white data-[active=true]:font-medium hover:bg-[#191e23] hover:text-white text-sm"
-                            data-active={location.pathname.startsWith(subItem.url)}
+                            data-active={location.pathname.startsWith(
+                              subItem.url
+                            )}
                             end={subItem.url === "/"}
                           >
                             <span>{subItem.title}</span>
