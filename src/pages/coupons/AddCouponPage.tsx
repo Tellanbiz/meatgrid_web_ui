@@ -6,14 +6,11 @@ import {
   selectCouponSuccessMessage,
   selectIsCreatingCoupon,
 } from "../../store/features/coupons/couponSelectors";
-import {
-  createCoupon,
-  fetchCoupons,
-} from "../../store/features/coupons/couponThunks";
+import { createCoupon } from "../../store/features/coupons/couponThunks";
 import { clearCouponMessages } from "../../store/features/coupons/couponSlice";
 import { toast } from "sonner";
-import Breadcrumbs from "../../components/breadcrumbs";
 import CouponForm, { CouponFormData } from "./components/CouponForm";
+import BackButton from "../../components/BackButton";
 
 const AddCouponPage = () => {
   const navigate = useNavigate();
@@ -35,13 +32,10 @@ const AddCouponPage = () => {
       toast.success(successMessage);
       dispatch(clearCouponMessages());
       navigate("/coupons");
-      setTimeout(() => {
-        dispatch(fetchCoupons());
-      }, 100);
     }
   }, [successMessage, dispatch, navigate]);
 
-  const handleSubmit = (formData: CouponFormData) => {
+  const handleSubmit = async (formData: CouponFormData) => {
     dispatch(createCoupon(formData));
   };
 
@@ -51,22 +45,16 @@ const AddCouponPage = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center py-2 sticky top-16 z-10 bg-background">
-        <Breadcrumbs
-          items={[
-            { label: "Coupons", to: "/coupons" },
-            { label: "Add New Coupon", isPage: true },
-          ]}
-        />
+      <div className="flex items-center py-2 mb-4">
+        <BackButton />
+        <h1 className="text-xl font-semibold ml-4">Create New Coupon</h1>
       </div>
 
-      <div className="mt-6">
-        <CouponForm
-          onSubmit={handleSubmit}
-          onCancel={handleCancel}
-          isLoading={isCreating}
-        />
-      </div>
+      <CouponForm
+        onSubmit={handleSubmit}
+        onCancel={handleCancel}
+        isLoading={isCreating}
+      />
     </div>
   );
 };

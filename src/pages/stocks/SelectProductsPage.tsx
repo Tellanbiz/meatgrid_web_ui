@@ -231,17 +231,15 @@ const SelectProductsPage = () => {
           ]}
         />
 
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            onClick={handleRefreshProducts}
-            className="p-2"
-            disabled={isFetchingProducts}
-          >
-            <RefreshCcw
-              className={`size-4 ${isFetchingProducts && "animate-spin"}`}
-            />
-            Refresh
+        <div className="flex items-center space-x-2">            <Button
+              variant="outline"
+              size="sm"
+              className="px-2"
+              onClick={handleRefreshProducts}
+              disabled={isFetchingProducts}
+            >
+              <RefreshCcw className={`h-4 w-4 ${isFetchingProducts ? "animate-spin" : ""}`} />
+              <span className="ml-2">Refresh</span>
           </Button>
 
           <Button

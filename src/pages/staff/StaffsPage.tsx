@@ -2,7 +2,6 @@ import { RefreshCcw } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { useEffect, useState } from "react";
-import Breadcrumbs from "../../components/breadcrumbs";
 import { fetchStaffs } from "../../store/features/staff/staffThunks";
 import { Staff } from "../../store/features/staff/staffTypes";
 import StaffsTable from "./components/StaffsTable";
@@ -11,6 +10,7 @@ import { selectIsFetchingStaffs } from "../../store/features/staff/staffSelector
 import { selectStores } from "../../store/features/stores/storeSelectors";
 import { useModal } from "../../hooks/use-modal";
 import { fetchStores } from "../../store/features/stores/storeThunks";
+
 const StaffsPage = () => {
   const dispatch = useAppDispatch();
   const [isStaffDialogOpen, setIsStaffDialogOpen] = useModal();
@@ -46,39 +46,35 @@ const StaffsPage = () => {
   };
 
   return (
-    <>
-      <div>
-        <div className="flex justify-between items-center py-2 sticky top-16 z-10 bg-background">
-          <Breadcrumbs items={[{ label: "Staff", isPage: true }]} />
-
-          <div className="flex space-x-2">
-            <Button
-              variant="outline"
-              className=""
-              onClick={handleRefresh}
-              disabled={isFetchingStaffs}
-            >
-              <RefreshCcw className={`${isFetchingStaffs && "animate-spin"}`} />
-              Refresh
-            </Button>
-          </div>
+    <div className="h-full">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">Staff</h1>
+        <div className="flex gap-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="px-2"
+            onClick={handleRefresh}
+            disabled={isFetchingStaffs}
+          >
+            <RefreshCcw className={`h-4 w-4 ${isFetchingStaffs ? "animate-spin" : ""}`} />
+            <span className="ml-2">Refresh</span>
+          </Button>
         </div>
-
-        <div className="mt-2 card h-table">
-          <StaffsTable
-            onUpdatePermissions={(staff) => handleOpenDialog(staff)}
-          />
-        </div>
-
-        <UpdateStaffPermissionsDialog
-          open={isStaffDialogOpen}
-          onOpenChange={handleCloseDialog}
-          account={selectedStaff}
-          stores={stores}
-          onUpdateSuccess={handleUpdateSuccess}
-        />
       </div>
-    </>
+
+      <div className="mt-2 card h-table">
+        <StaffsTable onUpdatePermissions={(staff) => handleOpenDialog(staff)} />
+      </div>
+
+      <UpdateStaffPermissionsDialog
+        open={isStaffDialogOpen}
+        onOpenChange={handleCloseDialog}
+        account={selectedStaff}
+        stores={stores}
+        onUpdateSuccess={handleUpdateSuccess}
+      />
+    </div>
   );
 };
 

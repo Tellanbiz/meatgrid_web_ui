@@ -16,7 +16,7 @@ import { fetchCategories } from "../../store/features/categories/categoryThunks"
 import { CreateProductRequest } from "../../store/features/products/requests/CreateProductRequest";
 import { UpdateProductRequest } from "../../store/features/products/requests/UpdateProductRequest";
 import { uploadImages } from "../../store/features/uploads/uploadThunks";
-import Breadcrumbs from "../../components/breadcrumbs";
+import BackButton from "../../components/BackButton";
 
 const ManageProductPage = () => {
   const navigate = useNavigate();
@@ -127,17 +127,11 @@ const ManageProductPage = () => {
   }, [dispatch]);
 
   return (
-    <div className="">
-      <div className="sticky top-16 z-10 bg-background py-3">
-        <Breadcrumbs
-          items={[
-            { label: "Products", to: "/products" },
-            { label: isEditMode ? "Edit Product" : "Add Product" },
-          ]}
-        />
+    <div className="h-full">
+      <div className="mb-4">
+        <BackButton />
       </div>
-
-      <div className="mt-2">
+      <div>
         <ProductForm
           initialValues={initialValues}
           tags={tags}

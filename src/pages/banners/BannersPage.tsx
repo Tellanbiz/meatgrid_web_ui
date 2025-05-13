@@ -1,6 +1,4 @@
 import { useState } from "react";
-import Breadcrumbs from "../../components/breadcrumbs";
-import BannerList from "./components/BannerList";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   selectBanners,
@@ -20,6 +18,7 @@ import { fetchTags } from "../../store/features/tags/tagThunks";
 import { selectCategories } from "../../store/features/categories/categorySelectors";
 import { fetchCategories } from "../../store/features/categories/categoryThunks";
 import { useNavigate } from "react-router-dom";
+import BannerList from "./components/BannerList";
 
 const BannersPage = () => {
   const navigate = useNavigate();
@@ -64,36 +63,28 @@ const BannersPage = () => {
   };
 
   return (
-    <div>
-      <div className="flex justify-between items-center py-2 sticky top-15 z-10 bg-background">
-        <Breadcrumbs
-          items={[
-            {
-              label: "Banners",
-              isPage: true,
-            },
-          ]}
-        />
-
-        <div className="flex gap-2">
+    <div className="h-full overflow-hidden">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">Banners</h1>
+        <div className="flex gap-x-2">
           <Button
             variant="outline"
+            size="sm"
+            className="px-2"
             onClick={handleRefresh}
             disabled={isFetching}
           >
-            <RefreshCcw
-              className={`h-4 w-4 mr-2 ${isFetching && "animate-spin"}`}
-            />
-            Refresh
+            <RefreshCcw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
+            <span className="ml-2">Refresh</span>
           </Button>
-          <Button variant="default" onClick={handleAddNew}>
-            <Plus className="h-4 w-4 mr-2" />
-            <span>Add Banner</span>
+          <Button size="sm" onClick={handleAddNew}>
+            <Plus className="w-4 h-4" />
+            Add Banner
           </Button>
         </div>
       </div>
 
-      <div className="mt-4">
+      <div className="h-full overflow-hidden">
         {isFetching ? (
           <LoadingPage />
         ) : (

@@ -91,15 +91,15 @@ const Products = () => {
               variant="outline"
               onClick={handleRefresh}
               disabled={isFetchingProducts}
-              className="flex items-center gap-2 h-9"
+              size="sm"
+              className="px-2"
             >
-              <RefreshCw
-                className={`size-4 ${isFetchingProducts ? "animate-spin" : ""}`}
-              />
-              <span>Refresh</span>
+              <RefreshCw className={`h-4 w-4 ${isFetchingProducts ? "animate-spin" : ""}`} />
+              <span className="ml-2">Refresh</span>
             </Button>
 
-            <Button onClick={handleAddProduct} className="h-9">
+            <Button onClick={handleAddProduct}
+             size="sm">
               <Plus className="h-4 w-4 mr-1" />
               <span>Add Product</span>
             </Button>

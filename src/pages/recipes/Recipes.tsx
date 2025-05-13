@@ -1,6 +1,5 @@
 import RecipeTable from "./components/RecipeTable";
 import { useNavigate } from "react-router-dom";
-import Breadcrumbs from "../../components/breadcrumbs";
 import { Button } from "../../components/ui/button";
 import { Plus, RefreshCcw } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -21,36 +20,32 @@ const Recipes = () => {
   }
 
   return (
-    <>
-      <div className="flex flex-col h-full">
-        <div className="flex justify-between items-center py-2 bg-background sticky top-16 z-10">
-          <Breadcrumbs items={[{ label: "Recipes", isPage: true }]} />
-
-          <div className="flex space-x-2">
-            <Button
-              variant="outline"
-              onClick={handleRefresh}
-              aria-label="Refresh"
-              disabled={isFetchingRecipes}
-            >
-              <RefreshCcw
-                className={`size-4 ${isFetchingRecipes ? "animate-spin" : ""}`}
-              />
-              <span>Refresh</span>
-            </Button>
-
-            <Button onClick={handleAddRecipe}>
-              <Plus className="size-4" />
-              <span>Add Recipe</span>
-            </Button>
-          </div>
-        </div>
-
-        <div className=" card mt-2 h-[calc(100vh-10rem)]">
-          <RecipeTable />
+    <div className="h-full">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">Recipes</h1>
+        <div className="flex gap-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={isFetchingRecipes}
+          >
+            <RefreshCcw
+              className={`h-4 w-4 ${isFetchingRecipes ? "animate-spin" : ""}`}
+            />
+            <span className="ml-2">Refresh</span>
+          </Button>
+          <Button size="sm" onClick={handleAddRecipe}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Recipe
+          </Button>
         </div>
       </div>
-    </>
+
+      <div className="card mt-2 h-table">
+        <RecipeTable />
+      </div>
+    </div>
   );
 };
 export default Recipes;

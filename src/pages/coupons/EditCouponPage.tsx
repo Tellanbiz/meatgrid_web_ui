@@ -12,11 +12,11 @@ import {
   fetchCoupons,
 } from "../../store/features/coupons/couponThunks";
 import { clearCouponMessages } from "../../store/features/coupons/couponSlice";
-import Breadcrumbs from "../../components/breadcrumbs";
 import { toast } from "sonner";
 import CouponForm, { CouponFormData } from "./components/CouponForm";
 import { Loader2 } from "lucide-react";
 import { Button } from "../../components/ui/button";
+import BackButton from "../../components/BackButton";
 
 const EditCouponPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -32,7 +32,6 @@ const EditCouponPage = () => {
   const error = useAppSelector(selectCouponError);
   const successMessage = useAppSelector(selectCouponSuccessMessage);
 
-  // Make sure we have the coupons data
   useEffect(() => {
     if (!coupon) {
       dispatch(fetchCoupons())
@@ -45,7 +44,6 @@ const EditCouponPage = () => {
     }
   }, [coupon, dispatch]);
 
-  // Error and success handling
   useEffect(() => {
     if (error) {
       toast.error(error);
@@ -61,7 +59,6 @@ const EditCouponPage = () => {
     }
   }, [successMessage, dispatch, navigate]);
 
-  // Handle form submit
   const handleSubmit = (formData: CouponFormData) => {
     if (!id) return;
 
@@ -98,13 +95,9 @@ const EditCouponPage = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center py-2 sticky top-16 z-10 bg-background">
-        <Breadcrumbs
-          items={[
-            { label: "Coupons", to: "/coupons" },
-            { label: "Edit Coupon", isPage: true },
-          ]}
-        />
+      <div className="flex items-center py-2 mb-4">
+        <BackButton />
+        <h1 className="text-xl font-semibold ml-4">Edit Coupon</h1>
       </div>
 
       <div className="mt-6">

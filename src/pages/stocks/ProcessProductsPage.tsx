@@ -191,16 +191,14 @@ const ProcessProductsPage = () => {
               Storage Type
             </Label>
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
+              className="px-2"
               onClick={handleRefreshStorageTypes}
               disabled={isLoadingStorageTypes}
             >
-              <RefreshCcw
-                className={`h-4 w-4 ${
-                  isLoadingStorageTypes ? "animate-spin" : ""
-                }`}
-              />
+              <RefreshCcw className={`h-4 w-4 ${isLoadingStorageTypes ? "animate-spin" : ""}`} />
+              <span className="ml-2">Refresh</span>
             </Button>
           </div>
           {isLoadingStorageTypes ? (

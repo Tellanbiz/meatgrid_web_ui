@@ -8,7 +8,6 @@ import { Supplier } from "../../store/features/suppliers/supplierTypes";
 import { useModal } from "../../hooks/use-modal";
 import { useState } from "react";
 import { selectIsFetchingSuppliers } from "../../store/features/suppliers/supplierSelectors";
-import Breadcrumbs from "../../components/breadcrumbs";
 
 const SupplierPage = () => {
   const [isSupplierDialogOpen, setIsSupplierDialogOpen] = useModal();
@@ -40,47 +39,40 @@ const SupplierPage = () => {
   };
 
   return (
-    <>
-      <div>
-        <div className="flex justify-between items-center py-2 sticky top-16 z-10 bg-background">
-          <Breadcrumbs items={[{ label: "Suppliers", isPage: true }]} />
-
-          <div className="flex space-x-2">
-            <Button
-              variant="outline"
-              className=""
-              onClick={handleRefresh}
-              disabled={isFetchingSuppliers}
-            >
-              <RefreshCcw
-                className={`${isFetchingSuppliers && "animate-spin"}`}
-              />
-              Refresh
-            </Button>
-            <Button
-              className="btn"
-              onClick={() => handleOpenDialog(false, null)}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              New Supplier
-            </Button>
-          </div>
+    <div className="h-full">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">Suppliers</h1>
+        <div className="flex gap-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="px-2"
+            onClick={handleRefresh}
+            disabled={isFetchingSuppliers}
+          >
+            <RefreshCcw className={`h-4 w-4 ${isFetchingSuppliers ? "animate-spin" : ""}`} />
+            <span className="ml-2">Refresh</span>
+          </Button>
+          <Button size="sm" onClick={() => handleOpenDialog(false, null)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Supplier
+          </Button>
         </div>
+      </div>
 
-        <div className="mt-2 card h-table">
-          <SuppliersTable
-            onEdit={(supplier) => handleOpenDialog(true, supplier)}
-          />
-        </div>
-
-        <SupplierDialog
-          open={isSupplierDialogOpen}
-          onOpenChange={handleCloseDialog}
-          isEditMode={isEditMode}
-          initialValues={selectedSupplier || undefined}
+      <div className="mt-2 card h-table">
+        <SuppliersTable
+          onEdit={(supplier) => handleOpenDialog(true, supplier)}
         />
       </div>
-    </>
+
+      <SupplierDialog
+        open={isSupplierDialogOpen}
+        onOpenChange={handleCloseDialog}
+        isEditMode={isEditMode}
+        initialValues={selectedSupplier || undefined}
+      />
+    </div>
   );
 };
 

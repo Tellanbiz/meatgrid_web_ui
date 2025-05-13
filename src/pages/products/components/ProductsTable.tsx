@@ -226,7 +226,6 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
         globalFilter={searchString}
         emptyMessage="No products found"
         header={tableHeader}
-        stripedRows
         rowHover
         className="p-datatable-sm"
         rowClassName={rowClassName}

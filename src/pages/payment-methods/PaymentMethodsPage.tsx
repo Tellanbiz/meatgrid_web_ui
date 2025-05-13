@@ -1,5 +1,4 @@
 import { EllipsisVertical, Pencil, Plus, RefreshCcw } from "lucide-react";
-import Breadcrumbs from "../../components/breadcrumbs";
 import { Button } from "../../components/ui/button";
 import { DataTable } from "primereact/datatable";
 import {
@@ -152,44 +151,32 @@ const PaymentMethodsPage = () => {
   };
 
   return (
-    <div className="bg-background">
-      <div className="flex justify-between items-center bg-background py-3 sticky top-16 z-20">
-        <Breadcrumbs
-          items={[
-            {
-              label: "Payment Methods",
-              isPage: true,
-            },
-          ]}
-        />
-
-        <div className="flex space-x-2">
+    <div className="h-full">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">Payment Methods</h1>
+        <div className="flex gap-x-2">
           <Button
             variant="outline"
-            className="hover:bg-gray-200"
+            size="sm"
             onClick={handleRefresh}
             disabled={isLoadingPaymentMethods}
-            aria-label="Refresh"
           >
             <RefreshCcw
-              className={`size-4 ${
+              className={`h-4 w-4 ${
                 isLoadingPaymentMethods ? "animate-spin" : ""
               }`}
             />
-            Refresh
+            <span className="ml-2">Refresh</span>
           </Button>
 
-          <Button
-            className="hover:bg-blue-800"
-            onClick={() => handleOpenDialog(false)}
-          >
-            <Plus className="size-4" />
-            Add Payment Method
+          <Button size="sm" onClick={() => handleOpenDialog(false)}>
+            <Plus className="h-4 w-4" />
+            <span className="ml-2">Add Payment Method</span>
           </Button>
         </div>
       </div>
 
-      <div className="mt-2 card h-table">
+      <div className="h-table">
         {isLoadingPaymentMethods && (
           <ProgressBar mode="indeterminate" style={{ height: "6px" }} />
         )}
@@ -204,8 +191,6 @@ const PaymentMethodsPage = () => {
             rowsPerPageOptions={[10, 25, 50]}
             emptyMessage="No payment methods found."
             loadingIcon="pi pi-spin pi-spinner"
-            stripedRows
-            rowHover
             scrollable
             scrollHeight="flex"
             size="small"
@@ -269,4 +254,5 @@ const PaymentMethodsPage = () => {
     </div>
   );
 };
+
 export default PaymentMethodsPage;

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { selectStoreById } from "../../store/features/stores/storeSelectors";
-import Breadcrumbs from "../../components/breadcrumbs";
 import WarehouseForm, { WarehouseFormData } from "./components/WareHouseForm";
 import { CreateStoreRequest } from "../../store/features/stores/requests/CreateStoreRequest";
 import {
@@ -89,22 +88,13 @@ const ManageWareHousePage = () => {
 
   return (
     <div className="h-full">
-      <Breadcrumbs
-        items={[
-          { label: "Warehouses", to: "/warehouses" },
-          { label: isEditMode ? "Edit Store" : "Add Store", isPage: true },
-        ]}
+      <WarehouseForm
+        initialValues={initialValues}
+        onSubmit={handleSubmit}
+        onCancel={handleCancel}
+        isEditMode={isEditMode}
+        isLoading={formLoading}
       />
-
-      <div className="mt-4">
-        <WarehouseForm
-          initialValues={initialValues}
-          onSubmit={handleSubmit}
-          onCancel={handleCancel}
-          isEditMode={isEditMode}
-          isLoading={formLoading}
-        />
-      </div>
     </div>
   );
 };

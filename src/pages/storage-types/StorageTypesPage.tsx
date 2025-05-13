@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { Plus, RefreshCcw } from "lucide-react";
-import Breadcrumbs from "../../components/breadcrumbs";
 import { Button } from "../../components/ui/button";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
@@ -58,26 +57,23 @@ const StorageTypesPage = () => {
   };
 
   return (
-    <div className="bg-background">
-      <div className="flex justify-between items-center bg-background py-3 sticky top-16 z-20">
-        <Breadcrumbs items={[{ label: "Storage Types", isPage: true }]} />
-
-        <div className="flex space-x-2">
+    <div className="h-full">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">Storage Types</h1>
+        <div className="flex gap-x-2">
           <Button
             variant="outline"
+            size="sm"
+            className="px-2"
             onClick={handleRefresh}
             disabled={isLoading}
-            aria-label="Refresh"
           >
-            <RefreshCcw
-              className={`size-4 ${isLoading ? "animate-spin" : ""}`}
-            />
-            Refresh
+            <RefreshCcw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+            <span className="ml-2">Refresh</span>
           </Button>
-
-          <Button onClick={handleAddStorageType}>
-            <Plus className="size-4" />
-            Add Storage Type
+          <Button size="sm" onClick={handleAddStorageType}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Type
           </Button>
         </div>
       </div>

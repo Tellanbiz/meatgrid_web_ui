@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Breadcrumbs from "../../components/breadcrumbs";
 import { Button } from "../../components/ui/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -149,33 +148,21 @@ const AccountsPage = () => {
   };
 
   return (
-    <div>
-      <div className="flex justify-between items-center py-3 sticky top-16 z-20 bg-background">
-        <Breadcrumbs
-          items={[
-            {
-              label: "Accounts",
-              isPage: true,
-            },
-          ]}
-        />
-
-        <Button
-          variant="outline"
-          className="hover:bg-gray-200"
-          onClick={handleRefresh}
-          disabled={isFetchingAccounts}
-        >
-          <RefreshCcw
-            className={`h-4 w-4 mr-2 ${
-              isFetchingAccounts ? "animate-spin" : ""
-            }`}
-          />
-          Refresh
-        </Button>
+    <div className="h-full">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">Accounts</h1>          <Button
+            variant="outline" 
+            size="sm"
+            className="px-2"
+            onClick={handleRefresh}
+            disabled={isFetchingAccounts}
+          >
+            <RefreshCcw className={`h-4 w-4 ${isFetchingAccounts ? "animate-spin" : ""}`} />
+            <span className="ml-2">Refresh</span>
+          </Button>
       </div>
 
-      <div className="mt-4 card h-table">
+      <div className="card h-table">
         {isFetchingAccounts && (
           <ProgressBar mode="indeterminate" style={{ height: "6px" }} />
         )}
@@ -206,19 +193,16 @@ const AccountsPage = () => {
             />
             <Column
               field="email"
-              header="Email
-             "
+              header="Email"
               style={TableHeaderStyle}
             />
             <Column field="role" header="Role" style={TableHeaderStyle} />
-
             <Column
               field="created_at"
               header="Joined On"
               body={(rowData) => formatDate(rowData.created_at)}
               style={TableHeaderStyle}
             />
-
             <Column
               field="status"
               header="Status"

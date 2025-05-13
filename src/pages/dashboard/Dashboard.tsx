@@ -1,4 +1,3 @@
-import Breadcrumbs from "../../components/breadcrumbs";
 import StatisticsGrid from "./components/StatisticsGrid";
 import OrderStatistics from "./components/OrderStatistics";
 import SalesStatistics from "./components/SalesStatistics";
@@ -10,11 +9,7 @@ import LatestOnlineOrders from "./components/LatestOnlineOrders";
 
 const Dashboard = () => {
   return (
-    <div className="w-full flex flex-col gap-y-6 p-4">
-      <div className="flex justify-between items-center sticky top-16 z-20 bg-background py-3">
-        <Breadcrumbs items={[{ label: "Dashboard", isPage: true }]} />
-      </div>
-
+    <div className="w-full flex flex-col gap-y-4">
       {/* Statistics Grid */}
       <StatisticsGrid />
 

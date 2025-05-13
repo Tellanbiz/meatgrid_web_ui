@@ -384,20 +384,19 @@ const ProductForm: React.FC<ProductFormProps> = ({
         </div>
 
         {/* Form Actions */}
-        <div className="flex justify-end my-4 col-span-4 gap-y-10">
+        <div className="flex justify-end my-4 col-span-4 gap-x-2">
           <Button
-            variant="ghost"
-            className="bg-gray-200 text-gray-700 px-4 py-2 rounded mr-2"
+            variant="secondary"
             onClick={onCancel}
           >
             Cancel
           </Button>
           <Button
-            className="bg-blue-600 text-white px-4 py-2 rounded"
+            variant="default"
             disabled={isLoading}
             onClick={handleSubmit}
           >
-            {isLoading ? <Loader2 className="animate-spin h-4 w-4" /> : null}
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isEditMode ? "Update" : "Save"}
           </Button>
         </div>

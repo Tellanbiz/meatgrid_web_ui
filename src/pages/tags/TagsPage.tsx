@@ -15,7 +15,6 @@ import { Tag } from "../../store/features/tags/tagTypes";
 import { CreateTagRequest } from "../../store/features/tags/request/CreateTagRequest";
 import { toast } from "sonner";
 import { resetTagState } from "../../store/features/tags/tagSlice";
-import Breadcrumbs from "../../components/breadcrumbs";
 
 const TagsPage = () => {
   const dispatch = useAppDispatch();
@@ -77,21 +76,18 @@ const TagsPage = () => {
   return (
     <>
       <div className="flex justify-between items-center py-2 sticky top-0 z-10">
-        <Breadcrumbs
-          items={[
-            {
-              label: "Tags",
-              isPage: true,
-            },
-          ]}
-        />
+        <h1 className="text-2xl font-semibold">Tags</h1>
 
         <div className="flex space-x-2">
-          <Button variant="outline" size="sm" onClick={handleRefresh}>
-            <RefreshCcw
-              className={`w-4 h-4 mr-2 ${isFetchingTags && "animate-spin"}`}
-            />
-            Refresh
+          <Button
+            variant="outline"
+            size="sm"
+            className="px-2"
+            onClick={handleRefresh}
+            disabled={isFetchingTags}
+          >
+            <RefreshCcw className={`h-4 w-4 ${isFetchingTags ? "animate-spin" : ""}`} />
+            <span className="ml-2">Refresh</span>
           </Button>
 
           <Button variant="default" size="sm" onClick={handleAddTag}>

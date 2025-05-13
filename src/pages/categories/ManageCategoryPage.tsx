@@ -7,7 +7,6 @@ import {
   updateCategory,
 } from "@/store/features/categories/categoryThunks";
 import { CategoryFormData } from "./components/CategoryForm";
-import Breadcrumbs from "@/components/breadcrumbs";
 import CategoryForm from "./components/CategoryForm";
 import { toast } from "sonner";
 import { UpdateCategoryRequest } from "../../store/features/categories/request/UpdateCategoryRequest";
@@ -74,24 +73,13 @@ const ManageCategoryPage = () => {
 
   return (
     <div className="h-full">
-      <Breadcrumbs
-        items={[
-          { label: "Categories", to: "/categories" },
-          {
-            label: isEditMode ? "Edit Category" : "Add Category",
-            isPage: true,
-          },
-        ]}
+      <CategoryForm
+        initialValues={initialValues}
+        onSubmit={handleSubmit}
+        onCancel={handleCancel}
+        isEditMode={isEditMode}
+        isLoading={formLoading}
       />
-      <div className="mt-4">
-        <CategoryForm
-          initialValues={initialValues}
-          onSubmit={handleSubmit}
-          onCancel={handleCancel}
-          isEditMode={isEditMode}
-          isLoading={formLoading}
-        />
-      </div>
     </div>
   );
 };

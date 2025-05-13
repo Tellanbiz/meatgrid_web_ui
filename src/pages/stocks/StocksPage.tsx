@@ -1,5 +1,4 @@
 import { Forward, RedoDot, RefreshCcw, WandSparkles } from "lucide-react";
-import Breadcrumbs from "../../components/breadcrumbs";
 import StocksTable from "./components/StocksTable";
 import { Button } from "../../components/ui/button";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -29,58 +28,53 @@ const StocksPage = () => {
   };
 
   return (
-    <>
-      <div className="flex justify-between items-center py-3 sticky top-16 z-20 bg-background">
-        <Breadcrumbs
-          items={[
-            {
-              label: "Stock",
-              isPage: true,
-            },
-          ]}
-        />
-        <div className="flex space-x-2">
+    <div className="h-full">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">Stock</h1>
+        <div className="flex gap-x-2">
           <Button
             variant="outline"
-            className="px-2"
+            size="sm"
             onClick={handleRefresh}
             disabled={isFetchingStocks}
           >
-            <RefreshCcw
-              className={`h-4 w-4 ${isFetchingStocks && "animate-spin"}`}
-            />
-            Refresh
+            <RefreshCcw className={`h-4 w-4 ${isFetchingStocks ? "animate-spin" : ""}`} />
+            <span className="ml-2">Refresh</span>
           </Button>
 
           <Button
             variant="outline"
-            className="px-2"
+            size="sm"
             onClick={handleTransferStock}
           >
             <Forward className="h-4 w-4" />
-            Transfer Stock
+            <span className="ml-2">Transfer Stock</span>
           </Button>
 
           <Button
             variant="outline"
-            className="px-2"
+            size="sm"
             onClick={handleProcessProducts}
           >
             <WandSparkles className="h-4 w-4" />
-            Process Products
+            <span className="ml-2">Process Products</span>
           </Button>
 
-          <Button variant="default" className="px-2" onClick={handleRestock}>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleRestock}
+          >
             <RedoDot className="h-4 w-4" />
-            Restock
+            <span className="ml-2">Restock</span>
           </Button>
         </div>
       </div>
 
-      <div className="mt-2 card h-table ">
+      <div className="h-table">
         <StocksTable />
       </div>
-    </>
+    </div>
   );
 };
 

@@ -1,5 +1,4 @@
 import { EllipsisVertical, Pencil, Plus, RefreshCcw } from "lucide-react";
-import Breadcrumbs from "../../components/breadcrumbs";
 import { Button } from "../../components/ui/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -62,41 +61,29 @@ const WareHousePage = () => {
       </DropdownMenu>
     );
   };
-  return (
-    <div className="h-full overflow-hidden">
-      <div className="flex justify-between items-center py-2 sticky top-0 z-10 bg-background">
-        <Breadcrumbs
-          items={[
-            {
-              label: "Warehouses",
-              isPage: true,
-            },
-          ]}
-        />
 
-        <div className="flex space-x-2">
-          <Button
-            variant="outline"
-            className="hover:bg-gray-200"
-            disabled={isFetchingStores}
-            onClick={handleRefresh}
-          >
-            <RefreshCcw
-              className={`h-4 w-4 ${isFetchingStores ? "animate-spin" : ""}`}
-            />
-            Refresh
-          </Button>
-          <Button
-            className="hover:bg-blue-800"
-            onClick={() => navigate("/warehouses/new")}
-          >
-            <Plus className="h-4 w-4" />
-            Add Store
-          </Button>
-        </div>
+  return (
+    <div className="h-full">
+      <div className="flex justify-end gap-x-2 mb-4">
+        <Button
+          variant="outline"
+          size="sm"
+          className="px-2"
+          onClick={handleRefresh}
+          disabled={isFetchingStores}
+        >
+          <RefreshCcw
+            className={`h-4 w-4 ${isFetchingStores ? "animate-spin" : ""}`}
+          />
+          <span className="ml-2">Refresh</span>
+        </Button>
+        <Button size="sm" onClick={() => navigate("/warehouses/new")}>
+          <Plus className="h-4 w-4" />
+          Add Store
+        </Button>
       </div>
 
-      <div className="mt-2 card h-table">
+      <div className="card h-table">
         {isFetchingStores && <LoadingPage />}
 
         {!isFetchingStores && (
@@ -108,7 +95,6 @@ const WareHousePage = () => {
             loading={false}
             loadingIcon="pi pi-spin pi-spinner"
             showGridlines
-            stripedRows
             rowHover
             globalFilterFields={["name", "location"]}
             scrollable

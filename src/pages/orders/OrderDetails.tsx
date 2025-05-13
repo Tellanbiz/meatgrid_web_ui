@@ -1,16 +1,15 @@
 import { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store.ts";
 import { fetchOrderById } from "../../store/features/orders/orderThunks";
 import OrderDetailsComponent from "./components/OrderDetailsComponent";
-import { FiChevronLeft } from "react-icons/fi";
 import LoadingPage from "../../components/LoadingPage.tsx";
 import { Badge } from "../../components/ui/badge.tsx";
+import BackButton from "../../components/BackButton";
 import { orderStatusColors } from "../../constants/StatusColors.ts";
 
 const OrderDetails = () => {
-  const navigate = useNavigate();
   const { orderId } = useParams<{ orderId: string }>();
   const dispatch = useDispatch<AppDispatch>();
 
@@ -24,18 +23,10 @@ const OrderDetails = () => {
     }
   }, [dispatch, orderId]);
 
-  const handleBack = () => navigate(-1);
-
   return (
     <>
-      <div className="flex items-center justify-between py-2 bg-background sticky top-16 z-20">
-        <button
-          onClick={handleBack}
-          className="flex items-center text-medium text-primary hover:underline"
-        >
-          <FiChevronLeft className="mr-2" />
-          Back
-        </button>
+      <div className="flex items-center justify-between py bg-background z-20">
+        <BackButton />
         <div className="flex flex-col space-y-1">
           <div className="flex items-center space-x-2">
             <span className="text-sm">MG{selectedOrderDetails?.order_id}</span>
@@ -65,7 +56,7 @@ const OrderDetails = () => {
         </div>
       </div>
 
-      <div className=" mt-2 bg-background rounded">
+      <div className="mt-2 bg-background rounded">
         {status === "loading" && <LoadingPage />}
 
         {error && <p className="text-red-500">{error}</p>}

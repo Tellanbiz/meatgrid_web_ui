@@ -9,8 +9,15 @@ import {
 
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import ProgressIndicator from "../../../components/ProgressIndicator.tsx";
-import { FiEdit, FiTrash } from "react-icons/fi";
-import { IconButton, PrimaryButton } from "../../../components/Button.tsx";
+import { PrimaryButton } from "../../../components/Button.tsx";
+import { EllipsisVertical, Pencil, Trash } from "lucide-react";
+import { Button } from "../../../components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../../components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
@@ -109,7 +116,6 @@ const RecipeTable = () => {
         scrollable
         scrollHeight="flex"
       >
-        <Column selectionMode="multiple" headerStyle={TableHeaderStyle} />
         <Column
           field="image"
           header="Image"
@@ -125,22 +131,32 @@ const RecipeTable = () => {
         <Column
           header="Actions"
           body={(rowData: Recipe) => (
-            <div className="flex items-center space-x-3">
-              <IconButton
-                icon={<FiEdit />}
-                onClick={() => handleEdit(rowData.id)}
-                className="text-blue-600 hover:text-blue-800"
-              />
-
-              <IconButton
-                icon={<FiTrash />}
-                onClick={() => {
-                  setRecipeToDelete(rowData);
-                  setOpenDialog(true);
-                }}
-                className="text-red-600 hover:text-red-800"
-              />
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 rounded-full"
+                  aria-label="Actions"
+                >
+                  <EllipsisVertical className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-auto">
+                <DropdownMenuItem onClick={() => handleEdit(rowData.id)}>
+                  <Pencil className="mr-2 h-4 w-4" /> Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-red-600 focus:text-red-600"
+                  onClick={() => {
+                    setRecipeToDelete(rowData);
+                    setOpenDialog(true);
+                  }}
+                >
+                  <Trash className="mr-2 h-4 w-4 text-red-600" /> Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
           headerStyle={TableHeaderStyle}
         />

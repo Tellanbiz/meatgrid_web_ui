@@ -2,14 +2,13 @@ import CouponsTable from "./components/CouponsTable";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Plus, RefreshCcw } from "lucide-react";
-import Breadcrumbs from "../../components/breadcrumbs";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchCoupons } from "../../store/features/coupons/couponThunks";
 import { selectIsFetchingCoupons } from "../../store/features/coupons/couponSelectors";
 
 const Coupons = () => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
   const isFetchingCoupons = useAppSelector(selectIsFetchingCoupons);
 
@@ -18,48 +17,38 @@ const Coupons = () => {
   };
 
   const handleRefresh = () => {
-    dispatch(fetchCoupons())
+    dispatch(fetchCoupons());
   };
 
-
   return (
-    <>
-      <div className="flex justify-between items-center py-2 bg-background sticky top-16 z-10">
-        <Breadcrumbs
-          items={[
-            {
-              label: "Coupons",
-              isPage: true,
-            },
-          ]}
-        />
-
-        <div className="flex justify-end items-center gap-x-2">
+    <div className="h-full">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">Coupons</h1>
+        <div className="flex gap-x-2">
           <Button
             variant="outline"
-            className="items-center gap-2"
+            size="sm"
             onClick={handleRefresh}
             disabled={isFetchingCoupons}
           >
-            <RefreshCcw className={`size-4 ${isFetchingCoupons? "animate-spin": ""}`} />
-            Refresh
+            <RefreshCcw className={`h-4 w-4 ${isFetchingCoupons ? "animate-spin" : ""}`} />
+            <span className="ml-2">Refresh</span>
           </Button>
 
           <Button
-            variant="default"
-            className="items-center gap-2"
+            size="sm"
             onClick={handleAddNewCoupon}
           >
-            <Plus className="size-4" />
-            New Coupon
+            <Plus className="h-4 w-4" />
+            <span className="ml-2">New Coupon</span>
           </Button>
         </div>
       </div>
 
-      <div className="mt-2 card h-table">
+      <div className="h-table">
         <CouponsTable />
       </div>
-    </>
+    </div>
   );
 };
 
