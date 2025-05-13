@@ -6,6 +6,7 @@ import {
   ChevronsUpDown,
   Loader2,
   LogOut,
+  User,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -62,7 +63,7 @@ export function NavUser({
     <SidebarMenu>
       <SidebarMenuItem>
         {!user ? (
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 px-4 py-2">
             {/* Skeleton for Avatar */}
             <Skeleton className="h-8 w-8 rounded-full" />
             {/* Skeleton for Text */}
@@ -76,65 +77,68 @@ export function NavUser({
             <DropdownMenuTrigger asChild>
               <SidebarMenuButton
                 size="lg"
-                className="data-[state=open]:bg-white data-[state=open]:text-black hover:bg-white hover:text-black transition-colors duration-200"
+                className="px-4 py-2 hover:bg-[#32373c] transition-colors duration-200 w-full justify-start"
               >
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.picture} alt={user.full_name} />
-                  <AvatarFallback className="rounded-lg">
-                    {getInitials(user.full_name)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">
-                    {user.full_name}
-                  </span>
-                  <span className="truncate text-xs">{user.email}</span>
+                <div className="flex items-center">
+                  <Avatar className="h-8 w-8 rounded-full overflow-hidden bg-[#00a0d2]">
+                    <AvatarImage src={user.picture} alt={user.full_name} />
+                    <AvatarFallback className="bg-[#00a0d2] text-white">
+                      <User size={16} />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="ml-2 text-left text-sm">
+                    <span className="text-[#b4b9be] text-xs">Howdy,</span>
+                    <span className="ml-1 text-sm text-white">{user.full_name.split(' ')[0]}</span>
+                  </div>
                 </div>
-                <ChevronsUpDown className="ml-auto size-4" />
               </SidebarMenuButton>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent
-              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-md"
               side={isMobile ? "bottom" : "right"}
               align="end"
               sideOffset={4}
             >
               <DropdownMenuLabel className="p-0 font-normal">
-                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <Avatar className="h-8 w-8 rounded-lg">
+                <div className="flex items-center gap-2 px-3 py-2 text-left text-sm">
+                  <Avatar className="h-8 w-8 rounded-full overflow-hidden">
                     <AvatarImage src={user.picture} alt={user.full_name} />
-                    <AvatarFallback className="rounded-lg">
-                      {getInitials(user.full_name)}
+                    <AvatarFallback className="bg-[#00a0d2] text-white">
+                      <User size={16} />
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">
                       {user.full_name}
                     </span>
-                    <span className="truncate text-xs">{user.email}</span>
+                    <span className="truncate text-xs text-gray-500">{user.email}</span>
                   </div>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem onClick={onAccountClick}>
-                  <BadgeCheck />
-                  Account
+                <DropdownMenuItem onClick={onAccountClick} className="flex items-center gap-2 px-3 py-2">
+                  <BadgeCheck className="size-4 text-[#00a0d2]" />
+                  <span>Your Profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={onNotificationClick}>
-                  <Bell />
-                  Notifications
+                <DropdownMenuItem onClick={onNotificationClick} className="flex items-center gap-2 px-3 py-2">
+                  <Bell className="size-4 text-[#00a0d2]" />
+                  <span>Notifications</span>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onLogoutClick} disabled={isLoggingOut}>
+              <DropdownMenuItem 
+                onClick={onLogoutClick} 
+                disabled={isLoggingOut}
+                className="flex items-center gap-2 px-3 py-2 text-red-500 hover:text-red-600"
+              >
                 {isLoggingOut ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="size-4 animate-spin" />
                 ) : (
-                  <LogOut className="mr-2 h-4 w-4" />
+                  <LogOut className="size-4" />
                 )}
-                Log out
+                <span>Log Out</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

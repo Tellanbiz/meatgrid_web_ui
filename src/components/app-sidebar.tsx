@@ -68,16 +68,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar 
       variant="sidebar" 
       collapsible="icon" 
-      className="bg-[#151922] text-white border-r-0 h-full"
+      className="bg-[#23282d] text-white border-r-0 h-full"
       {...props}
     >
-      <SidebarHeader className="px-4 py-2 flex-shrink-0">
+      <SidebarHeader className="px-0 py-0 flex-shrink-0">
         <CompanyHeader company={data.company} />
       </SidebarHeader>
-      <SidebarContent className="px-2 overflow-y-auto">
+      <SidebarContent className="px-0 overflow-y-auto">
         <NavMain items={data.navMain} />
       </SidebarContent>
-      <SidebarFooter className="mt-auto flex-shrink-0">
+      <SidebarFooter className="mt-auto flex-shrink-0 border-t border-[#32373c] pt-2">
         <NavUser
           user={user}
           isLoggingOut={isLoggingOut}

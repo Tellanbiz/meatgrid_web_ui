@@ -1,14 +1,10 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, FolderIcon } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Icon } from "@iconify/react";
+import React, { useState } from "react";
 
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import {
   SidebarGroup,
   SidebarMenu,
@@ -35,6 +31,7 @@ export function NavMain({
   }[];
 }) {
   const location = useLocation();
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
   const isActiveItem = (item: { url: string; items?: { url: string }[] }) => {
     // For direct menu items like Dashboard, check exact match
@@ -54,65 +51,90 @@ export function NavMain({
     return location.pathname.startsWith(item.url);
   };
 
+  const toggleExpanded = (title: string) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [title]: !prev[title]
+    }));
+  };
+
+  // Initialize expanded state for active items
+  React.useEffect(() => {
+    const initialExpanded: Record<string, boolean> = {};
+    items.forEach(item => {
+      if (isActiveItem(item) || item.isActive) {
+        initialExpanded[item.title] = true;
+      }
+    });
+    setExpandedItems(prev => ({...prev, ...initialExpanded}));
+  }, []);
+
   return (
     <SidebarGroup>
-      <SidebarMenu>
+      <SidebarMenu className="mt-4 space-y-1">
         {items.map((item) => (
-          <SidebarMenuItem key={item.title}>
+          <SidebarMenuItem key={item.title} className="my-1">
             {!item.items?.length ? (
               <SidebarMenuButton
                 asChild
                 tooltip={item.title}
-                className="text-white transition-colors data-[active=true]:bg-primary data-[active=true]:text-white hover:bg-primary/20 hover:text-white py-4 px-2"
+                className="text-[#eee] transition-colors data-[active=true]:bg-[#0073aa] data-[active=true]:text-white hover:bg-[#32373c] hover:text-white py-2.5 px-4 font-normal text-sm w-full border-l-4 border-transparent data-[active=true]:border-[#00b9eb]"
                 data-active={location.pathname === item.url}
               >
                 <NavLink to={item.url} className="flex items-center w-full">
-                  {item.icon && (
+                  {item.icon ? (
                     <Icon
                       icon={item.icon}
-                      width="20"
-                      height="20"
-                      className="mr-2"
+                      width="18"
+                      height="18"
+                      className="mr-2 opacity-80"
                     />
+                  ) : (
+                    <span className="w-[18px] h-[18px] mr-2"></span>
                   )}
                   <span>{item.title}</span>
                 </NavLink>
               </SidebarMenuButton>
             ) : (
-              <Collapsible
-                defaultOpen={item.isActive || isActiveItem(item)}
-                className="group/collapsible"
-              >
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton
-                    tooltip={item.title}
-                    data-active={isActiveItem(item)}
-                    className="text-white transition-colors data-[active=true]:bg-primary data-[active=true]:text-white hover:bg-primary/20 hover:text-white py-4 px-2"
-                  >
-                    {item.icon && (
-                      <Icon
-                        icon={item.icon}
-                        width="20"
-                        height="20"
-                        className={isActiveItem(item) ? "text-white" : ""}
-                      />
-                    )}
-                    <span>{item.title}</span>
-                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <SidebarMenuSub className="border-sidebar-border">
+              <div className="w-full">
+                <SidebarMenuButton
+                  tooltip={item.title}
+                  data-active={isActiveItem(item)}
+                  className="text-[#eee] transition-colors data-[active=true]:bg-[#0073aa] data-[active=true]:text-white hover:bg-[#32373c] hover:text-white py-2.5 px-4 font-normal text-sm w-full border-l-4 border-transparent data-[active=true]:border-[#00b9eb]"
+                  onClick={() => toggleExpanded(item.title)}
+                >
+                  {item.icon ? (
+                    <Icon
+                      icon={item.icon}
+                      width="18"
+                      height="18"
+                      className="mr-2 opacity-80"
+                    />
+                  ) : (
+                    <FolderIcon
+                      width="18"
+                      height="18"
+                      className="mr-2 opacity-80"
+                    />
+                  )}
+                  <span>{item.title}</span>
+                  <ChevronRight 
+                    className={`ml-auto size-4 transition-transform duration-200 ${expandedItems[item.title] ? 'rotate-90' : ''}`} 
+                  />
+                </SidebarMenuButton>
+                
+                {expandedItems[item.title] && (
+                  <SidebarMenuSub className="bg-[#32373c] mt-0.5">
                     {item.items?.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton
                           asChild
-                          className="text-white/80 transition-colors"
+                          className="text-[#eee]/90 transition-colors"
                           data-active={location.pathname.startsWith(subItem.url)}
                         >
                           <NavLink
                             to={subItem.url}
-                            className="w-full rounded-md py-4 px-2 transition-colors data-[active=true]:bg-primary data-[active=true]:text-white data-[active=true]:font-medium hover:bg-primary/20 hover:text-white"
+                            className="w-full py-2.5 pl-3 pr-4 transition-colors data-[active=true]:text-white data-[active=true]:font-medium hover:bg-[#191e23] hover:text-white text-sm"
                             data-active={location.pathname.startsWith(subItem.url)}
                             end={subItem.url === "/"}
                           >
@@ -122,8 +144,8 @@ export function NavMain({
                       </SidebarMenuSubItem>
                     ))}
                   </SidebarMenuSub>
-                </CollapsibleContent>
-              </Collapsible>
+                )}
+              </div>
             )}
           </SidebarMenuItem>
         ))}
