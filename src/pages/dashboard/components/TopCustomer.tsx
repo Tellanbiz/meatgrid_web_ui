@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Input } from "@/components/ui/input";
@@ -17,6 +18,8 @@ interface TopCustomerItem {
 }
 
 const TopCustomer = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+
   const customers: TopCustomerItem[] = [
     {
       name: "Samuel Njuguna",
@@ -60,6 +63,9 @@ const TopCustomer = () => {
     <Badge className="bg-green-100 text-green-500 rounded-md px-2 py-1">Orders: {rowData.orders}</Badge>
   );
 
+  const filteredCustomers = customers.filter(customer =>
+    customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="bg-white shadow rounded-lg p-4">
@@ -69,7 +75,9 @@ const TopCustomer = () => {
         <div className="relative">
           <Input
             type="text"
-            placeholder="Search"
+            placeholder="Search customers..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-9 w-full bg-white border-gray-200"
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -77,7 +85,7 @@ const TopCustomer = () => {
 
         <div className="border border-gray-200 rounded-lg overflow-hidden">
           <DataTable
-            value={customers}
+            value={filteredCustomers}
             tableStyle={{
               ...DataTableStyle,
               borderCollapse: "separate",

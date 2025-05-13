@@ -5,13 +5,15 @@ import {
   fetchProductsReport,
   fetchStoresReport,
   fetchYearlyReport,
+  fetchTopProducts,
 } from "./reportThunks";
 
 interface ReportState {
   productReports: ProductReport[];
   storeReports: StoreReport[];
   yearlyReports: MonthReport[];
-  currentOperation: "productReports" | "storeReports" | "yearlyReports" | null;
+  topProducts: ProductReport[];
+  currentOperation: "productReports" | "storeReports" | "yearlyReports" | "topProducts" | null;
   status: LoadingStatus;
   error: string | null;
   successMessage: string | null;
@@ -21,6 +23,7 @@ const initialState: ReportState = {
   productReports: [],
   storeReports: [],
   yearlyReports: [],
+  topProducts: [],
   currentOperation: null,
   status: LoadingState.Idle,
   error: null,
@@ -71,6 +74,19 @@ const reportSlice = createSlice({
       .addCase(fetchYearlyReport.rejected, (state, action) => {
         state.status = LoadingState.Failed;
         state.error = action.payload || "Failed to fetch reports";
+      })
+      .addCase(fetchTopProducts.pending, (state) => {
+        state.currentOperation = "topProducts";
+        state.status = LoadingState.Loading;
+        state.error = null;
+      })
+      .addCase(fetchTopProducts.fulfilled, (state, action) => {
+        state.status = LoadingState.Succeeded;
+        state.topProducts = action.payload;
+      })
+      .addCase(fetchTopProducts.rejected, (state, action) => {
+        state.status = LoadingState.Failed;
+        state.error = action.payload || "Failed to fetch top products";
       });
   },
 });

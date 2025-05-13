@@ -25,3 +25,10 @@ export const selectReportError = (state: RootState) => state.reports.error;
 
 export const selectReportSuccessMessage = (state: RootState) =>
   state.reports.successMessage;
+
+export const selectTopProducts = (state: RootState) =>
+  state.reports.topProducts;
+
+export const selectIsFetchingTopProducts = (state: RootState) =>
+  state.reports.currentOperation === "topProducts" &&
+  state.reports.status === "loading";
