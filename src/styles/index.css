@@ -29,17 +29,20 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --primary: #F10027;
+  --primary-foreground: #FFFFFF;
+  --primary-hover: #DB0023;
+  --primary-ring: rgba(241, 0, 39, 0.2);
+  --secondary: #f5f6fa;
+  --secondary-foreground: #1f2937;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --accent: #f3f4f6;
+  --accent-foreground: #1f2937;
+  --destructive: #ef4444;
+  --border: #e5e7eb;
+  --input: #ffffff;
+  --ring: rgba(241, 0, 39, 0.2);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -137,10 +140,33 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
+  }
+  input, textarea {
+    @apply bg-white focus:ring-2 focus:ring-[#F10027]/20 focus:border-[#F10027] outline-none;
+  }
+  [type='text'],
+  [type='email'],
+  [type='url'],
+  [type='password'],
+  [type='number'],
+  [type='date'],
+  [type='datetime-local'],
+  [type='month'],
+  [type='search'],
+  [type='tel'],
+  [type='time'],
+  [type='week'],
+  [multiple],
+  textarea,
+  select {
+    @apply bg-white focus:ring-2 focus:ring-[#F10027]/20 focus:border-[#F10027] outline-none;
+  }
+  button {
+    @apply focus:ring-2 focus:ring-[#F10027]/20 focus:ring-offset-2 hover:bg-[#DB0023] transition-colors duration-200;
   }
 }
 
@@ -152,9 +178,21 @@
     @apply text-gray-500;
   }
   .btn {
-    @apply bg-primary hover:bg-blue-800 transition duration-300;
+    @apply bg-[#F10027] hover:bg-[#DB0023] focus:ring-2 focus:ring-[#F10027]/20 focus:ring-offset-2 transition-all duration-200;
   }
-
+  /* ShadCN Button overrides */
+  .button {
+    @apply bg-[#F10027] hover:bg-[#DB0023] focus:ring-2 focus:ring-[#F10027]/20 focus:ring-offset-2;
+  }
+  .button-secondary {
+    @apply bg-white hover:bg-[#F10027]/10 text-[#F10027] border-[#F10027];
+  }
+  .button-outline {
+    @apply border-[#F10027] text-[#F10027] hover:bg-[#F10027]/10;
+  }
+  .button-ghost {
+    @apply hover:bg-[#F10027]/10 text-[#F10027];
+  }
   .h-table {
     @apply h-[calc(100vh-10rem)];
   }
@@ -162,8 +200,16 @@
 
 @theme {
   --color-primary: #F10027;
-  --color-primary-500: #1e2753;
-  --color-primary-800: #070b1d;
+  --color-primary-50: #FFF1F3;
+  --color-primary-100: #FFE4E8;
+  --color-primary-200: #FFCCD3;
+  --color-primary-300: #FFA3AE;
+  --color-primary-400: #FF6B7A;
+  --color-primary-500: #F10027;
+  --color-primary-600: #DB0023;
+  --color-primary-700: #B7001D;
+  --color-primary-800: #93001A;
+  --color-primary-900: #7A0015;
   --color-success: #c4f8e2;
   --color-background: #f5f6fa;
 }
