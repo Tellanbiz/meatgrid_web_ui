@@ -32,3 +32,10 @@ export const selectTopProducts = (state: RootState) =>
 export const selectIsFetchingTopProducts = (state: RootState) =>
   state.reports.currentOperation === "topProducts" &&
   state.reports.status === "loading";
+
+export const selectTopStores = (state: RootState) =>
+  state.reports.topStores;
+
+export const selectIsFetchingTopStores = (state: RootState) =>
+  state.reports.currentOperation === "topStores" &&
+  state.reports.status === "loading";

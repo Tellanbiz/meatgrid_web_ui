@@ -6,6 +6,7 @@ import { MonthReport, ProductReport, StoreReport } from "./reportTypes";
 import { FetchStoreReportRequest } from "./request/FetchStoreReportRequest";
 import { FetchYearlyReportRequest } from "./request/FetchYearlyReportRequest";
 import { FetchTopProductsRequest } from "./request/FetchTopProductsRequest";
+import { FetchTopStoresRequest } from "./request/FetchTopStoresRequest";
 
 export const fetchProductsReport = createAsyncThunk<
   ProductReport[],
@@ -78,5 +79,25 @@ export const fetchTopProducts = createAsyncThunk<
     );
   }
 });
+
+export const fetchTopStores = createAsyncThunk<
+  StoreReport[],
+  FetchTopStoresRequest,
+  { rejectValue: string }
+>("reports/fetchTopStores", async (payload, { rejectWithValue }) => {
+  try {
+    const response = await axios.get(`/reports/orders/stores`, {
+      params: payload,
+    });
+    return response.data;
+  } catch (err: unknown) {
+    const error = err as ApiError;
+    return rejectWithValue(
+      error.response?.data?.error || "Failed to fetch top stores"
+    );
+  }
+});
+
+
 
 

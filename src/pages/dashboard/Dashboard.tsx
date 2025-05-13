@@ -4,6 +4,7 @@ import RevenueStatistics from "./components/RevenueStatistics";
 import ProductStatusStatistics from "./components/ProductStatusStatistics";
 import TopSelling from "./components/TopSelling";
 import TopCustomer from "./components/TopCustomer";
+import TopStores from "./components/TopStores";
 import OrderStatus from "./components/OrderStatus";
 import OrderSummary from "./components/OrderSummary";
 import LatestOnlineOrders from "./components/LatestOnlineOrders";
@@ -34,9 +35,10 @@ const Dashboard = () => {
       {/* Latest Online Orders */}
       <LatestOnlineOrders />
 
-      {/* Top Selling, Rating, and Customers */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* Top Selling, Stores, and Customers */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <TopSelling />
+        <TopStores />
         <TopCustomer />
       </div>
     </div>
