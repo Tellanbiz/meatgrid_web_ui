@@ -64,144 +64,283 @@ const routes: RouteObject[] = [
       },
       {
         path: "orders",
-        element: <OrdersPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_orders_view"]}>
+            <OrdersPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "orders/:orderId",
-        element: <OrderDetails />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_orders_view"]}>
+            <OrderDetails />
+          </PrivateRoute>
+        ),
       },
       {
         path: "products",
-        element: <Products />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_product_view"]}>
+            <Products />
+          </PrivateRoute>
+        ),
       },
       {
         path: "products/new",
-        element: <ManageProductPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_product_submit"]}>
+            <ManageProductPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "products/:productId/edit",
-        element: <ManageProductPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_product_submit"]}>
+            <ManageProductPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "categories",
-        element: <CategoriesPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_category_view"]}>
+            <CategoriesPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "categories/:categoryId/edit",
-        element: <ManageCategoryPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_category_submit"]}>
+            <ManageCategoryPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "categories/new",
-        element: <ManageCategoryPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_category_submit"]}>
+            <ManageCategoryPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "coupons",
-        element: <Coupons />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_promotional_tag_view"]}>
+            <Coupons />
+          </PrivateRoute>
+        ),
       },
       {
         path: "coupons/new",
-        element: <AddCouponPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_promotional_tag_submit"]}>
+            <AddCouponPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "coupons/edit/:id",
-        element: <EditCouponPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_promotional_tag_submit"]}>
+            <EditCouponPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "recipes",
-        element: <Recipes />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_product_view"]}>
+            <Recipes />
+          </PrivateRoute>
+        ),
       },
       {
         path: "recipes/new",
-        element: <AddRecipe />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_product_submit"]}>
+            <AddRecipe />
+          </PrivateRoute>
+        ),
       },
       {
         path: "recipes/:id/edit",
-        element: <EditRecipe />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_product_submit"]}>
+            <EditRecipe />
+          </PrivateRoute>
+        ),
       },
       {
         path: "tags",
-        element: <TagsPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_promotional_tag_view"]}>
+            <TagsPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/banners",
-        element: <BannersPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_banners_view"]}>
+            <BannersPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "banners/new",
-        element: <ManageBannerPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_banners_submit_view"]}>
+            <ManageBannerPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "banners/:bannerId/edit",
-        element: <ManageBannerPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_banners_submit_view"]}>
+            <ManageBannerPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "suppliers",
-        element: <SupplierPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_suppliers_view"]}>
+            <SupplierPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "stock",
-        element: <StocksPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_stock_view"]}>
+            <StocksPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "stock/transfer",
-        element: <TransferStockPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_stock_submit"]}>
+            <TransferStockPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "stock/restock",
-        element: <RestockPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_stock_submit"]}>
+            <RestockPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "stock/process",
-        element: <ProcessProductsPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_stock_submit"]}>
+            <ProcessProductsPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "stock/process/select-products",
-        element: <SelectProductsPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_stock_submit"]}>
+            <SelectProductsPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "warehouses",
-        element: <WareHousePage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_warehouse_view"]}>
+            <WareHousePage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "warehouses/new",
-        element: <ManageWareHousePage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_warehouse_submit"]}>
+            <ManageWareHousePage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "warehouses/:warehouseId/edit",
-        element: <ManageWareHousePage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_warehouse_submit"]}>
+            <ManageWareHousePage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "payment-methods",
-        element: <PaymentMethodsPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_payment_method_view"]}>
+            <PaymentMethodsPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "storage-types",
-        element: <StorageTypesPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_storage_type_view"]}>
+            <StorageTypesPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "storage-types/new",
-        element: <ManageStorageTypesPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_storage_type_submit"]}>
+            <ManageStorageTypesPage />
+          </PrivateRoute>
+        ),
       },
-
       {
         path: "storage-types/:storageTypeId/edit",
-        element: <ManageStorageTypesPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_storage_type_submit"]}>
+            <ManageStorageTypesPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "accounts",
-        element: <AccountsPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_accounts_view"]}>
+            <AccountsPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "staffs",
-        element: <StaffsPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_staff_view"]}>
+            <StaffsPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "riders",
-        element: <RidersPage />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_riders_view"]}>
+            <RidersPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "settings",
-        element: <Settings />,
+        element: (
+          <PrivateRoute requiredPermissions={["allow_configuration_view"]}>
+            <Settings />
+          </PrivateRoute>
+        ),
       },
       {
         path: "*",
