@@ -101,8 +101,29 @@ const TopSelling = () => {
     name: product.name,
     sold: product.order_count,
     weight: product.unit_type,
-    price: product.regular_price
+    price: product.regular_price,
+    images: product.images || '/placeholder-product.png'
   }));
+
+  const itemNameTemplate = (rowData: TopSellingItem) => (
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+        <img 
+          src={rowData.images} 
+          alt={rowData.name}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = '/placeholder-product.png';
+          }}
+        />
+      </div>
+      <div className="flex flex-col">
+        <span className="font-medium text-gray-900">{rowData.name}</span>
+        <span className="text-sm text-gray-500">{rowData.weight}</span>
+      </div>
+    </div>
+  );
 
   const soldTemplate = (rowData: TopSellingItem) => (
     <Badge className="bg-green-100 text-green-800 rounded-md px-2 py-1">
@@ -209,17 +230,17 @@ const TopSelling = () => {
               headerStyle={{
                 ...TableHeaderStyle,
                 background: "white",
-                textAlign: "center",
+                textAlign: "left",
                 position: "sticky",
                 top: 0,
-                zIndex: 1
+                zIndex: 1,
+                paddingLeft: '1rem'
               }}
-              body={(rowData: TopSellingItem) => (
-                <div className="flex items-center space-x-2">
-                  <span>{rowData.name}</span>
-                  <span className="text-gray-500 text-sm">{rowData.weight}</span>
-                </div>
-              )}
+              style={{ 
+                minWidth: '300px',
+                paddingLeft: '1rem'
+              }}
+              body={itemNameTemplate}
             />
 
             <Column
