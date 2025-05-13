@@ -1,6 +1,6 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -17,42 +17,73 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "../../../store/store";
+import { fetchYearlyReport } from "../../../store/features/reports/reportThunks";
+import { selectYearlyReport, selectIsFetchingYearlyReports } from "../../../store/features/reports/reportSelectors";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
 
 const RevenueStatistics: FC = () => {
-  const data = Array.from({ length: 12 }, (_, i) => ({
-    month: new Date(2025, i).toLocaleString('default', { month: 'short' }),
-    revenue: Math.floor(Math.random() * 600) + 400
-  }));
+  const dispatch = useDispatch<AppDispatch>();
+  const [selectedYear, setSelectedYear] = useState<string>("2025");
+  const yearlyReport = useSelector(selectYearlyReport);
+  const isLoading = useSelector(selectIsFetchingYearlyReports);
+
+  useEffect(() => {
+    dispatch(fetchYearlyReport({ year: parseInt(selectedYear) }));
+  }, [selectedYear, dispatch]);
+
+  const years = ["2025", "2024", "2023", "2022"];
 
   return (
     <div className="bg-white shadow rounded-lg p-4 col-span-2">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold">Revenue Statistics (ksh/month)</h3>
-        <Select defaultValue="thisYear">
+        <Select value={selectedYear} onValueChange={setSelectedYear}>
           <SelectTrigger className="w-32">
-            <SelectValue placeholder="Select Period" />
+            <SelectValue placeholder="Select Year" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="thisYear">This Year</SelectItem>
-            <SelectItem value="lastYear">Last Year</SelectItem>
-            <SelectItem value="lastMonth">Last Month</SelectItem>
+            {years.map((year) => (
+              <SelectItem key={year} value={year}>
+                {year}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
-      <div className="w-full h-[300px]">
+      <div className="w-full h-[300px] relative">
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-10">
+            <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
+          </div>
+        )}
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data}>
+          <LineChart data={yearlyReport}>
             <CartesianGrid strokeDasharray="2 2" vertical={false} />
-            <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#A1A7C4" }} />
+            <XAxis 
+              dataKey="month_name" 
+              tick={{ fontSize: 12, fill: "#A1A7C4" }} 
+            />
             <YAxis
               axisLine={false}
               tick={{ fontSize: 12, fill: "#A1A7C4" }}
-              tickFormatter={(value) => `${value}`}
+              tickFormatter={(value) => `${value.toLocaleString()}`}
             />
-            <Tooltip formatter={(value) => `Ksh ${value}`} />
+            <Tooltip 
+              formatter={(value: number) => [`Ksh ${value.toLocaleString()}`, "Revenue"]}
+              labelStyle={{ color: "#374151" }}
+              contentStyle={{ 
+                backgroundColor: "white",
+                border: "1px solid #E5E7EB",
+                borderRadius: "6px",
+                padding: "8px"
+              }}
+            />
             <Line
               type="monotone"
-              dataKey="revenue"
+              dataKey="monthly_revenue"
               stroke="#22c55e"
               strokeWidth={2}
               dot={false}
