@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  Loader2,
-  LogOut,
-  User,
-} from "lucide-react";
+import { BadgeCheck, Bell, Loader2, LogOut, User } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -45,20 +38,6 @@ export function NavUser({
 }: NavUserProps) {
   const { isMobile } = useSidebar();
 
-  function getInitials(fullName: string): string {
-    if (!fullName) {
-      return "";
-    }
-    const words = fullName.split(" ").filter((word) => word.length > 0);
-    if (words.length === 1) {
-      return words[0].charAt(0).toUpperCase();
-    }
-    return (
-      words[0].charAt(0).toUpperCase() +
-      words[words.length - 1].charAt(0).toUpperCase()
-    );
-  }
-
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -88,7 +67,9 @@ export function NavUser({
                   </Avatar>
                   <div className="ml-2 text-left text-sm">
                     <span className="text-[#b4b9be] text-xs">Howdy,</span>
-                    <span className="ml-1 text-sm text-white">{user.full_name.split(' ')[0]}</span>
+                    <span className="ml-1 text-sm text-white">
+                      {user.full_name.split(" ")[0]}
+                    </span>
                   </div>
                 </div>
               </SidebarMenuButton>
@@ -112,24 +93,32 @@ export function NavUser({
                     <span className="truncate font-semibold">
                       {user.full_name}
                     </span>
-                    <span className="truncate text-xs text-gray-500">{user.email}</span>
+                    <span className="truncate text-xs text-gray-500">
+                      {user.email}
+                    </span>
                   </div>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem onClick={onAccountClick} className="flex items-center gap-2 px-3 py-2">
+                <DropdownMenuItem
+                  onClick={onAccountClick}
+                  className="flex items-center gap-2 px-3 py-2"
+                >
                   <BadgeCheck className="size-4 text-[#00a0d2]" />
                   <span>Your Profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={onNotificationClick} className="flex items-center gap-2 px-3 py-2">
+                <DropdownMenuItem
+                  onClick={onNotificationClick}
+                  className="flex items-center gap-2 px-3 py-2"
+                >
                   <Bell className="size-4 text-[#00a0d2]" />
                   <span>Notifications</span>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                onClick={onLogoutClick} 
+              <DropdownMenuItem
+                onClick={onLogoutClick}
                 disabled={isLoggingOut}
                 className="flex items-center gap-2 px-3 py-2 text-red-500 hover:text-red-600"
               >
