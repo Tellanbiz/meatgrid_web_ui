@@ -36,23 +36,21 @@ export function NavMain({
 }) {
   const location = useLocation();
 
-  // Check if a navigation item should be active based on current route
   const isActiveItem = (item: { url: string; items?: { url: string }[] }) => {
+    // For direct menu items like Dashboard, check exact match
+    if (!item.items?.length) {
+      return location.pathname === item.url;
+    }
+    
+    // For menu sections (with #), check if any child route matches
     if (item.url === "#") {
-      // For menu sections (with #), check if any child route matches or starts with child url
-      return item.items?.some(
+      return item.items.some(
         (subItem) =>
           location.pathname.startsWith(subItem.url) ||
           location.pathname === subItem.url
       );
     }
-
-    if (item.url === "/") {
-      // For dashboard, only exact match
-      return location.pathname === "/";
-    }
-
-    // For other items, check if current path starts with item url
+    
     return location.pathname.startsWith(item.url);
   };
 
@@ -60,55 +58,74 @@ export function NavMain({
     <SidebarGroup>
       <SidebarMenu>
         {items.map((item) => (
-          <Collapsible
-            key={item.title}
-            asChild
-            defaultOpen={item.isActive || isActiveItem(item)}
-            className="group/collapsible"
-          >
-            <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton
-                  tooltip={item.title}
-                  data-active={isActiveItem(item)}
-                  className="text-white transition-colors data-[active=true]:bg-primary data-[active=true]:text-white hover:bg-primary/20 hover:text-white"
-                >
+          <SidebarMenuItem key={item.title}>
+            {!item.items?.length ? (
+              <SidebarMenuButton
+                asChild
+                tooltip={item.title}
+                className="text-white transition-colors data-[active=true]:bg-primary data-[active=true]:text-white hover:bg-primary/20 hover:text-white py-4 px-2"
+                data-active={location.pathname === item.url}
+              >
+                <NavLink to={item.url} className="flex items-center w-full">
                   {item.icon && (
                     <Icon
                       icon={item.icon}
                       width="20"
                       height="20"
-                      className={isActiveItem(item) ? "text-white" : ""}
+                      className="mr-2"
                     />
                   )}
                   <span>{item.title}</span>
-                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <SidebarMenuSub className="border-sidebar-border">
-                  {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton
-                        asChild
-                        className="text-white/80 transition-colors"
-                        data-active={location.pathname === subItem.url}
-                      >
-                        <NavLink
-                          to={subItem.url}
-                          className="w-full rounded-md p-2 transition-colors data-[active=true]:bg-primary data-[active=true]:text-white data-[active=true]:font-medium hover:bg-primary/20 hover:text-white"
-                          data-active={location.pathname === subItem.url}
-                          end={subItem.url === "/"}
+                </NavLink>
+              </SidebarMenuButton>
+            ) : (
+              <Collapsible
+                defaultOpen={item.isActive || isActiveItem(item)}
+                className="group/collapsible"
+              >
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    data-active={isActiveItem(item)}
+                    className="text-white transition-colors data-[active=true]:bg-primary data-[active=true]:text-white hover:bg-primary/20 hover:text-white py-4 px-2"
+                  >
+                    {item.icon && (
+                      <Icon
+                        icon={item.icon}
+                        width="20"
+                        height="20"
+                        className={isActiveItem(item) ? "text-white" : ""}
+                      />
+                    )}
+                    <span>{item.title}</span>
+                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub className="border-sidebar-border">
+                    {item.items?.map((subItem) => (
+                      <SidebarMenuSubItem key={subItem.title}>
+                        <SidebarMenuSubButton
+                          asChild
+                          className="text-white/80 transition-colors"
+                          data-active={location.pathname.startsWith(subItem.url)}
                         >
-                          <span>{subItem.title}</span>
-                        </NavLink>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
-                </SidebarMenuSub>
-              </CollapsibleContent>
-            </SidebarMenuItem>
-          </Collapsible>
+                          <NavLink
+                            to={subItem.url}
+                            className="w-full rounded-md py-4 px-2 transition-colors data-[active=true]:bg-primary data-[active=true]:text-white data-[active=true]:font-medium hover:bg-primary/20 hover:text-white"
+                            data-active={location.pathname.startsWith(subItem.url)}
+                            end={subItem.url === "/"}
+                          >
+                            <span>{subItem.title}</span>
+                          </NavLink>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </Collapsible>
+            )}
+          </SidebarMenuItem>
         ))}
       </SidebarMenu>
     </SidebarGroup>

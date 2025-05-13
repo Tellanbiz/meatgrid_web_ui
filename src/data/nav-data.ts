@@ -9,7 +9,6 @@ export const data = {
       url: "/",
       icon: "solar:home-2-bold-duotone",
       isActive: true,
-      items: [{ title: "Dashboard", url: "/" }],
     },
     {
       title: "Product Management",
