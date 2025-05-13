@@ -18,6 +18,7 @@ import {
   selectIsFetchingAdminAccount,
   selectIsLoggingOut,
   selectLogoutSuccess,
+  selectAuthStatus,
 } from "../store/features/auth/authSelectors";
 import {
   fetchAdminAccount,
@@ -33,12 +34,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const isFetchingAdminAccount = useAppSelector(selectIsFetchingAdminAccount);
   const isLoggingOut = useAppSelector(selectIsLoggingOut);
   const logoutSuccess = useAppSelector(selectLogoutSuccess);
+  const status = useAppSelector(selectAuthStatus);
 
   React.useEffect(() => {
     if (!user && !isFetchingAdminAccount) {
-      dispatch(fetchAdminAccount());
+      if (status === 'failed') {
+        navigate('/login');
+      } else {
+        dispatch(fetchAdminAccount());
+      }
     }
-  }, [dispatch, isFetchingAdminAccount, user]);
+  }, [dispatch, isFetchingAdminAccount, user, status, navigate]);
 
   React.useEffect(() => {
     if (logoutSuccess) {
