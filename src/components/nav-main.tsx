@@ -80,7 +80,7 @@ export function NavMain({
               <SidebarMenuButton
                 asChild
                 tooltip={item.title}
-                className="text-[#eee] transition-colors data-[active=true]:bg-[#0073aa] data-[active=true]:text-white hover:bg-[#32373c] hover:text-white py-2.5 px-4 font-normal text-sm w-full border-l-4 border-transparent data-[active=true]:border-[#00b9eb]"
+                className="text-[#eee] transition-colors data-[active=true]:bg-[#c66e60] data-[active=true]:text-white hover:bg-[#32373c] hover:text-white py-2.5 px-4 font-normal text-sm w-full border-l-4 border-transparent data-[active=true]:border-[#f46b6b]"
                 data-active={location.pathname === item.url}
               >
                 <NavLink to={item.url} className="flex items-center w-full">
@@ -102,7 +102,7 @@ export function NavMain({
                 <SidebarMenuButton
                   tooltip={item.title}
                   data-active={isActiveItem(item)}
-                  className="text-[#eee] transition-colors data-[active=true]:bg-[#0073aa] data-[active=true]:text-white hover:bg-[#32373c] hover:text-white py-2.5 px-4 font-normal text-sm w-full border-l-4 border-transparent data-[active=true]:border-[#00b9eb]"
+                  className="text-[#eee] transition-colors data-[active=true]:bg-primary-500 data-[active=true]:text-white hover:bg-[#32373c] hover:text-white py-2.5 px-4 font-normal text-sm w-full border-l-4 border-transparent data-[active=true]:border-[#f56767]"
                   onClick={() => toggleExpanded(item.title)}
                 >
                   {item.icon ? (
