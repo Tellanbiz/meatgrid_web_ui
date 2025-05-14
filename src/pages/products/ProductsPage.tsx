@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "../../components/ui/select";
 
-const Products = () => {
+const ProductsPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -117,4 +117,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default ProductsPage;

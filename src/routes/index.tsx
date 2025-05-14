@@ -3,7 +3,7 @@ import NotFound from "../pages/NotFound";
 import { RouteObject } from "react-router-dom";
 import MainLayout from "../components/MainLayout.js";
 import Dashboard from "../pages/dashboard/Dashboard";
-import Products from "../pages/products/Products";
+import ProductsPage from "../pages/products/ProductsPage.js";
 import LoginPage from "../pages/login/LoginPage.js";
 import RegisterPage from "../pages/register/RegisterPage.js";
 import ResetPassword from "../pages/reset-pasword/ResetPassword";
@@ -84,7 +84,7 @@ const routes: RouteObject[] = [
         path: "products",
         element: (
           <PrivateRoute requiredPermissions={["allow_product_view"]}>
-            <Products />
+            <ProductsPage />
           </PrivateRoute>
         ),
       },
