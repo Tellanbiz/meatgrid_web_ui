@@ -25,8 +25,8 @@ import {
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
-const SIDEBAR_WIDTH = "16rem";
-const SIDEBAR_WIDTH_MOBILE = "18rem";
+const SIDEBAR_WIDTH = "20rem";
+const SIDEBAR_WIDTH_MOBILE = "22rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
@@ -685,8 +685,8 @@ function SidebarMenuSubButton({
       data-size={size}
       data-active={isActive}
       className={cn(
-        "text-sidebar-foreground ring-sidebar-ring hover:bg-[#191e23] hover:text-white active:bg-[#0073aa] active:text-white flex h-10 min-w-0 items-center gap-2 overflow-hidden rounded-none pl-4 pr-2 outline-hidden focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 border-l-2 border-transparent",
-        "data-[active=true]:border-primary-500 data-[active=true]:text-white data-[active=true]:font-medium",
+        "text-sidebar-foreground ring-sidebar-ring hover:bg-[#191e23] hover:text-white active:bg-primary-400 active:text-white flex h-10 min-w-0 items-center gap-2 overflow-hidden rounded-none pl-4 pr-2 outline-hidden disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 border-l-2 border-transparent",
+        "data-[active=true]:border-primary-500 data-[active=true]:text-primary-300 data-[active=true]:font-medium",
         size === "sm" && "text-xs h-7",
         size === "md" && "text-sm",
         "group-data-[collapsible=icon]:hidden",

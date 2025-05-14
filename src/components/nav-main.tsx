@@ -79,11 +79,12 @@ export function NavMain({
             {!item.items?.length ? (
               <SidebarMenuButton
                 asChild
+                size="lg"
                 tooltip={item.title}
-                className="text-[#eee] transition-colors data-[active=true]:bg-[#c66e60] data-[active=true]:text-white hover:bg-[#32373c] hover:text-white py-2.5 px-4 font-normal text-sm w-full border-l-4 border-transparent data-[active=true]:border-[#f46b6b]"
+                className="text-[#eee] transition-colors data-[active=true]:bg-primary-500 data-[active=true]:text-white hover:bg-[#2c3238] hover:text-white py-2.5 px-4 font-normal text-sm w-full outline-none focus:outline-none"
                 data-active={location.pathname === item.url}
               >
-                <NavLink to={item.url} className="flex items-center w-full">
+                <NavLink to={item.url} className="flex items-center w-full outline-none">
                   {item.icon ? (
                     <Icon
                       icon={item.icon}
@@ -100,9 +101,10 @@ export function NavMain({
             ) : (
               <div className="w-full">
                 <SidebarMenuButton
+                size="lg"
                   tooltip={item.title}
                   data-active={isActiveItem(item)}
-                  className="text-[#eee] transition-colors data-[active=true]:bg-primary-500 data-[active=true]:text-white hover:bg-[#32373c] hover:text-white py-2.5 px-4 font-normal text-sm w-full border-l-4 border-transparent data-[active=true]:border-[#f56767]"
+                  className="text-[#eee] transition-colors data-[active=true]:bg-primary-500 data-[active=true]:text-white hover:bg-[#2c3238] hover:text-white py-2.5 px-4 font-normal text-sm w-full outline-none focus:outline-none"
                   onClick={() => toggleExpanded(item.title)}
                 >
                   {item.icon ? (
@@ -128,19 +130,19 @@ export function NavMain({
                 </SidebarMenuButton>
 
                 {expandedItems[item.title] && (
-                  <SidebarMenuSub className="bg-[#32373c] mt-0.5">
+                  <SidebarMenuSub className="bg-[#2c3238] mt-0.5">
                     {item.items?.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton
                           asChild
-                          className="text-[#eee]/90 transition-colors"
+                          className="text-[#eee]/90 transition-colors outline-none focus:outline-none"
                           data-active={location.pathname.startsWith(
                             subItem.url
                           )}
                         >
                           <NavLink
                             to={subItem.url}
-                            className="w-full py-2.5 pl-3 pr-4 transition-colors data-[active=true]:text-white data-[active=true]:font-medium hover:bg-[#191e23] hover:text-white text-sm"
+                            className="w-full py-2.5 pl-3 pr-4 transition-colors data-[active=true]:text-primary-500 data-[active=true]:font-medium hover:bg-[#191e23] hover:text-white text-sm outline-none"
                             data-active={location.pathname.startsWith(
                               subItem.url
                             )}
