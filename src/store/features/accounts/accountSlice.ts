@@ -1,11 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { UserAccount } from "./accountTypes";
-import { fetchAccounts, updateUserRole } from "./accountThunks";
+import { UserAccount, AdminAccount } from "./accountTypes";
+import {
+  fetchAccounts,
+  updateUserRole,
+  fetchAdminAccounts,
+  updateAdministratorPermissions,
+} from "./accountThunks";
 import { LoadingStatus } from "../../../types/LoadingStatus";
 
 interface AccountState {
   accounts: UserAccount[];
-  currentOperation: "fetch" | "updateRole" | null;
+  adminAccounts: AdminAccount[];
+  currentOperation: "fetch" | "updateRole" | "fetchAdmins" | "updatePermissions" | null;
   status: LoadingStatus;
   error: string | null;
   successMessage: string | null;
@@ -13,6 +19,7 @@ interface AccountState {
 
 const initialState: AccountState = {
   accounts: [],
+  adminAccounts: [],
   currentOperation: null,
   status: "idle",
   error: null,
@@ -25,6 +32,7 @@ const accountSlice = createSlice({
   reducers: {
     resetAccountState: (state) => {
       state.accounts = [];
+      state.adminAccounts = [];
       state.currentOperation = null;
       state.status = "idle";
       state.error = null;
@@ -53,6 +61,7 @@ const accountSlice = createSlice({
         state.error = action.payload || "Failed to fetch accounts";
       })
 
+      // Update User Role
       .addCase(updateUserRole.pending, (state) => {
         state.currentOperation = "updateRole";
         state.status = "loading";
@@ -66,6 +75,37 @@ const accountSlice = createSlice({
       .addCase(updateUserRole.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || "Failed to update user role";
+      })
+
+      // Fetch Admin Accounts
+      .addCase(fetchAdminAccounts.pending, (state) => {
+        state.currentOperation = "fetchAdmins";
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(fetchAdminAccounts.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.adminAccounts = action.payload;
+      })
+      .addCase(fetchAdminAccounts.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Failed to fetch admin accounts";
+      })
+
+      // Update Administrator Permissions
+      .addCase(updateAdministratorPermissions.pending, (state) => {
+        state.currentOperation = "updatePermissions";
+        state.status = "loading";
+        state.error = null;
+        state.successMessage = null;
+      })
+      .addCase(updateAdministratorPermissions.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.successMessage = action.payload;
+      })
+      .addCase(updateAdministratorPermissions.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Failed to update administrator permissions";
       });
   },
 });

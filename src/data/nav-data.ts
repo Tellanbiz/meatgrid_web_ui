@@ -124,6 +124,11 @@ export const data = {
           url: "/accounts",
           requiredPermissions: ["allow_accounts_view"]
         },
+        {
+          title: "Administrators",
+          url: "/administrators",
+          requiredPermissions: ["allow_adminstrators_view"]
+        },
         { 
           title: "Staff Members", 
           url: "/staffs",

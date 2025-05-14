@@ -36,6 +36,8 @@ import RidersPage from "../pages/riders/RidersPage.js";
 import EditCouponPage from "../pages/coupons/EditCouponPage.js";
 import AddCouponPage from "../pages/coupons/AddCouponPage.js";
 import OrdersPage from "../pages/orders/OrdersPage.js";
+import AdministratorsPage from "../pages/administrators/AdministratorsPage";
+import UpdateAdminPermissionsPage from "../pages/administrators/UpdateAdminPermissionsPage";
 
 const routes: RouteObject[] = [
   {
@@ -339,6 +341,22 @@ const routes: RouteObject[] = [
         element: (
           <PrivateRoute requiredPermissions={["allow_configuration_view"]}>
             <Settings />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "administrators",
+        element: (
+          <PrivateRoute requiredPermissions={["allow_adminstrators_view"]}>
+            <AdministratorsPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "administrators/:userId/permissions",
+        element: (
+          <PrivateRoute requiredPermissions={["allow_adminstrators_submit"]}>
+            <UpdateAdminPermissionsPage />
           </PrivateRoute>
         ),
       },
