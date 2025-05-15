@@ -1,6 +1,6 @@
 import { CheckCircle, Loader2, RefreshCcw } from "lucide-react";
-import Breadcrumbs from "../../components/breadcrumbs";
 import { Button } from "../../components/ui/button";
+import BackButton from "../../components/BackButton";
 import { Input } from "../../components/ui/input";
 import {
   Dialog,
@@ -103,7 +103,16 @@ const SelectProductsPage = () => {
 
   const handleAddProduct = (product: Product) => {
     setSelectedProduct(product);
-    setAddAs("raw_material");
+
+    if (product.is_raw_material && !product.is_product) {
+      setAddAs("raw_material");
+    } else if (product.is_product && !product.is_raw_material) {
+      setAddAs("product");
+    } else {
+      setAddAs("raw_material");
+    }
+
+    setQuantity("");
     setIsDialogOpen(true);
   };
 
@@ -112,46 +121,52 @@ const SelectProductsPage = () => {
   };
 
   const handleConfirmAdd = () => {
-    if (selectedProduct) {
-      if (addAs === "raw_material") {
-        setRawMaterials((prev) => {
-          const existingProduct = prev.find(
-            (item) => item.id === selectedProduct.id
+    if (!selectedProduct) return;
+
+    // Check if trying to add as product when one already exists
+    if (addAs === "product" && processedProducts.length > 0) {
+      toast.error("You can only process one product at a time.");
+      return;
+    }
+
+    if (addAs === "raw_material") {
+      setRawMaterials((prev) => {
+        const existingProduct = prev.find(
+          (item) => item.id === selectedProduct.id
+        );
+        if (existingProduct) {
+          return prev.map((item) =>
+            item.id === selectedProduct.id
+              ? {
+                  ...item,
+                  quantity: (
+                    parseFloat(item.quantity) + parseFloat(quantity)
+                  ).toString(),
+                }
+              : item
           );
-          if (existingProduct) {
-            return prev.map((item) =>
-              item.id === selectedProduct.id
-                ? {
-                    ...item,
-                    quantity: (
-                      parseFloat(item.quantity) + parseFloat(quantity)
-                    ).toString(),
-                  }
-                : item
-            );
-          }
-          return [...prev, { ...selectedProduct, quantity }];
-        });
-      } else if (addAs === "product") {
-        setProcessedProducts((prev) => {
-          const existingProduct = prev.find(
-            (item) => item.id === selectedProduct.id
+        }
+        return [...prev, { ...selectedProduct, quantity }];
+      });
+    } else if (addAs === "product") {
+      setProcessedProducts((prev) => {
+        const existingProduct = prev.find(
+          (item) => item.id === selectedProduct.id
+        );
+        if (existingProduct) {
+          return prev.map((item) =>
+            item.id === selectedProduct.id
+              ? {
+                  ...item,
+                  quantity: (
+                    parseFloat(item.quantity) + parseFloat(quantity)
+                  ).toString(),
+                }
+              : item
           );
-          if (existingProduct) {
-            return prev.map((item) =>
-              item.id === selectedProduct.id
-                ? {
-                    ...item,
-                    quantity: (
-                      parseFloat(item.quantity) + parseFloat(quantity)
-                    ).toString(),
-                  }
-                : item
-            );
-          }
-          return [...prev, { ...selectedProduct, quantity }];
-        });
-      }
+        }
+        return [...prev, { ...selectedProduct, quantity }];
+      });
     }
     setIsDialogOpen(false);
     setQuantity("");
@@ -209,37 +224,30 @@ const SelectProductsPage = () => {
   };
 
   const isFinishDisabled =
-    rawMaterials.length === 0 || processedProducts.length === 0;
+    rawMaterials.length === 0 || processedProducts.length !== 1;
 
   return (
     <div>
-      <div className="sticky top-16 z-20 bg-background flex items-center justify-between py-3">
-        <Breadcrumbs
-          items={[
-            {
-              label: "Stock",
-              to: "/stock",
-            },
-            {
-              label: "Process Products",
-              to: "/stock/process",
-            },
-            {
-              label: "Select Products",
-              isPage: false,
-            },
-          ]}
-        />
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <BackButton />
+          <h1 className="text-2xl font-semibold">
+            Select Product Raw Materials
+          </h1>
+        </div>
 
-        <div className="flex items-center space-x-2">            <Button
-              variant="outline"
-              size="sm"
-              className="px-2"
-              onClick={handleRefreshProducts}
-              disabled={isFetchingProducts}
-            >
-              <RefreshCcw className={`h-4 w-4 ${isFetchingProducts ? "animate-spin" : ""}`} />
-              <span className="ml-2">Refresh</span>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="px-2"
+            onClick={handleRefreshProducts}
+            disabled={isFetchingProducts}
+          >
+            <RefreshCcw
+              className={`h-4 w-4 ${isFetchingProducts ? "animate-spin" : ""}`}
+            />
+            <span className="ml-2">Refresh</span>
           </Button>
 
           <Button
@@ -257,8 +265,8 @@ const SelectProductsPage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mt-2">
-        <div className="space-y-2 h-table">
+      <div className="grid grid-cols-3 gap-6">
+        <div className="space-y-4 h-table">
           <Input
             id="search"
             placeholder="Search products..."
@@ -319,7 +327,7 @@ const SelectProductsPage = () => {
         </div>
 
         <div className="space-y-2">
-          <Label className="font-normal text-base">Processed Products</Label>
+          <Label className="font-normal text-base">Processed Product</Label>
           <div className="h-table overflow-y-auto border rounded-md p-2 space-y-2">
             {processedProducts.length > 0 ? (
               processedProducts.map((product) => (
