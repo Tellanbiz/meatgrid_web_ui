@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import Breadcrumbs from "../../components/breadcrumbs";
+import BackButton from "../../components/BackButton";
 import { Label } from "../../components/ui/label";
 import {
   selectIsFetchingStorageTypes,
@@ -81,7 +81,6 @@ const ProcessProductsPage = () => {
     setSelectedStore(selectedStoreFromRedux || null);
     setSelectedStorageType(selectedStorageTypeFromRedux || null);
     setSelectedSuppliers(selectedSuppliersFromRedux || []);
-    
   }, [
     stores,
     storageTypes,
@@ -111,33 +110,24 @@ const ProcessProductsPage = () => {
 
   return (
     <div>
-      <div className="sticky top-16 z-20 bg-background flex items-center justify-between py-3">
-        <Breadcrumbs
-          items={[
-            {
-              label: "Stock",
-              to: "/stock",
-            },
-            {
-              label: "Process Products",
-              isPage: false,
-            },
-          ]}
-        />
-
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <BackButton />
+          <h1 className="text-2xl font-semibold">Process Products</h1>
+        </div>
         <Button
           onClick={handleContinue}
-          className="px-2"
           disabled={isContinueDisabled}
+          variant="default"
         >
           Continue
-          <ArrowRight className="h-4 w-4" />
+          <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
         {/* Store Selection */}
-        <div className="space-y-2 h-table">
+        <div className="space-y-4">
           <div className="flex items-center space-x-2">
             <Label htmlFor="stores" className="font-normal text-base">
               Store
@@ -191,14 +181,16 @@ const ProcessProductsPage = () => {
               Storage Type
             </Label>
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              className="px-2"
               onClick={handleRefreshStorageTypes}
               disabled={isLoadingStorageTypes}
             >
-              <RefreshCcw className={`h-4 w-4 ${isLoadingStorageTypes ? "animate-spin" : ""}`} />
-              <span className="ml-2">Refresh</span>
+              <RefreshCcw
+                className={`h-4 w-4 ${
+                  isLoadingStorageTypes ? "animate-spin" : ""
+                }`}
+              />
             </Button>
           </div>
           {isLoadingStorageTypes ? (

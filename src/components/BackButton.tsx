@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 
@@ -11,12 +11,12 @@ const BackButton = ({ className = "" }: BackButtonProps) => {
 
   return (
     <Button
-      variant="ghost"
+      variant="link"
       size="sm"
       className={`hover:bg-gray-100 ${className}`}
       onClick={() => navigate(-1)}
     >
-      <ArrowLeft className="h-4 w-4 mr-2" />
+      <ChevronLeft className="h-4 w-4" />
       Back
     </Button>
   );

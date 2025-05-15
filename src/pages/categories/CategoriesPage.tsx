@@ -46,7 +46,11 @@ const CategoriesPage = () => {
             onClick={handleRefresh}
             disabled={isFetchingCategories}
           >
-            <RefreshCcw className={`h-4 w-4 ${isFetchingCategories ? "animate-spin" : ""}`} />
+            <RefreshCcw
+              className={`h-4 w-4 ${
+                isFetchingCategories ? "animate-spin" : ""
+              }`}
+            />
             <span className="ml-2">Refresh</span>
           </Button>
           <Button size="sm" onClick={handleAddCategory}>
