@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -29,9 +29,9 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: #F10027;
-  --primary-foreground: #FFFFFF;
-  --primary-hover: #DB0023;
+  --primary: #f10027;
+  --primary-foreground: #ffffff;
+  --primary-hover: #db0023;
   --primary-ring: rgba(241, 0, 39, 0.2);
   --secondary: #f5f6fa;
   --secondary-foreground: #1f2937;
@@ -145,21 +145,22 @@
   body {
     @apply bg-background text-foreground;
   }
-  input, textarea {
+  input,
+  textarea {
     @apply bg-white focus:ring-2 focus:ring-[#F10027]/20 focus:border-[#F10027] outline-none;
   }
-  [type='text'],
-  [type='email'],
-  [type='url'],
-  [type='password'],
-  [type='number'],
-  [type='date'],
-  [type='datetime-local'],
-  [type='month'],
-  [type='search'],
-  [type='tel'],
-  [type='time'],
-  [type='week'],
+  [type="text"],
+  [type="email"],
+  [type="url"],
+  [type="password"],
+  [type="number"],
+  [type="date"],
+  [type="datetime-local"],
+  [type="month"],
+  [type="search"],
+  [type="tel"],
+  [type="time"],
+  [type="week"],
   [multiple],
   textarea,
   select {
@@ -199,17 +200,17 @@
 }
 
 @theme {
-  --color-primary: #F10027;
-  --color-primary-50: #FFF1F3;
-  --color-primary-100: #FFE4E8;
-  --color-primary-200: #FFCCD3;
-  --color-primary-300: #FFA3AE;
-  --color-primary-400: #FF6B7A;
-  --color-primary-500: #F10027;
-  --color-primary-600: #DB0023;
-  --color-primary-700: #B7001D;
-  --color-primary-800: #93001A;
-  --color-primary-900: #7A0015;
+  --color-primary: #f10027;
+  --color-primary-50: #fff1f3;
+  --color-primary-100: #ffe4e8;
+  --color-primary-200: #ffccd3;
+  --color-primary-300: #ffa3ae;
+  --color-primary-400: #ff6b7a;
+  --color-primary-500: #f10027;
+  --color-primary-600: #db0023;
+  --color-primary-700: #b7001d;
+  --color-primary-800: #93001a;
+  --color-primary-900: #7a0015;
   --color-success: #c4f8e2;
   --color-background: #f5f6fa;
 }
