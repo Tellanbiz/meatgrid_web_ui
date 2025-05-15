@@ -46,6 +46,12 @@ export const data = {
           requiredPermissions: ["allow_orders_view"]
         },
         { 
+          title: "Scheduled Deliveries", 
+          url: "/scheduled-deliveries",
+          icon: "solar:calendar-bold-duotone",
+          requiredPermissions: ["allow_orders_view"]
+        },
+        { 
           title: "Payment Methods", 
           url: "/payment-methods",
           requiredPermissions: ["allow_payment_method_view"]

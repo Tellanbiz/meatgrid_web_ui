@@ -18,6 +18,7 @@ import processProductReducer from "./features/process-products/processProductSli
 import accountSlice from "./features/accounts/accountSlice";
 import staffReducer from "./features/staff/staffSlice";
 import riderReducer from "./features/riders/riderSlice";
+import scheduledDeliveryReducer from "./features/scheduled-delivery/scheduledDeliverySlice";
 
 export const store = configureStore({
   reducer: {
@@ -40,6 +41,7 @@ export const store = configureStore({
     accounts: accountSlice,
     staff: staffReducer,
     riders: riderReducer,
+    scheduledDelivery: scheduledDeliveryReducer,
   },
   devTools: process.env.NODE_ENV != "production",
 });

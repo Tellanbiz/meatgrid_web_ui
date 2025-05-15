@@ -38,6 +38,7 @@ import AddCouponPage from "../pages/coupons/AddCouponPage.js";
 import OrdersPage from "../pages/orders/OrdersPage.js";
 import AdministratorsPage from "../pages/administrators/AdministratorsPage";
 import UpdateAdminPermissionsPage from "../pages/administrators/UpdateAdminPermissionsPage";
+import ScheduledDeliveriesPage from "../pages/scheduled-deliveries/ScheduledDeliveriesPage.js";
 
 const routes: RouteObject[] = [
   {
@@ -357,6 +358,14 @@ const routes: RouteObject[] = [
         element: (
           <PrivateRoute requiredPermissions={["allow_adminstrators_submit"]}>
             <UpdateAdminPermissionsPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "scheduled-deliveries",
+        element: (
+          <PrivateRoute requiredPermissions={["allow_orders_view"]}>
+            <ScheduledDeliveriesPage />
           </PrivateRoute>
         ),
       },
