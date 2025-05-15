@@ -40,6 +40,7 @@ import { ProcessProductRequest } from "../../store/features/process-products/req
 import { processProducts } from "../../store/features/process-products/processProductThunks";
 import { resetProcessProductState } from "../../store/features/process-products/processProductSlice";
 import LoadingPage from "../../components/LoadingPage";
+import { clearProductMessages } from "../../store/features/products/productSlice";
 
 const SelectProductsPage = () => {
   const dispatch = useAppDispatch();
@@ -90,12 +91,14 @@ const SelectProductsPage = () => {
   useEffect(() => {
     if (processingProductsError) {
       toast.error(processingProductsError);
+      dispatch(clearProductMessages());
     }
-  }, [processingProductsError]);
+  }, [processingProductsError, dispatch]);
 
   useEffect(() => {
     if (processingProductsSuccessMessage) {
       toast.success("Products processed successfully");
+      dispatch(clearProductMessages());
       dispatch(resetProcessProductState());
       navigate("/stock");
     }

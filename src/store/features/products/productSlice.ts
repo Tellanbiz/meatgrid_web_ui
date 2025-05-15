@@ -27,6 +27,10 @@ const productSlice = createSlice({
       state.error = null;
       state.currentOperation = null;
     },
+    clearProductMessages: (state) => {
+      state.successMessage = null;
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -78,5 +82,5 @@ const productSlice = createSlice({
   },
 });
 
-export const { resetProductState } = productSlice.actions;
+export const { resetProductState, clearProductMessages } = productSlice.actions;
 export default productSlice.reducer;

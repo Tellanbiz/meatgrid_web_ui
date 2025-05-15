@@ -1,8 +1,14 @@
 import { useState, useEffect } from "react";
-import Breadcrumbs from "../../components/breadcrumbs";
+import BackButton from "../../components/BackButton";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
 import { Edit, Trash, Plus, Loader2 } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
 import { selectStorageTypes } from "../../store/features/storages/storageSelectors";
 import { fetchStorageTypes } from "../../store/features/storages/storageThunks";
 import { selectStores } from "../../store/features/stores/storeSelectors";
@@ -104,14 +110,26 @@ const RestockPage = () => {
     const product = products.find((p) => p.id === selectedProductId);
     if (!product) return;
 
-    const newProduct: ProductToRestock = {
-      id: product.id,
-      name: product.name,
-      quantity: productQuantity,
-      unit_type: product.unit_type,
-    };
+    const existingProductIndex = productsToRestock.findIndex(
+      (p) => p.id === product.id
+    );
 
-    setProductsToRestock([...productsToRestock, newProduct]);
+    if (existingProductIndex !== -1) {
+      // Update quantity of existing product
+      const updatedProducts = [...productsToRestock];
+      updatedProducts[existingProductIndex].quantity += productQuantity;
+      setProductsToRestock(updatedProducts);
+    } else {
+      // Add new product
+      const newProduct: ProductToRestock = {
+        id: product.id,
+        name: product.name,
+        quantity: productQuantity,
+        unit_type: product.unit_type,
+      };
+      setProductsToRestock([...productsToRestock, newProduct]);
+    }
+
     setSelectedProduct(null);
     setSelectedProductId("");
     setProductQuantity(1);
@@ -166,21 +184,11 @@ const RestockPage = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center py-3 sticky top-16 z-20 bg-background">
-        <Breadcrumbs
-          items={[
-            {
-              label: "Stock",
-              to: "/stock",
-            },
-            {
-              label: "Restock Inventory",
-              isPage: true,
-            },
-          ]}
-        />
-
-        {/* Moved Complete Restock button to the top */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <BackButton />
+          <h1 className="text-2xl font-bold">Restock Inventory</h1>
+        </div>
         <Button
           onClick={handleSubmit}
           disabled={
@@ -192,94 +200,86 @@ const RestockPage = () => {
           variant="default"
         >
           {isRestockingInventory ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Restocking...
-            </>
-          ) : (
-            "Complete Restock"
-          )}
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : null}
+          Complete Restock
         </Button>
       </div>
 
-      <div className="container mx-auto py-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Store Selection */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="selectedStore">Store</Label>
-              <Select value={selectedStore} onValueChange={setSelectedStore}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a store" />
-                </SelectTrigger>
-                <SelectContent>
-                  {stores.map((store) => (
-                    <SelectItem key={store.id} value={store.id}>
-                      {store.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Restock Details</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="space-y-2">
+                <Label htmlFor="selectedStore">Store</Label>
+                <Select value={selectedStore} onValueChange={setSelectedStore}>
+                  <SelectTrigger className="bg-gray-50 w-full">
+                    <SelectValue placeholder="Select a store" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {stores.map((store) => (
+                      <SelectItem key={store.id} value={store.id}>
+                        {store.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="selectedStorageType">Storage Type</Label>
+                <Select
+                  value={selectedStorageType}
+                  onValueChange={setSelectedStorageType}
+                  disabled={!selectedStore}
+                >
+                  <SelectTrigger className="bg-gray-50 w-full">
+                    <SelectValue placeholder="Select storage type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {storageTypes.map((type) => (
+                      <SelectItem key={type.id} value={type.id}>
+                        {type.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {!selectedStore && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Please select a store first
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="selectedSupplier">Supplier (Optional)</Label>
+                <Select
+                  value={selectedSupplier}
+                  onValueChange={setSelectedSupplier}
+                >
+                  <SelectTrigger className="bg-gray-50 w-full">
+                    <SelectValue placeholder="Select a supplier (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {suppliers.map((supplier) => (
+                      <SelectItem key={supplier.id} value={supplier.id}>
+                        {supplier.full_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </div>
+          </CardContent>
+        </Card>
 
-          {/* Storage Type Selection */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="selectedStorageType">Storage Type</Label>
-              <Select
-                value={selectedStorageType}
-                onValueChange={setSelectedStorageType}
-                disabled={!selectedStore}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select storage type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {storageTypes.map((type) => (
-                    <SelectItem key={type.id} value={type.id}>
-                      {type.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              {!selectedStore && (
-                <p className="text-sm text-muted-foreground mt-2">
-                  Please select a store first
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Supplier Selection (Optional) */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="selectedSupplier">Supplier (Optional)</Label>
-              <Select
-                value={selectedSupplier}
-                onValueChange={setSelectedSupplier}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a supplier (optional)" />
-                </SelectTrigger>
-                <SelectContent>
-                  {suppliers.map((supplier) => (
-                    <SelectItem key={supplier.id} value={supplier.id}>
-                      {supplier.full_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-
-        {/* Products to Restock Section */}
         {selectedStore && selectedStorageType && (
-          <div className="mt-10 border-t pt-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="font-semibold text-md">Products to Restock</h2>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle>Products to Restock</CardTitle>
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="flex items-center gap-2" variant="default">
@@ -295,131 +295,143 @@ const RestockPage = () => {
                     </DialogDescription>
                   </DialogHeader>
 
-                  <div className="grid gap-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="product">Product</Label>
-                      <Select
-                        value={selectedProductId}
-                        onValueChange={(value) => {
-                          const product = products.find((p) => p.id === value);
-                          if (product) {
-                            handleSelectProduct(product);
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleAddProduct();
+                    }}
+                  >
+                    <div className="grid gap-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="product">Product</Label>
+                        <Select
+                          value={selectedProductId}
+                          onValueChange={(value) => {
+                            const product = products.find(
+                              (p) => p.id === value
+                            );
+                            if (product) {
+                              handleSelectProduct(product);
+                            }
+                          }}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a product" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {products.map((product) => (
+                              <SelectItem key={product.id} value={product.id}>
+                                {product.name} ({product.unit_type})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="quantity">
+                          Quantity{" "}
+                          {selectedProduct
+                            ? `(${selectedProduct.unit_type})`
+                            : ""}
+                        </Label>
+                        <Input
+                          id="quantity"
+                          type="number"
+                          min="1"
+                          value={productQuantity}
+                          onChange={(e) =>
+                            setProductQuantity(Number(e.target.value))
                           }
-                        }}
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+
+                    <DialogFooter>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setIsAddDialogOpen(false)}
                       >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a product" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {products.map((product) => (
-                            <SelectItem key={product.id} value={product.id}>
-                              {product.name} ({product.unit_type})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="quantity">
-                        Quantity{" "}
-                        {selectedProduct
-                          ? `(${selectedProduct.unit_type})`
-                          : ""}
-                      </Label>
-                      <Input
-                        id="quantity"
-                        type="number"
-                        min="1"
-                        value={productQuantity}
-                        onChange={(e) =>
-                          setProductQuantity(Number(e.target.value))
-                        }
-                        className="w-full"
-                      />
-                    </div>
-                  </div>
-
-                  <DialogFooter>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsAddDialogOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      onClick={handleAddProduct}
-                      disabled={!selectedProduct || productQuantity <= 0}
-                    >
-                      Add to Restock
-                    </Button>
-                  </DialogFooter>
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={!selectedProduct || productQuantity <= 0}
+                      >
+                        Add to Restock
+                      </Button>
+                    </DialogFooter>
+                  </form>
                 </DialogContent>
               </Dialog>
-            </div>
-
-            {productsToRestock.length === 0 ? (
-              <div className="text-center py-12 border rounded-md bg-gray-50">
-                <p className="text-muted-foreground">
-                  No products added for restocking yet.
-                </p>
-                <Button
-                  variant="outline"
-                  className="mt-4"
-                  onClick={() => setIsAddDialogOpen(true)}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Product
-                </Button>
-              </div>
-            ) : (
-              <div className="border rounded-md overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[400px]">Product Name</TableHead>
-                      <TableHead>Quantity</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {productsToRestock.map((product) => (
-                      <TableRow key={product.id}>
-                        <TableCell className="font-medium">
-                          {product.name}
-                        </TableCell>
-                        <TableCell>
-                          {product.quantity} {product.unit_type}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEditProduct(product)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteProduct(product.id)}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              <Trash className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
+            </CardHeader>
+            <CardContent>
+              {productsToRestock.length === 0 ? (
+                <div className="text-center py-12 border rounded-md bg-gray-50">
+                  <p className="text-muted-foreground">
+                    No products added for restocking yet.
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="mt-4"
+                    onClick={() => setIsAddDialogOpen(true)}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Product
+                  </Button>
+                </div>
+              ) : (
+                <div className="border rounded-md overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[400px]">
+                          Product Name
+                        </TableHead>
+                        <TableHead>Quantity</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </div>
+                    </TableHeader>
+                    <TableBody>
+                      {productsToRestock.map((product) => (
+                        <TableRow key={product.id}>
+                          <TableCell className="font-medium">
+                            {product.name}
+                          </TableCell>
+                          <TableCell>
+                            {product.quantity} {product.unit_type}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditProduct(product)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteProduct(product.id)}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                <Trash className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         )}
 
-        {/* Edit Product Dialog */}
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent>
             <DialogHeader>
@@ -429,37 +441,42 @@ const RestockPage = () => {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="py-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-quantity">
-                  Quantity
-                  {editingProduct ? ` (${editingProduct.unit_type})` : ""}
-                </Label>
-                <Input
-                  id="edit-quantity"
-                  type="number"
-                  min="1"
-                  value={productQuantity}
-                  onChange={(e) => setProductQuantity(Number(e.target.value))}
-                  className="w-full"
-                />
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleUpdateProduct();
+              }}
+            >
+              <div className="py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-quantity">
+                    Quantity
+                    {editingProduct ? ` (${editingProduct.unit_type})` : ""}
+                  </Label>
+                  <Input
+                    id="edit-quantity"
+                    type="number"
+                    min="1"
+                    value={productQuantity}
+                    onChange={(e) => setProductQuantity(Number(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
               </div>
-            </div>
 
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsEditDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleUpdateProduct}
-                disabled={productQuantity <= 0}
-              >
-                Update Quantity
-              </Button>
-            </DialogFooter>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={productQuantity <= 0}>
+                  Update Quantity
+                </Button>
+              </DialogFooter>
+            </form>
           </DialogContent>
         </Dialog>
       </div>
