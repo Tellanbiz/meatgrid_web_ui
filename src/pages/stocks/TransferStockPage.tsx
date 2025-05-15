@@ -1,8 +1,14 @@
 import { useState, useEffect } from "react";
-import Breadcrumbs from "../../components/breadcrumbs";
+import BackButton from "../../components/BackButton";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
-import { ArrowRight, Edit, Trash, Plus, Loader2 } from "lucide-react";
+import { Edit, Trash, Plus, Loader2 } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
 import { selectStorageTypes } from "../../store/features/storages/storageSelectors";
 import { fetchStorageTypes } from "../../store/features/storages/storageThunks";
 import { selectStores } from "../../store/features/stores/storeSelectors";
@@ -90,11 +96,9 @@ const TransferStockPage = () => {
 
   const handleOriginalStoreChange = (value: string) => {
     setOriginalStore(value);
-    // Reset receiving store if it matches the original store
     if (value === receivingStore) {
       setReceivingStore("");
     }
-    // Clear products when store changes
     setProductsToTransfer([]);
   };
 
@@ -172,112 +176,115 @@ const TransferStockPage = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center py-3 sticky top-16 z-20 bg-background">
-        <Breadcrumbs
-          items={[
-            {
-              label: "Stock",
-              to: "/stock",
-            },
-            {
-              label: "Transfer Stock",
-              isPage: true,
-            },
-          ]}
-        />
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <BackButton />
+          <h1 className="text-2xl font-bold">Transfer Stock</h1>
+        </div>
+        <Button
+          onClick={handleSubmit}
+          disabled={
+            !originalStore ||
+            !receivingStore ||
+            !storageType ||
+            productsToTransfer.length === 0 ||
+            isTranferringStock
+          }
+          variant="default"
+        >
+          {isTranferringStock ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : null}
+          Complete Transfer
+        </Button>
       </div>
 
-      <div className="container mx-auto py-6">
-        <h1 className="text-2xl font-bold mb-6">Transfer Stock</h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Original Store - Select Input */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="originalStore">Original Store</Label>
-              <Select
-                value={originalStore}
-                onValueChange={handleOriginalStoreChange}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a store" />
-                </SelectTrigger>
-                <SelectContent>
-                  {stores.map((store) => (
-                    <SelectItem key={store.id} value={store.id}>
-                      {store.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Receiving Store - Select Input */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="receivingStore">Receiving Store</Label>
-              <Select
-                value={receivingStore}
-                onValueChange={setReceivingStore}
-                disabled={!originalStore}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a store" />
-                </SelectTrigger>
-                <SelectContent>
-                  {stores
-                    .filter((store) => store.id !== originalStore)
-                    .map((store) => (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Transfer Details</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="space-y-2">
+                <Label htmlFor="originalStore">Original Store</Label>
+                <Select
+                  value={originalStore}
+                  onValueChange={handleOriginalStoreChange}
+                >
+                  <SelectTrigger className="bg-gray-50 w-full">
+                    <SelectValue placeholder="Select a store" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {stores.map((store) => (
                       <SelectItem key={store.id} value={store.id}>
                         {store.name}
                       </SelectItem>
                     ))}
-                </SelectContent>
-              </Select>
+                  </SelectContent>
+                </Select>
+              </div>
 
-              {!originalStore && (
-                <p className="text-sm text-muted-foreground mt-2">
-                  Please select an original store first
-                </p>
-              )}
+              <div className="space-y-2">
+                <Label htmlFor="receivingStore">Receiving Store</Label>
+                <Select
+                  value={receivingStore}
+                  onValueChange={setReceivingStore}
+                  disabled={!originalStore}
+                >
+                  <SelectTrigger className="bg-gray-50 w-full">
+                    <SelectValue placeholder="Select a store" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {stores
+                      .filter((store) => store.id !== originalStore)
+                      .map((store) => (
+                        <SelectItem key={store.id} value={store.id}>
+                          {store.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
 
-              {originalStore &&
-                stores.filter((store) => store.id !== originalStore).length ===
-                  0 && (
-                  <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-amber-700">
-                    No other stores available. Please select a different
-                    original store.
-                  </div>
+                {!originalStore && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Please select an original store first
+                  </p>
                 )}
-            </div>
-          </div>
 
-          {/* Storage Type - Select Input */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="storageType">Storage Type</Label>
-              <Select value={storageType} onValueChange={setStorageType}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select storage type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {storageTypes.map((type) => (
-                    <SelectItem key={type.id} value={type.id}>
-                      {type.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
+                {originalStore &&
+                  stores.filter((store) => store.id !== originalStore)
+                    .length === 0 && (
+                    <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-amber-700">
+                      No other stores available. Please select a different
+                      original store.
+                    </div>
+                  )}
+              </div>
 
-        {/* Products to Transfer Section */}
+              <div className="space-y-2">
+                <Label htmlFor="storageType">Storage Type</Label>
+                <Select value={storageType} onValueChange={setStorageType}>
+                  <SelectTrigger className="bg-gray-50 w-full">
+                    <SelectValue placeholder="Select storage type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {storageTypes.map((type) => (
+                      <SelectItem key={type.id} value={type.id}>
+                        {type.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {originalStore && receivingStore && storageType && (
-          <div className="mt-10 border-t pt-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="font-semibold text-lg">Products to Transfer</h2>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle>Products to Transfer</CardTitle>
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="flex items-center gap-2" variant="default">
@@ -358,70 +365,72 @@ const TransferStockPage = () => {
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
-            </div>
-
-            {productsToTransfer.length === 0 ? (
-              <div className="text-center py-12 border rounded-md bg-gray-50">
-                <p className="text-muted-foreground">
-                  No products added for transfer yet.
-                </p>
-                <Button
-                  variant="outline"
-                  className="mt-4"
-                  onClick={() => setIsAddDialogOpen(true)}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Product
-                </Button>
-              </div>
-            ) : (
-              <div className="border rounded-md overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[400px]">Product Name</TableHead>
-                      <TableHead>Quantity</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {productsToTransfer.map((product) => (
-                      <TableRow key={product.id}>
-                        <TableCell className="font-medium">
-                          {product.name}
-                        </TableCell>
-                        <TableCell>
-                          {product.quantity} {product.unit_type}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEditProduct(product)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteProduct(product.id)}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              <Trash className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
+            </CardHeader>
+            <CardContent>
+              {productsToTransfer.length === 0 ? (
+                <div className="text-center py-12 border rounded-md bg-gray-50">
+                  <p className="text-muted-foreground">
+                    No products added for transfer yet.
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="mt-4"
+                    onClick={() => setIsAddDialogOpen(true)}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Product
+                  </Button>
+                </div>
+              ) : (
+                <div className="border rounded-md overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[400px]">
+                          Product Name
+                        </TableHead>
+                        <TableHead>Quantity</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </div>
+                    </TableHeader>
+                    <TableBody>
+                      {productsToTransfer.map((product) => (
+                        <TableRow key={product.id}>
+                          <TableCell className="font-medium">
+                            {product.name}
+                          </TableCell>
+                          <TableCell>
+                            {product.quantity} {product.unit_type}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditProduct(product)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteProduct(product.id)}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                <Trash className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         )}
 
-        {/* Edit Product Dialog */}
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent>
             <DialogHeader>
@@ -464,76 +473,6 @@ const TransferStockPage = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-
-        {/* Summary and action */}
-        {(originalStore || receivingStore || storageType) && (
-          <div className="mt-10 border-t pt-6">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="font-semibold mb-4 text-lg">Transfer Summary</h2>
-
-              <div className="grid grid-cols-3 gap-4 mb-8">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">From:</p>
-                  <p className="font-medium">
-                    {originalStore
-                      ? stores.find((s) => s.id === originalStore)?.name
-                      : "Not selected"}
-                  </p>
-                </div>
-                <div className="row-span-2 flex items-center justify-center">
-                  <ArrowRight className="text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">To:</p>
-                  <p className="font-medium">
-                    {receivingStore
-                      ? stores.find((s) => s.id === receivingStore)?.name
-                      : "Not selected"}
-                  </p>
-                </div>
-
-                {productsToTransfer.length > 0 && (
-                  <div className="mb-8">
-                    <p className="text-sm text-muted-foreground mb-1">
-                      Products to transfer:
-                    </p>
-                    <p className="font-medium">
-                      {productsToTransfer.length} products
-                    </p>
-                  </div>
-                )}
-                <div className="mb-8">
-                  <p className="text-sm text-muted-foreground mb-1">
-                    Storage Type:
-                  </p>
-                  <p className="font-medium">
-                    {storageType
-                      ? storageTypes.find((t) => t.id === storageType)?.name
-                      : "Not selected"}
-                  </p>
-                </div>
-              </div>
-
-              <Button
-                onClick={handleSubmit}
-                disabled={
-                  !originalStore ||
-                  !receivingStore ||
-                  !storageType ||
-                  productsToTransfer.length === 0 ||
-                  isTranferringStock
-                }
-                className="w-full"
-                variant="default"
-              >
-                {isTranferringStock ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : null}
-                Complete Transfer
-              </Button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
