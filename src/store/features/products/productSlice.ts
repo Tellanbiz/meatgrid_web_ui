@@ -2,12 +2,22 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Product } from "./productTypes";
 import { CorporateProduct } from "./corporateProductTypes";
 import { createProduct, fetchProducts, updateProduct } from "./productThunks";
-import { fetchCorporateProducts } from "./corporateProductThunks";
+import {
+  fetchCorporateProducts,
+  updateCorporateProduct,
+} from "./corporateProductThunks";
 
 interface ProductState {
   products: Product[];
   corporateProducts: CorporateProduct[];
-  currentOperation: "fetch" | "fetch_corporate" | "create" | "update" | "delete" | null;
+  currentOperation:
+    | "fetch"
+    | "fetch_corporate"
+    | "create"
+    | "update"
+    | "update_corporate"
+    | "delete"
+    | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
   successMessage: string | null;
@@ -65,12 +75,18 @@ const productSlice = createSlice({
         fetchCorporateProducts.fulfilled,
         (state, action: PayloadAction<CorporateProduct[]>) => {
           state.status = "succeeded";
-          state.corporateProducts = action.payload;
+          // Ensure we're handling the payload correctly
+          if (Array.isArray(action.payload)) {
+            state.corporateProducts = action.payload;
+          } else {
+            console.error("Expected array but got:", action.payload);
+            state.corporateProducts = [];
+          }
         }
       )
       .addCase(fetchCorporateProducts.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload || "Failed to fetch corporate products";
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch corporate products";
       })
       // Create product
       .addCase(createProduct.pending, (state) => {
@@ -99,6 +115,28 @@ const productSlice = createSlice({
       .addCase(updateProduct.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || "Failed to update product";
+      })
+      // Update corporate product
+      .addCase(updateCorporateProduct.pending, (state) => {
+        state.status = "loading";
+        state.currentOperation = "update_corporate";
+        state.error = null;
+      })
+      .addCase(updateCorporateProduct.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        // Handle the case where action.payload might be an object with a message property
+        if (typeof action.payload === 'string') {
+          state.successMessage = action.payload;
+        } else if (action.payload && typeof action.payload === 'object' && 'message' in action.payload) {
+          // If it's an object with a message property, use that
+          state.successMessage = action.payload.message as string;
+        } else {
+          state.successMessage = "Corporate product updated successfully";
+        }
+      })
+      .addCase(updateCorporateProduct.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to update corporate product";
       });
   },
 });

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -15,7 +16,10 @@ import {
   selectAccountError,
 } from "../../store/features/accounts/accountSelectors";
 import { fetchAccounts } from "../../store/features/accounts/accountThunks";
-import { UserAccount } from "../../store/features/accounts/accountTypes";
+import {
+  UserAccount,
+  UserRole,
+} from "../../store/features/accounts/accountTypes";
 import { ProgressBar } from "primereact/progressbar";
 import { toast } from "sonner";
 import { CheckCircle, MoreVertical, RefreshCcw, XCircle } from "lucide-react";
@@ -27,8 +31,16 @@ import { useModal } from "../../hooks/use-modal";
 import UpdateStaffPermissionsDialog from "./components/UpdateStaffPermissionsDialog";
 import { selectStores } from "../../store/features/stores/storeSelectors";
 import { fetchStores } from "../../store/features/stores/storeThunks";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
 
 const AccountsPage = () => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const accounts = useAppSelector(selectAccounts);
   const stores = useAppSelector(selectStores);
@@ -42,10 +54,14 @@ const AccountsPage = () => {
   const [isRoleDialogOpen, setIsRoleDialogOpen] = useModal();
   const [isStaffDialogOpen, setIsStaffDialogOpen] = useModal();
 
+  const [selectedRole, setSelectedRole] = useState<UserRole | "all">("all");
+
   useEffect(() => {
-    dispatch(fetchAccounts());
+    dispatch(
+      fetchAccounts(selectedRole !== "all" ? { role: selectedRole } : undefined)
+    );
     dispatch(fetchStores());
-  }, [dispatch]);
+  }, [dispatch, selectedRole]);
 
   useEffect(() => {
     if (accountError) {
@@ -54,7 +70,9 @@ const AccountsPage = () => {
   }, [accountError]);
 
   const handleRefresh = () => {
-    dispatch(fetchAccounts());
+    dispatch(
+      fetchAccounts(selectedRole !== "all" ? { role: selectedRole } : undefined)
+    );
   };
 
   const actionsBodyTemplate = (rowData: UserAccount) => {
@@ -70,16 +88,27 @@ const AccountsPage = () => {
             Update Role
           </DropdownMenuItem>
 
-          {rowData.role != "indivual" && (
+          {rowData.role !== "indivual" && (
             <DropdownMenuItem onClick={() => handleUpdateStaffStatus(rowData)}>
               Update Staff Permissions
             </DropdownMenuItem>
           )}
 
           {rowData.role === "organization" && (
-            <DropdownMenuItem onClick={() => handleUpdateRiderStatus(rowData)}>
-              Update Rider Status
-            </DropdownMenuItem>
+            <>
+              <DropdownMenuItem
+                onClick={() => handleUpdateRiderStatus(rowData)}
+              >
+                Update Rider Status
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  navigate(`/organizations/${rowData.id}/products`)
+                }
+              >
+                Organization Products
+              </DropdownMenuItem>
+            </>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
@@ -150,16 +179,41 @@ const AccountsPage = () => {
   return (
     <div className="h-full">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">Accounts</h1>          <Button
-            variant="outline" 
+        <h1 className="text-2xl font-semibold">Accounts</h1>
+        <div className="flex items-center gap-2">
+          <Select
+            value={selectedRole}
+            onValueChange={(value) =>
+              setSelectedRole(value as UserRole | "all")
+            }
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="individual">Individual</SelectItem>
+              <SelectItem value="staff">Staff</SelectItem>
+              <SelectItem value="organization">Organization</SelectItem>
+              <SelectItem value="administrator">Administrator</SelectItem>
+              <SelectItem value="super-administrator">
+                Super Administrator
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
             size="sm"
             className="px-2"
             onClick={handleRefresh}
             disabled={isFetchingAccounts}
           >
-            <RefreshCcw className={`h-4 w-4 ${isFetchingAccounts ? "animate-spin" : ""}`} />
+            <RefreshCcw
+              className={`h-4 w-4 ${isFetchingAccounts ? "animate-spin" : ""}`}
+            />
             <span className="ml-2">Refresh</span>
           </Button>
+        </div>
       </div>
 
       <div className="card h-table">
@@ -191,11 +245,7 @@ const AccountsPage = () => {
               header="Phone Number"
               style={TableHeaderStyle}
             />
-            <Column
-              field="email"
-              header="Email"
-              style={TableHeaderStyle}
-            />
+            <Column field="email" header="Email" style={TableHeaderStyle} />
             <Column field="role" header="Role" style={TableHeaderStyle} />
             <Column
               field="created_at"

@@ -140,6 +140,12 @@ export const data = {
           url: "/staffs",
           requiredPermissions: ["allow_staff_view"]
         },
+        {
+          title: "Organizations",
+          url: "/organizations",
+          icon: "solar:buildings-3-bold-duotone",
+          requiredPermissions: ["allow_accounts_view"]
+        },
         { 
           title: "Riders", 
           url: "/riders",
@@ -157,4 +163,4 @@ export const data = {
       ],
     },
   ],
-}; 
+};

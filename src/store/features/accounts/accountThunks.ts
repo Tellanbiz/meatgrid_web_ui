@@ -5,14 +5,17 @@ import { ApiError } from "../../../types/ApiError";
 import { UpdateUserRoleRequest } from "./requests/UpdateUserRoleRequest";
 import { AdminAccount } from "./accountTypes";
 import { UpdateAdministratorPermissionsRequest } from "./requests/UpdateAdministratorPermissionsRequest";
+import { FetchAccountsRequest } from "./requests/FetchAccountsRequest";
 
 export const fetchAccounts = createAsyncThunk<
   UserAccount[],
-  void,
+  FetchAccountsRequest | undefined,
   { rejectValue: string }
->("accounts/fetchAccounts", async (_, { rejectWithValue }) => {
+>("accounts/fetchAccounts", async (fetchParams, { rejectWithValue }) => {
   try {
-    const response = await axios.get<UserAccount[]>("/accounts");
+    const response = await axios.get<UserAccount[]>("/accounts", {
+      params: fetchParams,
+    });
     return response.data;
   } catch (err: unknown) {
     const error = err as ApiError;

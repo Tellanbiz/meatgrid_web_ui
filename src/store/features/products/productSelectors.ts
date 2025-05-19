@@ -2,10 +2,18 @@ import { RootState } from "../../store";
 
 export const selectProducts = (state: RootState) => state.products.products;
 
-export const selectCorporateProducts = (state: RootState) => state.products.corporateProducts;
+export const selectCorporateProducts = (state: RootState) =>
+  state.products.corporateProducts;
 
-export const selectCorporateProductById = (state: RootState, productId: string) => {
-  return state.products.corporateProducts.find((product) => product.id === productId) || null;
+export const selectCorporateProductById = (
+  state: RootState,
+  productId: string
+) => {
+  return (
+    state.products.corporateProducts.find(
+      (product) => product.id === productId
+    ) || null
+  );
 };
 
 export const selectProductById = (state: RootState, productId: string) => {
@@ -33,6 +41,10 @@ export const selectIsUpdatingProduct = (state: RootState) =>
 export const selectIsDeletingProduct = (state: RootState) =>
   state.products.status === "loading" &&
   state.products.currentOperation === "delete";
+
+export const selectIsUpdatingCorporateProduct = (state: RootState) =>
+  state.products.status === "loading" &&
+  state.products.currentOperation === "update_corporate";
 
 export const selectProductError = (state: RootState) => state.products.error;
 

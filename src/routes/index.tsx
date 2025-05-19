@@ -39,6 +39,8 @@ import OrdersPage from "../pages/orders/OrdersPage.js";
 import AdministratorsPage from "../pages/administrators/AdministratorsPage";
 import UpdateAdminPermissionsPage from "../pages/administrators/UpdateAdminPermissionsPage";
 import ScheduledDeliveriesPage from "../pages/scheduled-deliveries/ScheduledDeliveriesPage.js";
+import CorporateProductsPage from "../pages/products/CorporateProductsPage.js";
+import OrganizationsPage from "../pages/organizations/OrganizationsPage.js";
 
 const routes: RouteObject[] = [
   {
@@ -102,6 +104,14 @@ const routes: RouteObject[] = [
         element: (
           <PrivateRoute requiredPermissions={["allow_product_submit"]}>
             <ManageProductPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "organizations/:organizationId/products",
+        element: (
+          <PrivateRoute requiredPermissions={["allow_product_view"]}>
+            <CorporateProductsPage />
           </PrivateRoute>
         ),
       },
@@ -326,6 +336,14 @@ const routes: RouteObject[] = [
         element: (
           <PrivateRoute requiredPermissions={["allow_staff_view"]}>
             <StaffsPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "organizations",
+        element: (
+          <PrivateRoute requiredPermissions={["allow_accounts_view"]}>
+            <OrganizationsPage />
           </PrivateRoute>
         ),
       },
