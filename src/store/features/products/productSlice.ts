@@ -1,10 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Product } from "./productTypes";
+import { CorporateProduct } from "./corporateProductTypes";
 import { createProduct, fetchProducts, updateProduct } from "./productThunks";
+import { fetchCorporateProducts } from "./corporateProductThunks";
 
 interface ProductState {
   products: Product[];
-  currentOperation: "fetch" | "create" | "update" | "delete" | null;
+  corporateProducts: CorporateProduct[];
+  currentOperation: "fetch" | "fetch_corporate" | "create" | "update" | "delete" | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
   successMessage: string | null;
@@ -12,6 +15,7 @@ interface ProductState {
 
 const initialState: ProductState = {
   products: [],
+  corporateProducts: [],
   currentOperation: null,
   status: "idle",
   error: null,
@@ -50,6 +54,23 @@ const productSlice = createSlice({
       .addCase(fetchProducts.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || "Failed to fetch products";
+      })
+      // Fetch corporate products
+      .addCase(fetchCorporateProducts.pending, (state) => {
+        state.status = "loading";
+        state.currentOperation = "fetch_corporate";
+        state.error = null;
+      })
+      .addCase(
+        fetchCorporateProducts.fulfilled,
+        (state, action: PayloadAction<CorporateProduct[]>) => {
+          state.status = "succeeded";
+          state.corporateProducts = action.payload;
+        }
+      )
+      .addCase(fetchCorporateProducts.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Failed to fetch corporate products";
       })
       // Create product
       .addCase(createProduct.pending, (state) => {
