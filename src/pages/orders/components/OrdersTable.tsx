@@ -350,7 +350,7 @@ const OrdersTable = () => {
       {/* Date Range Filter */}
       <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
         <PopoverTrigger asChild>
-          <Button variant="filter" className="h-10 px-3">
+          <Button variant="filter" size="sm">
             {getSelectedDateLabel()}
           </Button>
         </PopoverTrigger>
@@ -389,7 +389,7 @@ const OrdersTable = () => {
       {/* Store Filter */}
       <Popover open={storePopoverOpen} onOpenChange={setStorePopoverOpen}>
         <PopoverTrigger asChild>
-          <Button variant="filter" className="h-10 px-3">
+          <Button variant="filter" size="sm">
             {getSelectedStoreLabel()}
           </Button>
         </PopoverTrigger>
@@ -447,7 +447,7 @@ const OrdersTable = () => {
         onOpenChange={setPaymentMethodPopoverOpen}
       >
         <PopoverTrigger asChild>
-          <Button variant="filter" className="h-10 px-3">
+          <Button variant="filter" size="sm">
             {getSelectedPaymentMethodLabel()}
           </Button>
         </PopoverTrigger>
@@ -502,7 +502,7 @@ const OrdersTable = () => {
       {/* Status Filter */}
       <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
         <PopoverTrigger asChild>
-          <Button variant="filter" className="h-10 px-3">
+          <Button variant="filter" size="sm">
             {getSelectedStatusLabel()}
           </Button>
         </PopoverTrigger>
@@ -558,12 +558,12 @@ const OrdersTable = () => {
 
   return (
     <div className="h-full">
+      {/* Filters Section */}
+      <div className="my-3">{filterDropdowns}</div>
+
       {isFetchingOrders && (
         <ProgressBar mode="indeterminate" style={{ height: "4px" }} />
       )}
-
-      {/* Filters Section */}
-      <div className="bg-gray-50 border-b py-3">{filterDropdowns}</div>
 
       {/* DataTable for orders */}
       <DataTable
