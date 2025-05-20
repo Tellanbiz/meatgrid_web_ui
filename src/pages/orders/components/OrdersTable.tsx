@@ -80,6 +80,7 @@ const OrdersTable = () => {
   const [storeSearchTerm, setStoreSearchTerm] = useState("");
   const [paymentMethodSearchTerm, setPaymentMethodSearchTerm] = useState("");
   const [statusSearchTerm, setStatusSearchTerm] = useState("");
+  const [orderSearchTerm, setOrderSearchTerm] = useState("");
 
   // Popover states
   const [datePopoverOpen, setDatePopoverOpen] = useState(false);
@@ -139,8 +140,20 @@ const OrdersTable = () => {
   ]);
 
   useEffect(() => {
-    setFilteredOrders(orders);
-  }, [orders]);
+    if (!orderSearchTerm) {
+      setFilteredOrders(orders);
+    } else {
+      const searchTermLower = orderSearchTerm.toLowerCase();
+      // Filter orders by ID
+      setFilteredOrders(
+        orders.filter(
+          (order) =>
+            order.order_id.toString().includes(searchTermLower) ||
+            `MG${order.order_id}`.toLowerCase().includes(searchTermLower)
+        )
+      );
+    }
+  }, [orders, orderSearchTerm]);
 
   const refreshOrders = useCallback(() => {
     const filters: OrderFilters = {};
@@ -346,223 +359,241 @@ const OrdersTable = () => {
 
   // Filter dropdowns
   const filterDropdowns = (
-    <div className="flex flex-wrap gap-4 px-4">
-      {/* Date Range Filter */}
-      <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
-        <PopoverTrigger asChild>
-          <Button variant="filter" size="sm">
-            {getSelectedDateLabel()}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-80 p-0" align="start">
-          <div className="p-2 border-b">
-            <div className="font-medium mb-2">Quick Select</div>
-            <div className="grid grid-cols-2 gap-2">
-              {quickDateOptions.map((option) => (
-                <Button
-                  key={option.value}
-                  variant={
-                    selectedDuration === option.value ? "secondary" : "filter"
-                  }
-                  size="sm"
-                  className="w-full"
-                  onClick={() =>
-                    handleQuickDateSelect(option.value as DurationOption)
-                  }
+    <div className="flex flex-wrap items-center justify-between px-4 py-2 w-full">
+      <div className="flex flex-wrap gap-3 items-center">
+        {/* Order ID Search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+          <input
+            type="text"
+            placeholder="Search order ID..."
+            className="h-9 pl-9 pr-4 py-2 border rounded-md text-sm w-64"
+            value={orderSearchTerm}
+            onChange={(e) => setOrderSearchTerm(e.target.value)}
+          />
+        </div>
+
+        {/* Date Range Filter */}
+        <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="filter" size="sm">
+              {getSelectedDateLabel()}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80 p-0" align="start">
+            <div className="p-2 border-b">
+              <div className="font-medium mb-2">Quick Select</div>
+              <div className="grid grid-cols-2 gap-2">
+                {quickDateOptions.map((option) => (
+                  <Button
+                    key={option.value}
+                    variant={
+                      selectedDuration === option.value ? "secondary" : "filter"
+                    }
+                    size="sm"
+                    className="w-full"
+                    onClick={() =>
+                      handleQuickDateSelect(option.value as DurationOption)
+                    }
+                  >
+                    {option.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div className="p-2">
+              <div className="font-medium mb-2">Custom Range</div>
+              <DateRangePicker
+                date={dateRange}
+                onDateChange={handleDateRangeChange}
+                className="w-full"
+              />
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        {/* Store Filter */}
+        <Popover open={storePopoverOpen} onOpenChange={setStorePopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="filter" size="sm">
+              {getSelectedStoreLabel()}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-64 p-0" align="start">
+            <div className="p-2 border-b">
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="w-full pl-8 pr-4 py-2 h-9 border rounded-md text-sm"
+                  value={storeSearchTerm}
+                  onChange={(e) => setStoreSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="max-h-60 overflow-auto py-1">
+              <div
+                className={`px-2 py-1.5 cursor-pointer hover:bg-gray-100 ${
+                  !selectedStore ? "bg-blue-50" : ""
+                }`}
+                onClick={() => handleStoreChange(null)}
+              >
+                <div className="flex items-center">
+                  <span>All Stores</span>
+                  {!selectedStore && (
+                    <span className="ml-auto text-blue-600">✓</span>
+                  )}
+                </div>
+              </div>
+
+              {filteredStores?.map((store) => (
+                <div
+                  key={store.id}
+                  className={`px-2 py-1.5 cursor-pointer hover:bg-gray-100 ${
+                    selectedStore === store.id ? "bg-blue-50" : ""
+                  }`}
+                  onClick={() => handleStoreChange(store.id)}
                 >
-                  {option.label}
-                </Button>
+                  <div className="flex items-center">
+                    <span>{store.name}</span>
+                    {selectedStore === store.id && (
+                      <span className="ml-auto text-blue-600">✓</span>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
-          </div>
-          <div className="p-2">
-            <div className="font-medium mb-2">Custom Range</div>
-            <DateRangePicker
-              date={dateRange}
-              onDateChange={handleDateRangeChange}
-              className="w-full"
-            />
-          </div>
-        </PopoverContent>
-      </Popover>
+          </PopoverContent>
+        </Popover>
 
-      {/* Store Filter */}
-      <Popover open={storePopoverOpen} onOpenChange={setStorePopoverOpen}>
-        <PopoverTrigger asChild>
-          <Button variant="filter" size="sm">
-            {getSelectedStoreLabel()}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-64 p-0" align="start">
-          <div className="p-2 border-b">
-            <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-full pl-8 pr-4 py-2 h-9 border rounded-md text-sm"
-                value={storeSearchTerm}
-                onChange={(e) => setStoreSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="max-h-60 overflow-auto py-1">
-            <div
-              className={`px-2 py-1.5 cursor-pointer hover:bg-gray-100 ${
-                !selectedStore ? "bg-blue-50" : ""
-              }`}
-              onClick={() => handleStoreChange(null)}
-            >
-              <div className="flex items-center">
-                <span>All Stores</span>
-                {!selectedStore && (
-                  <span className="ml-auto text-blue-600">✓</span>
-                )}
+        {/* Payment Method Filter */}
+        <Popover
+          open={paymentMethodPopoverOpen}
+          onOpenChange={setPaymentMethodPopoverOpen}
+        >
+          <PopoverTrigger asChild>
+            <Button variant="filter" size="sm">
+              {getSelectedPaymentMethodLabel()}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-64 p-0" align="start">
+            <div className="p-2 border-b">
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="w-full pl-8 pr-4 py-2 h-9 border rounded-md text-sm"
+                  value={paymentMethodSearchTerm}
+                  onChange={(e) => setPaymentMethodSearchTerm(e.target.value)}
+                />
               </div>
             </div>
-
-            {filteredStores?.map((store) => (
+            <div className="max-h-60 overflow-auto py-1">
               <div
-                key={store.id}
                 className={`px-2 py-1.5 cursor-pointer hover:bg-gray-100 ${
-                  selectedStore === store.id ? "bg-blue-50" : ""
+                  !selectedPaymentMethod ? "bg-blue-50" : ""
                 }`}
-                onClick={() => handleStoreChange(store.id)}
+                onClick={() => handlePaymentMethodChange(null)}
               >
                 <div className="flex items-center">
-                  <span>{store.name}</span>
-                  {selectedStore === store.id && (
+                  <span>All Methods</span>
+                  {!selectedPaymentMethod && (
                     <span className="ml-auto text-blue-600">✓</span>
                   )}
                 </div>
               </div>
-            ))}
-          </div>
-        </PopoverContent>
-      </Popover>
 
-      {/* Payment Method Filter */}
-      <Popover
-        open={paymentMethodPopoverOpen}
-        onOpenChange={setPaymentMethodPopoverOpen}
-      >
-        <PopoverTrigger asChild>
-          <Button variant="filter" size="sm">
-            {getSelectedPaymentMethodLabel()}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-64 p-0" align="start">
-          <div className="p-2 border-b">
-            <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-full pl-8 pr-4 py-2 h-9 border rounded-md text-sm"
-                value={paymentMethodSearchTerm}
-                onChange={(e) => setPaymentMethodSearchTerm(e.target.value)}
-              />
+              {filteredPaymentMethods?.map((method) => (
+                <div
+                  key={method.id}
+                  className={`px-2 py-1.5 cursor-pointer hover:bg-gray-100 ${
+                    selectedPaymentMethod === method.id ? "bg-blue-50" : ""
+                  }`}
+                  onClick={() => handlePaymentMethodChange(method.id)}
+                >
+                  <div className="flex items-center">
+                    <span>{method.name}</span>
+                    {selectedPaymentMethod === method.id && (
+                      <span className="ml-auto text-blue-600">✓</span>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-          <div className="max-h-60 overflow-auto py-1">
-            <div
-              className={`px-2 py-1.5 cursor-pointer hover:bg-gray-100 ${
-                !selectedPaymentMethod ? "bg-blue-50" : ""
-              }`}
-              onClick={() => handlePaymentMethodChange(null)}
-            >
-              <div className="flex items-center">
-                <span>All Methods</span>
-                {!selectedPaymentMethod && (
-                  <span className="ml-auto text-blue-600">✓</span>
-                )}
+          </PopoverContent>
+        </Popover>
+
+        {/* Status Filter */}
+        <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="filter" size="sm">
+              {getSelectedStatusLabel()}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-64 p-0" align="start">
+            <div className="p-2 border-b">
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="w-full pl-8 pr-4 py-2 h-9 border rounded-md text-sm"
+                  value={statusSearchTerm}
+                  onChange={(e) => setStatusSearchTerm(e.target.value)}
+                />
               </div>
             </div>
-
-            {filteredPaymentMethods?.map((method) => (
+            <div className="max-h-60 overflow-auto py-1">
               <div
-                key={method.id}
                 className={`px-2 py-1.5 cursor-pointer hover:bg-gray-100 ${
-                  selectedPaymentMethod === method.id ? "bg-blue-50" : ""
+                  !selectedStatus ? "bg-blue-50" : ""
                 }`}
-                onClick={() => handlePaymentMethodChange(method.id)}
+                onClick={() => handleStatusChange(null)}
               >
                 <div className="flex items-center">
-                  <span>{method.name}</span>
-                  {selectedPaymentMethod === method.id && (
+                  <span>All Status</span>
+                  {!selectedStatus && (
                     <span className="ml-auto text-blue-600">✓</span>
                   )}
                 </div>
               </div>
-            ))}
-          </div>
-        </PopoverContent>
-      </Popover>
 
-      {/* Status Filter */}
-      <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
-        <PopoverTrigger asChild>
-          <Button variant="filter" size="sm">
-            {getSelectedStatusLabel()}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-64 p-0" align="start">
-          <div className="p-2 border-b">
-            <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-full pl-8 pr-4 py-2 h-9 border rounded-md text-sm"
-                value={statusSearchTerm}
-                onChange={(e) => setStatusSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="max-h-60 overflow-auto py-1">
-            <div
-              className={`px-2 py-1.5 cursor-pointer hover:bg-gray-100 ${
-                !selectedStatus ? "bg-blue-50" : ""
-              }`}
-              onClick={() => handleStatusChange(null)}
-            >
-              <div className="flex items-center">
-                <span>All Status</span>
-                {!selectedStatus && (
-                  <span className="ml-auto text-blue-600">✓</span>
-                )}
-              </div>
-            </div>
-
-            {filteredOrderStatuses.map((status) => (
-              <div
-                key={status}
-                className={`px-2 py-1.5 cursor-pointer hover:bg-gray-100 ${
-                  selectedStatus === status ? "bg-blue-50" : ""
-                }`}
-                onClick={() => handleStatusChange(status)}
-              >
-                <div className="flex items-center">
-                  <span>{formatStatusName(status)}</span>
-                  {selectedStatus === status && (
-                    <span className="ml-auto text-blue-600">✓</span>
-                  )}
+              {filteredOrderStatuses.map((status) => (
+                <div
+                  key={status}
+                  className={`px-2 py-1.5 cursor-pointer hover:bg-gray-100 ${
+                    selectedStatus === status ? "bg-blue-50" : ""
+                  }`}
+                  onClick={() => handleStatusChange(status)}
+                >
+                  <div className="flex items-center">
+                    <span>{formatStatusName(status)}</span>
+                    {selectedStatus === status && (
+                      <span className="ml-auto text-blue-600">✓</span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </PopoverContent>
-      </Popover>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
     </div>
   );
 
   return (
     <div className="h-full">
       {/* Filters Section */}
-      <div className="my-3">{filterDropdowns}</div>
+      <div className="bg-gray-50 border-b mb-3">{filterDropdowns}</div>
 
       {isFetchingOrders && (
-        <ProgressBar mode="indeterminate" style={{ height: "4px" }} />
+        <ProgressBar
+          mode="indeterminate"
+          style={{ height: "4px" }}
+          className="mb-2"
+        />
       )}
 
       {/* DataTable for orders */}
@@ -571,6 +602,8 @@ const OrdersTable = () => {
         dataKey="id"
         tableStyle={{
           ...DataTableStyle,
+          borderCollapse: "separate",
+          borderSpacing: "0 4px",
         }}
         size="normal"
         selectionMode="checkbox"
