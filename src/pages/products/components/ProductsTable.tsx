@@ -191,7 +191,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
   };
 
   const rowClassName = () => {
-    return "border-b border-gray-100 hover:bg-gray-50";
+    return " hover:bg-gray-50";
   };
 
   return (
@@ -219,7 +219,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
         scrollable
         scrollHeight="flex"
-        size="small"
+        size="normal"
         globalFilter={searchString}
         emptyMessage="No products found"
         rowHover
@@ -230,46 +230,38 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
           field="name"
           header="Product"
           body={imageBodyTemplate}
-          headerStyle={{ ...TableHeaderStyle, fontWeight: "600" }}
-          className="border-b border-gray-100"
-          sortable
+          headerStyle={{ ...TableHeaderStyle }}
         />
 
         <Column
           field="unit_type"
           header="Unit Type"
           body={unitTypeBodyTemplate}
-          headerStyle={{ ...TableHeaderStyle, fontWeight: "600" }}
-          className="border-b border-gray-100"
+          headerStyle={{ ...TableHeaderStyle }}
         />
 
         <Column
           header="Price"
           body={priceBodyTemplate}
-          sortable
-          headerStyle={{ ...TableHeaderStyle, fontWeight: "600" }}
-          className="border-b border-gray-100"
+          headerStyle={{ ...TableHeaderStyle }}
         />
 
         <Column
           header="Status"
           body={statusBodyTemplate}
-          headerStyle={{ ...TableHeaderStyle, fontWeight: "600" }}
-          className="border-b border-gray-100"
+          headerStyle={{ ...TableHeaderStyle }}
         />
 
         <Column
           header="In Stock"
           body={totalInStockBodyTemplate}
-          headerStyle={{ ...TableHeaderStyle, fontWeight: "600" }}
-          className="border-b border-gray-100"
+          headerStyle={{ ...TableHeaderStyle }}
         />
 
         <Column
           header="Consumed"
           body={totalConsumedBodyTemplate}
-          headerStyle={{ ...TableHeaderStyle, fontWeight: "600" }}
-          className="border-b border-gray-100"
+          headerStyle={{ ...TableHeaderStyle }}
         />
 
         <Column
@@ -277,10 +269,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
           body={actionsBodyTemplate}
           headerStyle={{
             ...TableHeaderStyle,
-            fontWeight: "600",
-            width: "80px",
           }}
-          className="border-b border-gray-100"
         />
       </DataTable>
     </div>

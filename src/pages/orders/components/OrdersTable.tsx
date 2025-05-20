@@ -22,7 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { EllipsisVertical, XCircle, Search } from "lucide-react";
+import { MoreVertical, XCircle, Search } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { fetchOrders } from "../../../store/features/orders/orderThunks";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
@@ -212,7 +212,7 @@ const OrdersTable = () => {
     setEndDate(endDateObj);
     setDateRange({
       from: startDateObj,
-      to: endDateObj
+      to: endDateObj,
     });
     setDatePopoverOpen(false);
   };
@@ -252,6 +252,11 @@ const OrdersTable = () => {
     return <StatusBadge text={rowData.status} className={colorClass} />;
   };
 
+  // View order handler
+  const handleViewOrder = (order: Order) => {
+    window.location.href = `/orders/${order.order_id}`;
+  };
+
   // Cancel order handler
   const handleCancelOrder = (order: Order) => {
     setOrderToCancel(order);
@@ -272,20 +277,22 @@ const OrdersTable = () => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 rounded-full"
-            aria-label="Actions"
-          >
-            <EllipsisVertical className="w-4 h-4" />
+          <Button variant="ghost" size="icon" className="h-8 w-8">
+            <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-
-        <DropdownMenuContent align="end" className="w-auto">
-          <DropdownMenuItem onClick={() => handleCancelOrder(order)}>
-            <XCircle className="text-red-400" />{" "}
-            <span className="text-red-400">Cancel</span>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            onSelect={() => handleViewOrder(order)}
+            className="flex items-center gap-2"
+          >
+            <Search className="h-4 w-4" /> View
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={() => handleCancelOrder(order)}
+            className="flex items-center gap-2 text-red-600"
+          >
+            <XCircle className="h-4 w-4" /> Cancel
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -326,7 +333,10 @@ const OrdersTable = () => {
     const [start_date, end_date] = getDateRange(selectedDuration);
     const startDate = new Date(start_date);
     const endDate = new Date(end_date);
-    return `${format(startDate, "LLL dd, y")} - ${format(endDate, "LLL dd, y")}`;
+    return `${format(startDate, "LLL dd, y")} - ${format(
+      endDate,
+      "LLL dd, y"
+    )}`;
   };
 
   // Format status display
@@ -336,7 +346,7 @@ const OrdersTable = () => {
 
   // Filter dropdowns
   const filterDropdowns = (
-    <div className="flex flex-wrap gap-4 px-4 py-3">
+    <div className="flex flex-wrap gap-4 px-4">
       {/* Date Range Filter */}
       <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
         <PopoverTrigger asChild>
@@ -547,47 +557,59 @@ const OrdersTable = () => {
   );
 
   return (
-    <div className="h-table">
+    <div className="h-full">
       {isFetchingOrders && (
-        <ProgressBar mode="indeterminate" style={{ height: "6px" }} />
+        <ProgressBar mode="indeterminate" style={{ height: "4px" }} />
       )}
 
       {/* Filters Section */}
-      <div className="bg-background">
-        {filterDropdowns}
-      </div>
+      <div className="bg-gray-50 border-b py-3">{filterDropdowns}</div>
 
       {/* DataTable for orders */}
       <DataTable
         value={filteredOrders}
         dataKey="id"
-        tableStyle={DataTableStyle}
-        size="small"
+        tableStyle={{
+          ...DataTableStyle,
+        }}
+        size="normal"
         selectionMode="checkbox"
         selection={selectedOrders}
         onSelectionChange={(e) => setSelectedOrders(e.value)}
         paginator
         rows={10}
-        rowsPerPageOptions={[10, 20, 50]}
+        rowsPerPageOptions={[5, 10, 25, 50]}
+        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} orders"
         scrollable
         scrollHeight="flex"
+        emptyMessage="No orders found"
+        rowHover
+        className="bg-white"
       >
         <Column
-          header="Order ID"
+          header="Order Details"
           body={(order: Order) => (
-            <NavLink to={`/orders/${order.order_id}`} className="underline">
-              {`MG${order.order_id}`}
-            </NavLink>
+            <div className="flex items-center px-4">
+              <div className="flex-shrink-0">
+                <div className="h-10 w-10 rounded-md bg-gray-100 flex items-center justify-center border border-gray-200">
+                  <span className="text-xs font-medium">MG</span>
+                </div>
+              </div>
+              <div className="ml-3">
+                <NavLink
+                  to={`/orders/${order.order_id}`}
+                  className="text-sm font-semibold text-gray-900 hover:underline"
+                >
+                  {`MG${order.order_id}`}
+                </NavLink>
+                <div className="text-xs text-gray-500">
+                  {order.recipient.full_name}
+                </div>
+              </div>
+            </div>
           )}
           headerStyle={TableHeaderStyle}
-          className="font-bold text-xs"
-        />
-
-        <Column
-          header="Full Name"
-          body={(order: Order) => order.recipient.full_name}
-          headerStyle={TableHeaderStyle}
-          className="text-xs"
         />
         <Column
           field="address"
@@ -606,23 +628,28 @@ const OrdersTable = () => {
           field="total"
           header="Total Cost"
           body={(order: Order) => (
-            <span className="text-xs">KES {order.total_cost.toFixed(2)}</span>
+            <div className="font-medium text-sm">
+              {order.total_cost.toLocaleString("en-US", {
+                style: "currency",
+                currency: "KSH",
+              })}
+            </div>
           )}
           headerStyle={TableHeaderStyle}
-          className="text-xs"
         />
         <Column
           field="createdAt"
           header="Created At"
-          body={(order: Order) =>
-            new Date(order.created_at).toLocaleDateString("en-KE", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })
-          }
+          body={(order: Order) => (
+            <div className="text-sm">
+              {new Date(order.created_at).toLocaleDateString("en-KE", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </div>
+          )}
           headerStyle={TableHeaderStyle}
-          className="text-xs"
         />
         <Column
           body={actionsTemplate}

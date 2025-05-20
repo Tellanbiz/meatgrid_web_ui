@@ -10,18 +10,18 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-white shadow-xs hover:bg-primary-600 focus:ring-2 focus:ring-primary/20 focus:ring-offset-2",
+          "bg-primary text-white shadow-xs hover:bg-primary-600 focus:ring-2 focus:ring-primary/20 focus:ring-offset-0",
         destructive:
-          "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus:ring-2 focus:ring-destructive/20 focus:ring-offset-2",
+          "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus:ring-2 focus:ring-destructive/20 focus:ring-offset-0",
         outline:
-          "border border-primary bg-white text-primary shadow-xs hover:bg-primary-50 focus:ring-2 focus:ring-primary/20 focus:ring-offset-2",
+          "border border-primary bg-white text-primary shadow-xs hover:bg-primary-50 focus:ring-2 focus:ring-primary/20 focus:ring-offset-0",
         secondary:
-          "bg-white text-primary border-primary border shadow-xs hover:bg-primary-50 focus:ring-2 focus:ring-primary/20 focus:ring-offset-2",
+          "bg-white text-primary border-primary border shadow-xs hover:bg-primary-50 focus:ring-2 focus:ring-primary/20 focus:ring-offset-0",
         ghost:
-          "text-primary hover:bg-primary-50 focus:ring-2 focus:ring-primary/20 focus:ring-offset-2",
+          "text-primary hover:bg-primary-50 focus:ring-2 focus:ring-primary/20 focus:ring-offset-0",
         link: "text-primary underline-offset-4 hover:underline hover:text-primary-600",
         filter:
-          "border border-gray-500 bg-white text-gray-500 shadow-xs hover:bg-gray-50 focus:ring-1 focus:ring-gray-500 focus:ring-offset-2",
+          "border border-gray-500 bg-white text-gray-500 shadow-xs hover:bg-gray-50 focus:ring-1 focus:ring-gray-500 focus:ring-offset-0",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

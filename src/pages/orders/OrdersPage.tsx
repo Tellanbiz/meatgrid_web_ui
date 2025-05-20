@@ -2,12 +2,12 @@ import OrdersTable from "./components/OrdersTable";
 
 const OrdersPage = () => {
   return (
-    <div className="">
+    <div>
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Orders</h1>
       </div>
 
-      <div className="">
+      <div className="h-table">
         <OrdersTable />
       </div>
     </div>
