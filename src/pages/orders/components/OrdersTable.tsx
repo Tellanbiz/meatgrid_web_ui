@@ -336,11 +336,11 @@ const OrdersTable = () => {
 
   // Filter dropdowns
   const filterDropdowns = (
-    <div className="flex flex-wrap gap-4 px-4 py-3 bg-gray-50 border-b">
+    <div className="flex flex-wrap gap-4 px-4 py-3">
       {/* Date Range Filter */}
       <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="h-10 px-3 bg-white">
+          <Button variant="filter" className="h-10 px-3">
             {getSelectedDateLabel()}
           </Button>
         </PopoverTrigger>
@@ -352,7 +352,7 @@ const OrdersTable = () => {
                 <Button
                   key={option.value}
                   variant={
-                    selectedDuration === option.value ? "default" : "outline"
+                    selectedDuration === option.value ? "secondary" : "filter"
                   }
                   size="sm"
                   className="w-full"
@@ -379,7 +379,7 @@ const OrdersTable = () => {
       {/* Store Filter */}
       <Popover open={storePopoverOpen} onOpenChange={setStorePopoverOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="h-10 px-3 bg-white">
+          <Button variant="filter" className="h-10 px-3">
             {getSelectedStoreLabel()}
           </Button>
         </PopoverTrigger>
@@ -437,7 +437,7 @@ const OrdersTable = () => {
         onOpenChange={setPaymentMethodPopoverOpen}
       >
         <PopoverTrigger asChild>
-          <Button variant="outline" className="h-10 px-3 bg-white">
+          <Button variant="filter" className="h-10 px-3">
             {getSelectedPaymentMethodLabel()}
           </Button>
         </PopoverTrigger>
@@ -492,7 +492,7 @@ const OrdersTable = () => {
       {/* Status Filter */}
       <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="h-10 px-3 bg-white">
+          <Button variant="filter" className="h-10 px-3">
             {getSelectedStatusLabel()}
           </Button>
         </PopoverTrigger>
@@ -547,10 +547,15 @@ const OrdersTable = () => {
   );
 
   return (
-    <div className="h-full">
+    <div className="h-table">
       {isFetchingOrders && (
         <ProgressBar mode="indeterminate" style={{ height: "6px" }} />
       )}
+
+      {/* Filters Section */}
+      <div className="bg-background">
+        {filterDropdowns}
+      </div>
 
       {/* DataTable for orders */}
       <DataTable
@@ -566,7 +571,6 @@ const OrdersTable = () => {
         rowsPerPageOptions={[10, 20, 50]}
         scrollable
         scrollHeight="flex"
-        header={filterDropdowns}
       >
         <Column
           header="Order ID"

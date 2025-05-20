@@ -4,10 +4,10 @@ import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { resetUploadState } from "../../../store/features/uploads/uploadSlice";
 import TextField from "../../../components/TextField";
-import { PrimaryButton, SecondaryButton } from "../../../components/Button";
 import MarkdownEditor from "@uiw/react-md-editor";
 import ImageThumbnail from "../../../components/ImageThumbnail";
 import ProgressIndicator from "../../../components/ProgressIndicator";
+import { Button } from "../../../components/ui/button";
 import IngredientItem from "./IngredientItem";
 import { fetchProducts } from "../../../store/features/products/productThunks";
 import { ApiError } from "../../../types/ApiError";
@@ -41,6 +41,7 @@ const EditRecipeComponent = () => {
   const [shortDescription, setShortDescription] = useState("");
   const [description, setDescription] = useState("");
   const [productIds, setProductIds] = useState<string[]>([]);
+  const [isImageRemoved, setIsImageRemoved] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -58,6 +59,7 @@ const EditRecipeComponent = () => {
       setShortDescription(recipe.short_description);
       setDescription(recipe.description);
       setProductIds(recipe.product_ids);
+      setIsImageRemoved(false); // Reset image removed flag when loading a recipe
     }
   }, [recipe]);
 
@@ -82,16 +84,36 @@ const EditRecipeComponent = () => {
   };
 
   const handleRemoveImage = () => {
+    // Reset the upload state to clear any newly uploaded images
     dispatch(resetUploadState());
+    
+    // Set the flag to indicate image removal
+    setIsImageRemoved(true);
   };
 
   const handleUpdate = async () => {
     if (!id) return;
 
+    // Determine which image to use:
+    // 1. Use newly uploaded image if available
+    // 2. If image was removed, use empty string
+    // 3. Use existing image if it hasn't been removed
+    let imageToUse = "";
+    if (images.length > 0) {
+      // New image was uploaded
+      imageToUse = images[0];
+      // Reset the removed flag as we're using a new image
+      setIsImageRemoved(false);
+    } else if (!isImageRemoved && recipe?.image) {
+      // Use existing image only if it wasn't removed
+      imageToUse = recipe.image;
+    }
+    // Otherwise, imageToUse remains an empty string (no image)
+
     const updateData: EditRecipeRequest = {
       id,
       name,
-      image: images[0] || recipe?.image || "",
+      image: imageToUse,
       short_description: shortDescription,
       description,
       product_ids: productIds,
@@ -133,7 +155,7 @@ const EditRecipeComponent = () => {
   }
   return (
     <div className="bg-white rounded-xl w-full h-screen flex flex-col">
-      <div className="bg-white rounded-xl w-full mx-auto space-y-6">
+      <div className="rounded-xl w-full mx-auto space-y-6">
         <div className="grid grid-cols-2 gap-x-10">
           <div className="space-y-6">
             <div className="flex items-center gap-4 flex-wrap">
@@ -143,7 +165,7 @@ const EditRecipeComponent = () => {
                 </div>
               ) : images.length > 0 ? (
                 <ImageThumbnail src={images[0]} onRemove={handleRemoveImage} />
-              ) : recipe?.image ? (
+              ) : recipe?.image && !isImageRemoved ? (
                 <ImageThumbnail
                   src={recipe.image}
                   onRemove={handleRemoveImage}
@@ -211,17 +233,17 @@ const EditRecipeComponent = () => {
         </div>
 
         <div className="bg-white border-t px-6 py-4 flex justify-end space-x-4">
-          <SecondaryButton
-            text="Cancel"
-            onClick={handleCancel}
-            className="px-6"
-          />
-          <PrimaryButton
-            text={recipeStatus === "loading" ? "Updating..." : "Update"}
+          <Button variant="outline" onClick={handleCancel} className="px-6">
+            Cancel
+          </Button>
+          <Button
+            variant="default"
             onClick={handleUpdate}
             disabled={recipeStatus === "loading"}
             className="px-10"
-          />
+          >
+            {recipeStatus === "loading" ? "Updating..." : "Update"}
+          </Button>
         </div>
       </div>
     </div>

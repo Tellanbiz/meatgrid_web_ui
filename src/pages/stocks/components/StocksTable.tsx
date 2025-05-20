@@ -123,6 +123,7 @@ const StocksTable = () => {
         scrollable
         scrollHeight="flex"
         size="small"
+        className="bg-white"
       >
         <Column
           header="Product"

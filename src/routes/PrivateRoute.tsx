@@ -22,13 +22,11 @@ const PrivateRoute = ({
     return <Navigate to="/login" replace />;
   }
 
-  // const hasAccess =
-  //   requiredPermissions.length === 0 ||
-  //   (requireAll
-  //     ? hasAllPermissions(requiredPermissions)
-  //     : hasAnyPermission(requiredPermissions));
-
-  const hasAccess = true;
+  const hasAccess =
+    requiredPermissions.length === 0 ||
+    (requireAll
+      ? hasAllPermissions(requiredPermissions)
+      : hasAnyPermission(requiredPermissions));
 
   if (!hasAccess) {
     return <NotAuthorized />;

@@ -1,11 +1,51 @@
 import { Icon } from "@iconify/react";
 import { sidebarData } from "./data";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import * as React from "react";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import {
+  selectAuthUser,
+  selectIsFetchingAdminAccount,
+  selectIsLoggingOut,
+  selectLogoutSuccess,
+  selectAuthStatus,
+} from "../../store/features/auth/authSelectors";
+import {
+  fetchAdminAccount,
+  logoutUser,
+} from "../../store/features/auth/authThunks";
 
 export function SideBar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectAuthUser);
+  const isFetchingAdminAccount = useAppSelector(selectIsFetchingAdminAccount);
+  const isLoggingOut = useAppSelector(selectIsLoggingOut);
+  const logoutSuccess = useAppSelector(selectLogoutSuccess);
+  const status = useAppSelector(selectAuthStatus);
 
   const filteredNav = sidebarData.navMain;
+
+  React.useEffect(() => {
+    if (!user && !isFetchingAdminAccount) {
+      if (status === "failed") {
+        navigate("/login");
+      } else {
+        dispatch(fetchAdminAccount());
+      }
+    }
+  }, [dispatch, isFetchingAdminAccount, user, status, navigate]);
+
+  React.useEffect(() => {
+    if (logoutSuccess) {
+      navigate("/login");
+    }
+  }, [logoutSuccess, navigate]);
+
+  const handleLogoutClick = () => {
+    dispatch(logoutUser());
+  };
 
   return (
     <aside className="h-screen w-[260px] bg-white border-r shadow-sm flex flex-col overflow-hidden rounded-l-2xl">
@@ -17,10 +57,10 @@ export function SideBar() {
           className="w-10 h-10 rounded-lg bg-cover"
         />
         <div>
-          <div className="font-semibold text-base text-gray-900 leading-tight">
+          <div className="font-semibold text-base text-primary-500 leading-tight">
             {sidebarData.company.name}
           </div>
-          <div className="text-xs text-gray-400 leading-tight">Foundation</div>
+          <div className="text-xs text-gray-400 leading-tight">Admin Panel</div>
         </div>
       </div>
       {/* Nav Sections */}
@@ -114,25 +154,50 @@ export function SideBar() {
       </nav>
       {/* User Profile */}
       <div className="mt-auto px-3 py-3 border-t bg-gray-50 flex items-center gap-3">
-        <img
-          src="https://randomuser.me/api/portraits/women/44.jpg"
-          alt="User"
-          className="w-9 h-9 rounded-full border"
-        />
-        <div className="flex-1 min-w-0">
-          <div className="font-medium text-sm text-gray-900 truncate">
-            Esther Howard
-          </div>
-          <div className="text-xs text-gray-400 truncate">
-            esther@howard.com
-          </div>
-        </div>
-        <button className="p-2 hover:bg-gray-200 rounded-full">
-          <Icon
-            icon="solar:logout-2-linear"
-            width={20}
-            className="text-gray-400"
-          />
+        {user ? (
+          <>
+            {user.picture ? (
+              <img
+                src={user.picture}
+                alt={user.full_name || "User"}
+                className="w-9 h-9 rounded-full border"
+              />
+            ) : (
+              <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center border">
+                <Icon icon="solar:user-linear" width={20} className="text-gray-600" />
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-sm text-gray-900 truncate">
+                {user.full_name || "User"}
+              </div>
+              <div className="text-xs text-gray-400 truncate">
+                {user.email || ""}
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center border">
+              <Icon icon="solar:user-linear" width={20} className="text-gray-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-sm text-gray-900 truncate">
+                Loading...
+              </div>
+            </div>
+          </>
+        )}
+        <button 
+          className="p-2 hover:bg-gray-200 rounded-full"
+          onClick={handleLogoutClick}
+          disabled={isLoggingOut}
+        >
+          {isLoggingOut ? (
+            <Icon icon="solar:spinner-linear" width={20} className="text-gray-400 animate-spin" />
+          ) : (
+            <Icon icon="solar:logout-2-linear" width={20} className="text-gray-400" />
+          )}
         </button>
       </div>
       {/* Custom thin scrollbar styles */}

@@ -55,7 +55,7 @@ const ProductsPage = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-4 py-3  bg-background border-b border-gray-100">
+      <div className="flex flex-col bg-background border-b border-gray-100">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
             <div className="relative flex-1 max-w-md">

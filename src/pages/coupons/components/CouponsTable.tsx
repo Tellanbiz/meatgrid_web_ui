@@ -167,6 +167,7 @@ const CouponsTable = () => {
         rowsPerPageOptions={[10, 20, 50]}
         scrollable
         scrollHeight="flex"
+        className="bg-white"
       >
         <Column field="name" header="Name" headerStyle={TableHeaderStyle} />
         <Column

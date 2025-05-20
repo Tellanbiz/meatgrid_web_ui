@@ -68,14 +68,13 @@ const StorageTypeTable: React.FC<StorageTypeTableProps> = ({
         <DataTable
           value={storageTypes}
           loading={isLoading}
-          className="h-full"
+          className="h-full bg-white"
           dataKey="id"
           paginator
           rows={25}
           rowsPerPageOptions={[10, 25, 50]}
           emptyMessage="No storage types found."
           loadingIcon="pi pi-spin pi-spinner"
-          stripedRows
           rowHover
           scrollable
           scrollHeight="flex"

@@ -195,6 +195,7 @@ const PaymentMethodsPage = () => {
             scrollHeight="flex"
             size="small"
             tableStyle={DataTableStyle}
+            className="bg-white"
           >
             <Column field="name" header="Name" headerStyle={TableHeaderStyle} />
             <Column field="tag" header="Tag" headerStyle={TableHeaderStyle} />

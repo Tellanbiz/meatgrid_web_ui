@@ -43,7 +43,7 @@ const SuppliersTable = ({ onEdit }: SuppliersTableProps) => {
   const [supplierToDelete, setSupplierToDelete] = useState<Supplier | null>(
     null
   );
-  const suppliers = useAppSelector(selectSuppliers)
+  const suppliers = useAppSelector(selectSuppliers);
   const isFetchingSuppliers = useAppSelector(selectIsFetchingSuppliers);
   const isDeletingSupplier = useAppSelector(selectIsDeletingSupplier);
   const supplierError = useAppSelector(selectSupplierError);
@@ -115,6 +115,7 @@ const SuppliersTable = ({ onEdit }: SuppliersTableProps) => {
             style={{ height: "6px" }}
           ></ProgressBar>
         )}
+
         <DataTable
           value={suppliers}
           dataKey="id"
@@ -127,6 +128,7 @@ const SuppliersTable = ({ onEdit }: SuppliersTableProps) => {
           scrollable
           scrollHeight="flex"
           size="small"
+          className="bg-white"
         >
           <Column
             field="full_name"

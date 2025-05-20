@@ -83,7 +83,7 @@ const WareHousePage = () => {
         </Button>
       </div>
 
-      <div className="card h-table">
+      <div className="h-table">
         {isFetchingStores && <LoadingPage />}
 
         {!isFetchingStores && (
@@ -94,7 +94,6 @@ const WareHousePage = () => {
             emptyMessage="No warehouses found."
             loading={false}
             loadingIcon="pi pi-spin pi-spinner"
-            showGridlines
             rowHover
             globalFilterFields={["name", "location"]}
             scrollable
@@ -102,6 +101,7 @@ const WareHousePage = () => {
             size="small"
             dataKey="id"
             tableStyle={DataTableStyle}
+            className="h-full bg-white"
           >
             <Column field="name" header="Name" headerStyle={TableHeaderStyle} />
             <Column
