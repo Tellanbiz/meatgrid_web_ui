@@ -5,36 +5,49 @@ import BackButton from "../../components/BackButton";
 import {
   selectCorporateProducts,
   selectIsFetchingCorporateProducts,
+  selectProducts,
 } from "../../store/features/products/productSelectors";
 import { ProgressBar } from "primereact/progressbar";
 import { fetchCorporateProducts } from "../../store/features/products/corporateProductThunks";
+import { fetchProducts } from "../../store/features/products/productThunks";
 import { CorporateProduct } from "../../store/features/products/corporateProductTypes";
 import { Button } from "../../components/ui/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Pencil, RefreshCw, Search } from "lucide-react";
+import { PlusCircle, Pencil, RefreshCw, Search } from "lucide-react";
 import { TableHeaderStyle, DataTableStyle } from "../../constants/TableStyles";
 import { Input } from "../../components/ui/input";
 import { toast } from "sonner";
 import { clearProductMessages } from "../../store/features/products/productSlice";
-import { UpdateCorporateProductDialog } from "./components";
+import { UpdateCorporateProductDialog, AddCorporateProductDialog } from "./components";
+import { formatCurrency, formatWeight } from "../../utils/formatters";
 
 const CorporateProductsPage = () => {
   const dispatch = useAppDispatch();
   const { organizationId } = useParams();
   const [searchString, setSearchString] = useState("");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] =
     useState<CorporateProduct | null>(null);
 
   const corporateProducts = useAppSelector(selectCorporateProducts);
   const isFetching = useAppSelector(selectIsFetchingCorporateProducts);
+  const allProducts = useAppSelector(selectProducts);
 
+  // Fetch corporate products for this organization
   useEffect(() => {
     if (organizationId) {
       dispatch(fetchCorporateProducts({ user_id: organizationId }));
     }
   }, [dispatch, organizationId]);
+  
+  // Fetch all products for the add product dialog
+  useEffect(() => {
+    if (addDialogOpen && allProducts.length === 0) {
+      dispatch(fetchProducts());
+    }
+  }, [addDialogOpen, allProducts, dispatch]);
 
   // Error handling
   const error = useAppSelector((state) => state.products.error);
@@ -55,6 +68,14 @@ const CorporateProductsPage = () => {
     if (organizationId) {
       dispatch(fetchCorporateProducts({ user_id: organizationId }));
     }
+  };
+  
+  const handleAddProduct = () => {
+    setAddDialogOpen(true);
+  };
+  
+  const handleCloseAddDialog = () => {
+    setAddDialogOpen(false);
   };
 
   const imageBodyTemplate = (rowData: CorporateProduct) => {
@@ -84,10 +105,7 @@ const CorporateProductsPage = () => {
   const priceBodyTemplate = (rowData: CorporateProduct) => {
     return (
       <div className="text-sm font-medium">
-        {rowData.regular_price.toLocaleString("en-US", {
-          style: "currency",
-          currency: "KSH",
-        })}
+        {formatCurrency(rowData.regular_price)}
       </div>
     );
   };
@@ -95,7 +113,7 @@ const CorporateProductsPage = () => {
   const weightBodyTemplate = (rowData: CorporateProduct) => {
     return (
       <div className="text-sm">
-        {rowData.weight} {rowData.unit_type}
+        {formatWeight(rowData.weight, rowData.unit_type)}
       </div>
     );
   };
@@ -159,18 +177,29 @@ const CorporateProductsPage = () => {
             </div>
           </div>
 
-          <Button
-            variant="outline"
-            onClick={handleRefresh}
-            disabled={isFetching}
-            size="sm"
-            className="px-2"
-          >
-            <RefreshCw
-              className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
-            />
-            <span className="ml-2">Refresh</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={handleRefresh}
+              disabled={isFetching}
+              size="sm"
+              className="px-2"
+            >
+              <RefreshCw
+                className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
+              />
+              <span className="ml-2">Refresh</span>
+            </Button>
+            
+            <Button
+              onClick={handleAddProduct}
+              size="sm"
+              className="px-2"
+            >
+              <PlusCircle className="h-4 w-4 mr-2" />
+              Add Product
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -236,6 +265,14 @@ const CorporateProductsPage = () => {
         open={editDialogOpen}
         onClose={handleCloseEditDialog}
         product={selectedProduct}
+        organizationId={organizationId || ""}
+        onSuccess={refreshProducts}
+      />
+      
+      {/* Add Product Dialog */}
+      <AddCorporateProductDialog
+        open={addDialogOpen}
+        onClose={handleCloseAddDialog}
         organizationId={organizationId || ""}
         onSuccess={refreshProducts}
       />

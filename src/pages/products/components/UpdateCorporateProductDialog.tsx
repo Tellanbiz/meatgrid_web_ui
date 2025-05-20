@@ -20,6 +20,7 @@ import {
   selectProductSuccessMessage,
 } from "../../../store/features/products/productSelectors";
 import { clearProductMessages } from "../../../store/features/products/productSlice";
+import { formatCurrency, formatWeight } from "../../../utils/formatters";
 
 interface UpdateCorporateProductDialogProps {
   open: boolean;
@@ -108,7 +109,9 @@ const UpdateCorporateProductDialog = ({
               />
               <div>
                 <h3 className="font-medium text-gray-900">{product.name}</h3>
-                <p className="text-xs text-gray-500">{product.org.full_name}</p>
+                <p className="text-xs text-gray-500">
+                  {product.org.full_name} • {formatCurrency(product.regular_price)} • {formatWeight(product.weight, product.unit_type)}
+                </p>
               </div>
             </div>
           )}

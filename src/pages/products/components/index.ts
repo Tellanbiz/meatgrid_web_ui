@@ -1,3 +1,4 @@
 import UpdateCorporateProductDialog from "./UpdateCorporateProductDialog";
+import AddCorporateProductDialog from "./AddCorporateProductDialog";
 
-export { UpdateCorporateProductDialog };
+export { UpdateCorporateProductDialog, AddCorporateProductDialog };
