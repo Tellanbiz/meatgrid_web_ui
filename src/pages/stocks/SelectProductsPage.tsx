@@ -1,4 +1,4 @@
-import { CheckCircle, Loader2, RefreshCcw } from "lucide-react";
+import { ArrowRight, CheckCircle, Loader2, RefreshCcw } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import BackButton from "../../components/BackButton";
 import { Input } from "../../components/ui/input";
@@ -71,6 +71,22 @@ const SelectProductsPage = () => {
     (Product & { quantity: string })[]
   >([]);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [isQrDialogOpen, setIsQrDialogOpen] = useState<boolean>(false);
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    const date = now.toISOString().split("T")[0];
+    const time = now.toTimeString().split(":").slice(0, 2).join(":");
+    return { date, time };
+  };
+
+  const [processedDate, setProcessedDate] = useState<string>(
+    getCurrentDateTime().date
+  );
+  const [processedTime, setProcessedTime] = useState<string>(
+    getCurrentDateTime().time
+  );
+  const [expiryDate, setExpiryDate] = useState<string>("");
+  const [expiryTime, setExpiryTime] = useState<string>("");
 
   useEffect(() => {
     if (
@@ -97,9 +113,11 @@ const SelectProductsPage = () => {
 
   useEffect(() => {
     if (processingProductsSuccessMessage) {
+      setIsQrDialogOpen(false);
       toast.success("Products processed successfully");
       dispatch(clearProductMessages());
       dispatch(resetProcessProductState());
+
       navigate("/stock");
     }
   }, [processingProductsSuccessMessage, dispatch, navigate]);
@@ -207,20 +225,35 @@ const SelectProductsPage = () => {
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleOpenQrDialog = () => {
+    const { date, time } = getCurrentDateTime();
+    setProcessedDate(date);
+    setProcessedTime(time);
+    setExpiryDate("");
+    setExpiryTime("");
+    setIsQrDialogOpen(true);
+  };
+
+  const formatDateTime = (date: string, time: string) => {
+    if (!date || !time) return "";
+    const [hours, minutes] = time.split(":");
+    return `${date}T${hours}:${minutes}:00Z`;
+  };
+
   const handleProcessProducts = () => {
     const request: ProcessProductRequest = {
+      store_id: selectedStore || "",
+      storage_type_id: selectedStorageType || "",
       suppliers: selectedSuppliers,
+      expiry_at: formatDateTime(expiryDate, expiryTime),
       raw_materials: rawMaterials.map((item) => ({
         quantity: parseFloat(item.quantity),
         product_id: item.id,
-        store_id: selectedStore || "",
       })),
-      processed_products: processedProducts.map((item) => ({
-        quantity: parseFloat(item.quantity),
-        product_id: item.id,
-        store_id: selectedStore || "",
-        storage_type_id: selectedStorageType || "",
-      })),
+      processed_products: {
+        quantity: parseFloat(processedProducts[0].quantity),
+        product_id: processedProducts[0].id,
+      },
     };
 
     dispatch(processProducts(request));
@@ -254,16 +287,12 @@ const SelectProductsPage = () => {
           </Button>
 
           <Button
-            onClick={handleProcessProducts}
+            onClick={handleOpenQrDialog}
             className="px-2"
-            disabled={isFinishDisabled || isProcessingProducts}
+            disabled={isFinishDisabled}
           >
-            {isProcessingProducts ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <CheckCircle className="size-4" />
-            )}
-            Finish
+            <ArrowRight className="size-4" />
+            Continue
           </Button>
         </div>
       </div>
@@ -415,6 +444,84 @@ const SelectProductsPage = () => {
               <Button type="submit">Add</Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Generate Batch</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-2">
+            <div className="space-y-1">
+              <Label>Date Processed</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="date"
+                  value={processedDate}
+                  onChange={(e) => setProcessedDate(e.target.value)}
+                  placeholder="mm/dd/yy"
+                  required
+                />
+                <Input
+                  type="time"
+                  value={processedTime}
+                  onChange={(e) => setProcessedTime(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <Label>Expiry Date</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="date"
+                  value={expiryDate}
+                  onChange={(e) => setExpiryDate(e.target.value)}
+                  placeholder="mm/dd/yy"
+                  required
+                />
+                <Input
+                  type="time"
+                  value={expiryTime}
+                  onChange={(e) => setExpiryTime(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="mt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsQrDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleProcessProducts}
+              disabled={
+                !processedDate ||
+                !processedTime ||
+                !expiryDate ||
+                !expiryTime ||
+                isProcessingProducts
+              }
+            >
+              {isProcessingProducts ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Complete
+                </>
+              )}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
