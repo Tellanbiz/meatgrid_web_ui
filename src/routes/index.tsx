@@ -1,7 +1,7 @@
 import Settings from "../pages/Settings";
 import NotFound from "../pages/NotFound";
 import { RouteObject } from "react-router-dom";
-import MainLayout from "../components/MainLayout.js";
+import MainLayout from "../components/layouts/MainLayout.js";
 import Dashboard from "../pages/dashboard/Dashboard";
 import ProductsPage from "../pages/products/ProductsPage.js";
 import LoginPage from "../pages/login/LoginPage.js";

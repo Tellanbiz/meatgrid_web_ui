@@ -32,9 +32,9 @@ interface ProductsTableProps {
   selectedStore: string | null;
 }
 
-const ProductsTable: React.FC<ProductsTableProps> = ({ 
+const ProductsTable: React.FC<ProductsTableProps> = ({
   searchString,
-  selectedStore
+  selectedStore,
 }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -44,7 +44,9 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
 
   useEffect(() => {
     dispatch(fetchStores());
-    dispatch(fetchProducts(selectedStore ? { store_id: selectedStore } : undefined));
+    dispatch(
+      fetchProducts(selectedStore ? { store_id: selectedStore } : undefined)
+    );
     dispatch(fetchTags());
     dispatch(fetchCategories());
   }, [dispatch, selectedStore]);
@@ -72,12 +74,15 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
             alt={rowData.name}
             className="h-10 w-10 rounded-md object-cover border border-gray-200"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = "https://via.placeholder.com/40";
+              (e.target as HTMLImageElement).src =
+                "https://via.placeholder.com/40";
             }}
           />
         </div>
         <div className="ml-3">
-          <div className="text-sm font-medium text-gray-900">{rowData.name}</div>
+          <div className="text-sm font-medium text-gray-900">
+            {rowData.name}
+          </div>
           <Badge variant="outline" className="mt-1 text-xs">
             {rowData.category_tag}
           </Badge>
@@ -88,7 +93,9 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
 
   const priceBodyTemplate = (rowData: Product) => {
     return (
-      <div className="font-medium text-sm">{formatCurrency(rowData.regular_price)}</div>
+      <div className="font-medium text-sm">
+        {formatCurrency(rowData.regular_price)}
+      </div>
     );
   };
 
@@ -186,19 +193,8 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
     console.log("Delete product", rowData);
   };
 
-  const tableHeader = () => {
-    return (
-      <div className="flex justify-between items-center px-2 py-2">
-        <span className="text-sm font-semibold">Product List</span>
-        <span className="text-xs text-gray-500">
-          {products.length} products found
-        </span>
-      </div>
-    );
-  };
-
   const rowClassName = () => {
-    return 'border-b border-gray-100 hover:bg-gray-50';
+    return "border-b border-gray-100 hover:bg-gray-50";
   };
 
   return (
@@ -214,7 +210,11 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
       <DataTable
         value={products}
         dataKey="id"
-        tableStyle={{ ...DataTableStyle, borderCollapse: "separate", borderSpacing: "0 4px" }}
+        tableStyle={{
+          ...DataTableStyle,
+          borderCollapse: "separate",
+          borderSpacing: "0 4px",
+        }}
         paginator
         rows={10}
         rowsPerPageOptions={[5, 10, 25, 50]}
@@ -225,7 +225,6 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
         size="small"
         globalFilter={searchString}
         emptyMessage="No products found"
-        header={tableHeader}
         rowHover
         className="p-datatable-sm"
         rowClassName={rowClassName}
@@ -279,7 +278,11 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
         <Column
           header="Actions"
           body={actionsBodyTemplate}
-          headerStyle={{ ...TableHeaderStyle, fontWeight: "600", width: "80px" }}
+          headerStyle={{
+            ...TableHeaderStyle,
+            fontWeight: "600",
+            width: "80px",
+          }}
           className="border-b border-gray-100"
         />
       </DataTable>

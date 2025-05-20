@@ -94,12 +94,15 @@ const ProductsPage = () => {
               size="sm"
               className="px-2"
             >
-              <RefreshCw className={`h-4 w-4 ${isFetchingProducts ? "animate-spin" : ""}`} />
+              <RefreshCw
+                className={`h-4 w-4 ${
+                  isFetchingProducts ? "animate-spin" : ""
+                }`}
+              />
               <span className="ml-2">Refresh</span>
             </Button>
 
-            <Button onClick={handleAddProduct}
-             size="sm">
+            <Button onClick={handleAddProduct} size="sm">
               <Plus className="h-4 w-4 mr-1" />
               <span>Add Product</span>
             </Button>
@@ -107,7 +110,7 @@ const ProductsPage = () => {
         </div>
       </div>
 
-      <div className="card h-table rounded-md shadow-sm border border-gray-100 overflow-hidden bg-white">
+      <div className=" h-table rounded-md shadow-sm border border-gray-100 overflow-hidden bg-white">
         <ProductsTable
           searchString={searchString}
           selectedStore={selectedStore}

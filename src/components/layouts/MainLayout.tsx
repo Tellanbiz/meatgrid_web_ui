@@ -1,16 +1,16 @@
-import { AppSidebar } from "@/components/app-sidebar";
 import { TopNavigation } from "@/components/TopNavigation";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { SidebarInset } from "@/components/SidebarInset";
 import { Outlet } from "react-router-dom";
 import { data } from "@/data/nav-data";
+import { SideBar } from "../navigation/Sidebar";
 
 export default function MainLayout() {
   return (
     <SidebarProvider>
       <div className="fixed inset-0 flex h-screen overflow-hidden">
         <div className="flex-shrink-0 h-full">
-          <AppSidebar />
+          <SideBar />
         </div>
         <div className="flex-1 flex flex-col min-w-0 h-full">
           <div className="flex-shrink-0">
