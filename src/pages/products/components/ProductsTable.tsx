@@ -67,7 +67,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
 
   const imageBodyTemplate = (rowData: Product) => {
     return (
-      <div className="flex items-center py-2">
+      <div className="flex items-center px-4">
         <div className="flex-shrink-0">
           <img
             src={rowData.images[0] || "https://via.placeholder.com/40"}
@@ -80,12 +80,9 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
           />
         </div>
         <div className="ml-3">
-          <div className="text-sm font-medium text-gray-900">
+          <div className="text-sm font-semibold text-gray-900">
             {rowData.name}
           </div>
-          <Badge variant="outline" className="mt-1 text-xs">
-            {rowData.category_tag}
-          </Badge>
         </div>
       </div>
     );

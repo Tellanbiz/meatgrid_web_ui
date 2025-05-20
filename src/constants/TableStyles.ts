@@ -4,12 +4,14 @@ import { TextPrimary } from "./Colors";
 export const DataTableStyle: CSSProperties = {
   minWidth: "5rem",
   fontSize: "0.875rem",
+
 };
 
 export const TableHeaderStyle: CSSProperties = {
   fontWeight: "normal",
-  fontSize: ".75rem",
+  fontSize: ".85rem",
   color: TextPrimary,
+  backgroundColor: "#ffffff"
 };
 
 export const ColumnWidthStyle: {
