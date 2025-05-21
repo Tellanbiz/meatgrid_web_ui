@@ -115,10 +115,6 @@ const ManageProductPage = () => {
     }
   };
 
-  const handleCancel = () => {
-    navigate(-1);
-  };
-
   useEffect(() => {
     dispatch(fetchTags());
     dispatch(fetchCategories());
@@ -132,7 +128,6 @@ const ManageProductPage = () => {
         tags={tags}
         categories={categories}
         onSubmit={handleSubmit}
-        onCancel={handleCancel}
         isEditMode={isEditMode}
         isLoading={formLoading}
       />

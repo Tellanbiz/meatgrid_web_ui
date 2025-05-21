@@ -51,7 +51,6 @@ interface ProductFormProps {
   tags: Tag[];
   categories: Category[];
   onSubmit: (data: ProductFormData) => void;
-  onCancel: () => void;
   isEditMode?: boolean;
   isLoading?: boolean;
 }
@@ -61,8 +60,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
   tags,
   categories,
   onSubmit,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onCancel,
   isEditMode = false,
   isLoading = false,
 }) => {
