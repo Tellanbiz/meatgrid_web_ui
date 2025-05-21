@@ -41,6 +41,7 @@ import UpdateAdminPermissionsPage from "../pages/administrators/UpdateAdminPermi
 import ScheduledDeliveriesPage from "../pages/scheduled-deliveries/ScheduledDeliveriesPage.js";
 import CorporateProductsPage from "../pages/products/CorporateProductsPage.js";
 import OrganizationsPage from "../pages/organizations/OrganizationsPage.js";
+import BatchesPage from "../pages/batches/BatchesPage";
 
 const routes: RouteObject[] = [
   {
@@ -136,6 +137,14 @@ const routes: RouteObject[] = [
         element: (
           <PrivateRoute requiredPermissions={["allow_category_submit"]}>
             <ManageCategoryPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "batches",
+        element: (
+          <PrivateRoute requiredPermissions={["allow_product_view"]}>
+            <BatchesPage />
           </PrivateRoute>
         ),
       },

@@ -90,6 +90,12 @@ export const sidebarData = {
           requiredPermissions: ["allow_stock_view"],
         },
         {
+          title: "Batches",
+          url: "/batches",
+          icon: "solar:box-minimalistic-bold-duotone",
+          requiredPermissions: ["allow_product_view"],
+        },
+        {
           title: "Suppliers",
           url: "/suppliers",
           icon: "solar:users-group-rounded-bold-duotone",
