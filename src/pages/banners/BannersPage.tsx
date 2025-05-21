@@ -63,7 +63,7 @@ const BannersPage = () => {
   };
 
   return (
-    <div className="h-full overflow-hidden">
+    <div className="h-full overflow-hidden p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Banners</h1>
         <div className="flex gap-x-2">
@@ -74,7 +74,9 @@ const BannersPage = () => {
             onClick={handleRefresh}
             disabled={isFetching}
           >
-            <RefreshCcw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
+            <RefreshCcw
+              className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
+            />
             <span className="ml-2">Refresh</span>
           </Button>
           <Button size="sm" onClick={handleAddNew}>

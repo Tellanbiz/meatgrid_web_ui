@@ -176,7 +176,7 @@ export default function UpdateAdminPermissionsPage() {
     adminAccounts.find((a) => a.id === userId)?.full_name || "Administrator";
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto p-6">
       <div className="flex items-center justify-between mb-8">
         <div>
           <BackButton className="mb-2" />
@@ -189,10 +189,7 @@ export default function UpdateAdminPermissionsPage() {
             </p>
           </div>
         </div>
-        <Button
-          onClick={handleSubmit}
-          disabled={isUpdating}
-        >
+        <Button onClick={handleSubmit} disabled={isUpdating}>
           {isUpdating ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -239,7 +236,8 @@ export default function UpdateAdminPermissionsPage() {
                     {group.label}
                   </h2>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Manage {group.label.toLowerCase()} permissions and access controls
+                    Manage {group.label.toLowerCase()} permissions and access
+                    controls
                   </p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -255,7 +253,9 @@ export default function UpdateAdminPermissionsPage() {
                       )}
                     >
                       <Checkbox
-                        checked={permissions[perm.key as keyof AdminPermissions]}
+                        checked={
+                          permissions[perm.key as keyof AdminPermissions]
+                        }
                         onCheckedChange={() =>
                           handleCheck(perm.key as keyof AdminPermissions)
                         }

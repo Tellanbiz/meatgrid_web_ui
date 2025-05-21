@@ -11,7 +11,7 @@ import LatestOnlineOrders from "./components/LatestOnlineOrders";
 
 const Dashboard = () => {
   return (
-    <div className="w-full flex flex-col gap-y-4">
+    <div className="w-full flex flex-col gap-y-4 p-6">
       {/* Statistics Grid */}
       <StatisticsGrid />
 

@@ -87,7 +87,7 @@ const ManageWareHousePage = () => {
   };
 
   return (
-    <div className="h-full">
+    <div className="h-full p-6">
       <WarehouseForm
         initialValues={initialValues}
         onSubmit={handleSubmit}

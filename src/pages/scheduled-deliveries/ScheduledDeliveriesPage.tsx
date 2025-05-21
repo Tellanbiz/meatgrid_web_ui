@@ -57,7 +57,7 @@ const ScheduledDeliveriesPage = () => {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full p-6">
       <div className="bg-white rounded-lg">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="border-b">

@@ -41,7 +41,7 @@ const OrganizationsPage = () => {
   // Name template with verification badge
   const nameBodyTemplate = (rowData: UserAccount) => {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 p-6">
         <span>{rowData.full_name}</span>
         {rowData.verified_org ? (
           <Badge
@@ -92,7 +92,7 @@ const OrganizationsPage = () => {
   };
 
   return (
-    <div className="h-full">
+    <div className="h-full p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Organizations</h1>
         <div className="flex items-center gap-2">

@@ -92,7 +92,7 @@ const ManageStorageTypesPage = () => {
   };
 
   return (
-    <div className="h-full">
+    <div className="h-full p-6">
       <Breadcrumbs
         items={[
           { label: "Storage Types", to: "/storage-types" },

@@ -46,7 +46,7 @@ const StaffsPage = () => {
   };
 
   return (
-    <div className="h-full">
+    <div className="h-full p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Staff</h1>
         <div className="flex gap-x-2">
@@ -57,7 +57,9 @@ const StaffsPage = () => {
             onClick={handleRefresh}
             disabled={isFetchingStaffs}
           >
-            <RefreshCcw className={`h-4 w-4 ${isFetchingStaffs ? "animate-spin" : ""}`} />
+            <RefreshCcw
+              className={`h-4 w-4 ${isFetchingStaffs ? "animate-spin" : ""}`}
+            />
             <span className="ml-2">Refresh</span>
           </Button>
         </div>

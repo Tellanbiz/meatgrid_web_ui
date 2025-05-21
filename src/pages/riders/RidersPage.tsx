@@ -31,7 +31,7 @@ const RidersPage = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full p-6">
       <div className="flex justify-between items-center flex-none">
         <h1 className="text-2xl font-semibold">Riders</h1>
         <div className="flex gap-x-2">
@@ -41,7 +41,9 @@ const RidersPage = () => {
             onClick={() => dispatch(fetchRiders())}
             disabled={isFetchingRiders}
           >
-            <RefreshCcw className={`h-4 w-4 ${isFetchingRiders ? "animate-spin" : ""}`} />
+            <RefreshCcw
+              className={`h-4 w-4 ${isFetchingRiders ? "animate-spin" : ""}`}
+            />
             <span className="ml-2">Refresh</span>
           </Button>
           <Button size="sm" onClick={() => navigate("/riders/add")}>

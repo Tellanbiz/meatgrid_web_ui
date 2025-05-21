@@ -57,7 +57,7 @@ const StorageTypesPage = () => {
   };
 
   return (
-    <div className="h-full">
+    <div className="h-full p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Storage Types</h1>
         <div className="flex gap-x-2">
@@ -68,7 +68,9 @@ const StorageTypesPage = () => {
             onClick={handleRefresh}
             disabled={isLoading}
           >
-            <RefreshCcw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+            <RefreshCcw
+              className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
+            />
             <span className="ml-2">Refresh</span>
           </Button>
           <Button size="sm" onClick={handleAddStorageType}>

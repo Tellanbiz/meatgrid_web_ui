@@ -19,7 +19,10 @@ import { TableHeaderStyle, DataTableStyle } from "../../constants/TableStyles";
 import { Input } from "../../components/ui/input";
 import { toast } from "sonner";
 import { clearProductMessages } from "../../store/features/products/productSlice";
-import { UpdateCorporateProductDialog, AddCorporateProductDialog } from "./components";
+import {
+  UpdateCorporateProductDialog,
+  AddCorporateProductDialog,
+} from "./components";
 import { formatCurrency, formatWeight } from "../../utils/formatters";
 
 const CorporateProductsPage = () => {
@@ -41,7 +44,7 @@ const CorporateProductsPage = () => {
       dispatch(fetchCorporateProducts({ user_id: organizationId }));
     }
   }, [dispatch, organizationId]);
-  
+
   // Fetch all products for the add product dialog
   useEffect(() => {
     if (addDialogOpen && allProducts.length === 0) {
@@ -63,17 +66,17 @@ const CorporateProductsPage = () => {
       dispatch(fetchCorporateProducts({ user_id: organizationId }));
     }
   };
-  
+
   const refreshProducts = () => {
     if (organizationId) {
       dispatch(fetchCorporateProducts({ user_id: organizationId }));
     }
   };
-  
+
   const handleAddProduct = () => {
     setAddDialogOpen(true);
   };
-  
+
   const handleCloseAddDialog = () => {
     setAddDialogOpen(false);
   };
@@ -161,7 +164,7 @@ const CorporateProductsPage = () => {
   const filteredProducts = getFilteredProducts();
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col p-6">
       <div className="flex flex-col gap-4 bg-background border-b border-gray-100 pb-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
@@ -190,12 +193,8 @@ const CorporateProductsPage = () => {
               />
               <span className="ml-2">Refresh</span>
             </Button>
-            
-            <Button
-              onClick={handleAddProduct}
-              size="sm"
-              className="px-2"
-            >
+
+            <Button onClick={handleAddProduct} size="sm" className="px-2">
               <PlusCircle className="h-4 w-4 mr-2" />
               Add Product
             </Button>
@@ -268,7 +267,7 @@ const CorporateProductsPage = () => {
         organizationId={organizationId || ""}
         onSuccess={refreshProducts}
       />
-      
+
       {/* Add Product Dialog */}
       <AddCorporateProductDialog
         open={addDialogOpen}

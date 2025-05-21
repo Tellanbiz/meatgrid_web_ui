@@ -74,7 +74,7 @@ const TagsPage = () => {
   };
 
   return (
-    <>
+    <div className="p-6">
       <div className="flex justify-between items-center py-2 sticky top-0 z-10">
         <h1 className="text-2xl font-semibold">Tags</h1>
 
@@ -86,7 +86,9 @@ const TagsPage = () => {
             onClick={handleRefresh}
             disabled={isFetchingTags}
           >
-            <RefreshCcw className={`h-4 w-4 ${isFetchingTags ? "animate-spin" : ""}`} />
+            <RefreshCcw
+              className={`h-4 w-4 ${isFetchingTags ? "animate-spin" : ""}`}
+            />
             <span className="ml-2">Refresh</span>
           </Button>
 
@@ -110,7 +112,7 @@ const TagsPage = () => {
           onSubmit={handleSubmitTag}
         />
       )}
-    </>
+    </div>
   );
 };
 

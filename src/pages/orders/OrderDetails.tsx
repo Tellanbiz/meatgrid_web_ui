@@ -25,7 +25,7 @@ const OrderDetails = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between py bg-background z-20">
+      <div className="flex items-center justify-between py bg-background z-20 p-6">
         <BackButton />
         <div className="flex flex-col space-y-1">
           <div className="flex items-center space-x-2">

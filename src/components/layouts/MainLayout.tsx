@@ -17,7 +17,7 @@ export default function MainLayout() {
             <TopNavigation items={data.navMain} />
           </div>
           <SidebarInset className="flex-1 w-full overflow-auto">
-            <div className="flex flex-1 flex-col w-full p-6 space-y-6">
+            <div className="flex flex-1 flex-col w-full  space-y-6">
               <Outlet />
             </div>
           </SidebarInset>

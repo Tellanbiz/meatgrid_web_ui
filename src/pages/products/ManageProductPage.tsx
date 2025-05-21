@@ -16,7 +16,6 @@ import { fetchCategories } from "../../store/features/categories/categoryThunks"
 import { CreateProductRequest } from "../../store/features/products/requests/CreateProductRequest";
 import { UpdateProductRequest } from "../../store/features/products/requests/UpdateProductRequest";
 import { uploadImages } from "../../store/features/uploads/uploadThunks";
-import BackButton from "../../components/BackButton";
 
 const ManageProductPage = () => {
   const navigate = useNavigate();
@@ -127,21 +126,16 @@ const ManageProductPage = () => {
   }, [dispatch]);
 
   return (
-    <div className="h-full">
-      <div className="mb-4">
-        <BackButton />
-      </div>
-      <div>
-        <ProductForm
-          initialValues={initialValues}
-          tags={tags}
-          categories={categories}
-          onSubmit={handleSubmit}
-          onCancel={handleCancel}
-          isEditMode={isEditMode}
-          isLoading={formLoading}
-        />
-      </div>
+    <div className="h-full w-fit">
+      <ProductForm
+        initialValues={initialValues}
+        tags={tags}
+        categories={categories}
+        onSubmit={handleSubmit}
+        onCancel={handleCancel}
+        isEditMode={isEditMode}
+        isLoading={formLoading}
+      />
     </div>
   );
 };

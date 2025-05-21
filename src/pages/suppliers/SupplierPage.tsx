@@ -39,7 +39,7 @@ const SupplierPage = () => {
   };
 
   return (
-    <div className="h-full">
+    <div className="h-full p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Suppliers</h1>
         <div className="flex gap-x-2">
@@ -50,7 +50,9 @@ const SupplierPage = () => {
             onClick={handleRefresh}
             disabled={isFetchingSuppliers}
           >
-            <RefreshCcw className={`h-4 w-4 ${isFetchingSuppliers ? "animate-spin" : ""}`} />
+            <RefreshCcw
+              className={`h-4 w-4 ${isFetchingSuppliers ? "animate-spin" : ""}`}
+            />
             <span className="ml-2">Refresh</span>
           </Button>
           <Button size="sm" onClick={() => handleOpenDialog(false, null)}>

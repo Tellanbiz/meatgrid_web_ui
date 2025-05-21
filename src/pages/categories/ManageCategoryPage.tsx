@@ -72,7 +72,7 @@ const ManageCategoryPage = () => {
   };
 
   return (
-    <div className="h-full">
+    <div className="h-full p-6">
       <CategoryForm
         initialValues={initialValues}
         onSubmit={handleSubmit}

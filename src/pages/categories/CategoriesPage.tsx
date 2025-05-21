@@ -35,7 +35,7 @@ const CategoriesPage = () => {
     categories.find((category) => category.id === parentId);
 
   return (
-    <div className="h-full overflow-hidden">
+    <div className="h-full overflow-hidden p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Categories</h1>
         <div className="flex gap-x-2">

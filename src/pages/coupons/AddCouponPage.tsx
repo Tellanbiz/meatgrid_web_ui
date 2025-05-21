@@ -44,7 +44,7 @@ const AddCouponPage = () => {
   };
 
   return (
-    <div>
+    <div className="p-6">
       <div className="flex items-center py-2 mb-4">
         <BackButton />
         <h1 className="text-xl font-semibold ml-4">Create New Coupon</h1>

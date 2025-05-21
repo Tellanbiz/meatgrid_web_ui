@@ -114,7 +114,7 @@ const ManageBannerPage = () => {
   }, [errorMessage, dispatch]);
 
   return (
-    <div className="h-full">
+    <div className="h-full p-6">
       <div className="mt-4">
         <BannerForm
           initialValues={initialValues}

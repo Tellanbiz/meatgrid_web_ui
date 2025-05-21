@@ -28,7 +28,7 @@ const StocksPage = () => {
   };
 
   return (
-    <div className="h-full">
+    <div className="h-full p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Stock</h1>
         <div className="flex gap-x-2">
@@ -38,33 +38,23 @@ const StocksPage = () => {
             onClick={handleRefresh}
             disabled={isFetchingStocks}
           >
-            <RefreshCcw className={`h-4 w-4 ${isFetchingStocks ? "animate-spin" : ""}`} />
+            <RefreshCcw
+              className={`h-4 w-4 ${isFetchingStocks ? "animate-spin" : ""}`}
+            />
             <span className="ml-2">Refresh</span>
           </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleTransferStock}
-          >
+          <Button variant="outline" size="sm" onClick={handleTransferStock}>
             <Forward className="h-4 w-4" />
             <span className="ml-2">Transfer Stock</span>
           </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleProcessProducts}
-          >
+          <Button variant="outline" size="sm" onClick={handleProcessProducts}>
             <WandSparkles className="h-4 w-4" />
             <span className="ml-2">Process Products</span>
           </Button>
 
-          <Button
-            variant="default"
-            size="sm"
-            onClick={handleRestock}
-          >
+          <Button variant="default" size="sm" onClick={handleRestock}>
             <RedoDot className="h-4 w-4" />
             <span className="ml-2">Restock</span>
           </Button>

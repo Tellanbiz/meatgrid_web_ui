@@ -63,7 +63,7 @@ const WareHousePage = () => {
   };
 
   return (
-    <div className="h-full">
+    <div className="h-full p-6">
       <div className="flex justify-end gap-x-2 mb-4">
         <Button
           variant="outline"

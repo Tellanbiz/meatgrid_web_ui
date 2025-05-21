@@ -2,10 +2,8 @@ import OrdersTable from "./components/OrdersTable";
 
 const OrdersPage = () => {
   return (
-    <div>
-      <div className="h-table">
-        <OrdersTable />
-      </div>
+    <div className="h-table p-6">
+      <OrdersTable />
     </div>
   );
 };

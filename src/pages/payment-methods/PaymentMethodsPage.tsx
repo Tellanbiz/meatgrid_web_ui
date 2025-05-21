@@ -151,7 +151,7 @@ const PaymentMethodsPage = () => {
   };
 
   return (
-    <div className="h-full">
+    <div className="h-full p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Payment Methods</h1>
         <div className="flex gap-x-2">

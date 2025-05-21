@@ -9,7 +9,7 @@ const AddRecipe = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between p-6">
         <button
           onClick={handleBack}
           className="flex items-center text-medium text-primary hover:underline"
