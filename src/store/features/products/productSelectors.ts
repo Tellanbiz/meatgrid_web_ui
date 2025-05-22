@@ -60,6 +60,10 @@ export const selectIsUpdatingCorporateProduct = (state: RootState) =>
   state.products.status === "loading" &&
   state.products.currentOperation === "update_corporate";
 
+export const selectIsUpdatingStoreProduct = (state: RootState) =>
+  state.products.status === "loading" &&
+  state.products.currentOperation === "update_store";
+
 export const selectIsDeletingProduct = (state: RootState) =>
   state.products.status === "loading" &&
   state.products.currentOperation === "delete";

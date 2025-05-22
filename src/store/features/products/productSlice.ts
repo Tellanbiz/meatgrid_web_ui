@@ -7,7 +7,7 @@ import {
   fetchCorporateProducts,
   updateCorporateProduct,
 } from "./corporateProductThunks";
-import { fetchStoreProducts } from "./storeProductThunks";
+import { fetchStoreProducts, updateStoreProduct } from "./storeProductThunks";
 
 interface ProductState {
   products: Product[];
@@ -20,6 +20,7 @@ interface ProductState {
     | "create"
     | "update"
     | "update_corporate"
+    | "update_store"
     | "delete"
     | null;
   status: "idle" | "loading" | "succeeded" | "failed";
@@ -165,6 +166,20 @@ const productSlice = createSlice({
       .addCase(updateCorporateProduct.rejected, (state, action) => {
         state.status = "failed";
         state.error = typeof action.payload === 'string' ? action.payload : "Failed to update corporate product";
+      })
+      // Update store product
+      .addCase(updateStoreProduct.pending, (state) => {
+        state.status = "loading";
+        state.currentOperation = "update_store";
+        state.error = null;
+      })
+      .addCase(updateStoreProduct.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.successMessage = action.payload;
+      })
+      .addCase(updateStoreProduct.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Failed to update store product";
       });
   },
 });
