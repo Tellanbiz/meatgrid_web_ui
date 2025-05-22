@@ -44,6 +44,7 @@ import { ProgressBar } from "primereact/progressbar";
 import { fetchStores } from "../../../store/features/stores/storeThunks";
 import { fetchPaymentMethods } from "../../../store/features/payment-methods/paymentMethodThunks";
 import { DateRangePicker } from "../../../components/ui/date-range-picker";
+import { Input } from "../../../components/ui/input";
 
 const OrdersTable = () => {
   const dispatch = useAppDispatch();
@@ -358,17 +359,17 @@ const OrdersTable = () => {
   };
 
   return (
-    <div className="h-table">
+    <div className="h-table space-y-4">
       {/* Filters Section */}
-      <div className="flex flex-wrap items-center justify-between mb-3 w-full">
+      <div className="flex flex-wrap items-center justify-between w-full">
         <div className="flex flex-wrap gap-3 items-center">
           {/* Order ID Search */}
           <div className="relative">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
-            <input
+            <Input
               type="text"
               placeholder="Search order ID..."
-              className="h-9 pl-9 pr-4 py-2 border rounded-md text-sm w-64"
+              className="pl-9 h-10 pr-4 py-2 border rounded-md text-sm w-64"
               value={orderSearchTerm}
               onChange={(e) => setOrderSearchTerm(e.target.value)}
             />
