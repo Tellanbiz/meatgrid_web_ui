@@ -21,7 +21,7 @@ const BatchesPage = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-6">
       <div className="flex flex-col bg-background border-b border-gray-100">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">

@@ -64,23 +64,26 @@ const WareHousePage = () => {
 
   return (
     <div className="h-full p-6">
-      <div className="flex justify-end gap-x-2 mb-4">
-        <Button
-          variant="outline"
-          size="sm"
-          className="px-2"
-          onClick={handleRefresh}
-          disabled={isFetchingStores}
-        >
-          <RefreshCcw
-            className={`h-4 w-4 ${isFetchingStores ? "animate-spin" : ""}`}
-          />
-          <span className="ml-2">Refresh</span>
-        </Button>
-        <Button size="sm" onClick={() => navigate("/warehouses/new")}>
-          <Plus className="h-4 w-4" />
-          Add Store
-        </Button>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">WareHouses</h1>
+        <div className="flex gap-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="px-2"
+            onClick={handleRefresh}
+            disabled={isFetchingStores}
+          >
+            <RefreshCcw
+              className={`h-4 w-4 ${isFetchingStores ? "animate-spin" : ""}`}
+            />
+            <span className="ml-2">Refresh</span>
+          </Button>
+          <Button size="sm" onClick={() => navigate("/warehouses/new")}>
+            <Plus className="h-4 w-4" />
+            Add Store
+          </Button>
+        </div>
       </div>
 
       <div className="h-table">
