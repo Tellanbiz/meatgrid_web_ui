@@ -110,7 +110,7 @@ const StocksTable = () => {
   return (
     <div className="h-full">
       {isFetchingStocks && (
-        <ProgressBar mode="indeterminate" style={{ height: "6px" }} />
+        <ProgressBar mode="indeterminate" style={{ height: "4px" }} />
       )}
 
       <DataTable

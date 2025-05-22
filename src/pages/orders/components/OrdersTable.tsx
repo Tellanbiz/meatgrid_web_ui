@@ -359,9 +359,9 @@ const OrdersTable = () => {
   };
 
   return (
-    <div className="h-table space-y-4">
+    <div className="h-table">
       {/* Filters Section */}
-      <div className="flex flex-wrap items-center justify-between w-full">
+      <div className="flex flex-wrap items-center justify-between w-full mb-4">
         <div className="flex flex-wrap gap-3 items-center">
           {/* Order ID Search */}
           <div className="relative">
@@ -587,22 +587,14 @@ const OrdersTable = () => {
       </div>
 
       {isFetchingOrders && (
-        <ProgressBar
-          mode="indeterminate"
-          style={{ height: "4px" }}
-          className="mb-2"
-        />
+        <ProgressBar mode="indeterminate" style={{ height: "4px" }} />
       )}
 
       {/* DataTable for orders */}
       <DataTable
         value={filteredOrders}
         dataKey="id"
-        tableStyle={{
-          ...DataTableStyle,
-          borderCollapse: "separate",
-          borderSpacing: "0 4px",
-        }}
+        tableStyle={DataTableStyle}
         size="normal"
         selectionMode="checkbox"
         selection={selectedOrders}

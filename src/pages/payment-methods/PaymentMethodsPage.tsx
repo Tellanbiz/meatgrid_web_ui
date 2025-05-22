@@ -178,53 +178,50 @@ const PaymentMethodsPage = () => {
 
       <div className="h-table">
         {isLoadingPaymentMethods && (
-          <ProgressBar mode="indeterminate" style={{ height: "6px" }} />
+          <ProgressBar mode="indeterminate" style={{ height: "4px" }} />
         )}
 
-        {!isLoadingPaymentMethods && (
-          <DataTable
-            value={paymentMethods}
-            loading={isLoadingPaymentMethods}
-            dataKey="id"
-            paginator
-            rows={25}
-            rowsPerPageOptions={[10, 25, 50]}
-            emptyMessage="No payment methods found."
-            loadingIcon="pi pi-spin pi-spinner"
-            scrollable
-            scrollHeight="flex"
-            size="small"
-            tableStyle={DataTableStyle}
-            className="bg-white"
-          >
-            <Column field="name" header="Name" headerStyle={TableHeaderStyle} />
-            <Column field="tag" header="Tag" headerStyle={TableHeaderStyle} />
-            <Column
-              field="active"
-              header="Active"
-              headerStyle={TableHeaderStyle}
-            />
-            <Column
-              header="Created At"
-              body={(rowData) => {
-                return new Date(rowData.created_at).toLocaleString("en-US", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: true,
-                });
-              }}
-              headerStyle={TableHeaderStyle}
-            />
-            <Column
-              header="Actions"
-              headerStyle={TableHeaderStyle}
-              body={actionsBodyTemplate}
-            />
-          </DataTable>
-        )}
+        <DataTable
+          value={paymentMethods}
+          dataKey="id"
+          paginator
+          rows={25}
+          rowsPerPageOptions={[10, 25, 50]}
+          emptyMessage="No payment methods found."
+          loadingIcon="pi pi-spin pi-spinner"
+          scrollable
+          scrollHeight="flex"
+          size="small"
+          tableStyle={DataTableStyle}
+          className="bg-white"
+        >
+          <Column field="name" header="Name" headerStyle={TableHeaderStyle} />
+          <Column field="tag" header="Tag" headerStyle={TableHeaderStyle} />
+          <Column
+            field="active"
+            header="Active"
+            headerStyle={TableHeaderStyle}
+          />
+          <Column
+            header="Created At"
+            body={(rowData) => {
+              return new Date(rowData.created_at).toLocaleString("en-US", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              });
+            }}
+            headerStyle={TableHeaderStyle}
+          />
+          <Column
+            header="Actions"
+            headerStyle={TableHeaderStyle}
+            body={actionsBodyTemplate}
+          />
+        </DataTable>
       </div>
 
       {/* Dialog for Create/Edit */}

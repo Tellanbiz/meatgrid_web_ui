@@ -65,7 +65,7 @@ const StaffsPage = () => {
         </div>
       </div>
 
-      <div className="mt-2 card h-table">
+      <div className="mt-2">
         <StaffsTable onUpdatePermissions={(staff) => handleOpenDialog(staff)} />
       </div>
 

@@ -90,52 +90,52 @@ const StaffsTable = ({ onUpdatePermissions }: StaffsTableProps) => {
     <>
       <div className="h-full">
         {isFetchingStaffs && (
-          <ProgressBar
-            mode="indeterminate"
-            style={{ height: "6px" }}
-          ></ProgressBar>
+          <ProgressBar mode="indeterminate" style={{ height: "4px" }} />
         )}
-        <DataTable
-          value={staffWithUniqueIds}
-          dataKey="tempId"
-          tableStyle={DataTableStyle}
-          paginator
-          rows={10}
-          rowsPerPageOptions={[5, 10, 25]}
-          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} staff"
-          scrollable
-          scrollHeight="flex"
-          size="small"
-        >
-          <Column
-            header="Full Name"
-            body={(staff: Staff) => staff.profile.full_name}
-            headerStyle={TableHeaderStyle}
-          ></Column>
-          <Column
-            header="Store Name"
-            body={(staff: Staff) => staff.store?.name ?? "N/A"}
-            headerStyle={TableHeaderStyle}
-          ></Column>
-          <Column
-            field="can_claim"
-            header="Can Claim"
-            headerStyle={TableHeaderStyle}
-            body={(rowData) => booleanTemplate(rowData, "can_claim")}
-          ></Column>
-          <Column
-            field="can_dispatch"
-            header="Can Dispatch"
-            headerStyle={TableHeaderStyle}
-            body={(rowData) => booleanTemplate(rowData, "can_dispatch")}
-          ></Column>
-          <Column
-            header="Actions"
-            body={actionsBodyTemplate}
-            headerStyle={TableHeaderStyle}
-          ></Column>
-        </DataTable>
+        <div className="card h-table">
+          <DataTable
+            value={staffWithUniqueIds}
+            dataKey="tempId"
+            tableStyle={DataTableStyle}
+            paginator
+            rows={10}
+            rowsPerPageOptions={[5, 10, 25]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} staff"
+            scrollable
+            scrollHeight="flex"
+            className="rounded-md"
+            size="small"
+          >
+            <Column
+              header="Full Name"
+              body={(staff: Staff) => staff.profile.full_name}
+              headerStyle={TableHeaderStyle}
+            ></Column>
+            <Column
+              header="Store Name"
+              body={(staff: Staff) => staff.store?.name ?? "N/A"}
+              headerStyle={TableHeaderStyle}
+            ></Column>
+            <Column
+              field="can_claim"
+              header="Can Claim"
+              headerStyle={TableHeaderStyle}
+              body={(rowData) => booleanTemplate(rowData, "can_claim")}
+            ></Column>
+            <Column
+              field="can_dispatch"
+              header="Can Dispatch"
+              headerStyle={TableHeaderStyle}
+              body={(rowData) => booleanTemplate(rowData, "can_dispatch")}
+            ></Column>
+            <Column
+              header="Actions"
+              body={actionsBodyTemplate}
+              headerStyle={TableHeaderStyle}
+            ></Column>
+          </DataTable>
+        </div>
       </div>
     </>
   );

@@ -177,7 +177,7 @@ const AccountsPage = () => {
   };
 
   return (
-    <div className="h-full p-6 ">
+    <div className="h-full p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Accounts</h1>
         <div className="flex items-center gap-2">
@@ -216,56 +216,55 @@ const AccountsPage = () => {
         </div>
       </div>
 
-      <div className="card h-table">
-        {isFetchingAccounts && (
-          <ProgressBar mode="indeterminate" style={{ height: "6px" }} />
-        )}
+      {isFetchingAccounts && (
+        <ProgressBar mode="indeterminate" style={{ height: "4px" }} />
+      )}
 
-        {!isFetchingAccounts && (
-          <DataTable
-            value={accounts}
-            dataKey="id"
-            paginator
-            rows={10}
-            rowsPerPageOptions={[10, 20, 50]}
-            emptyMessage="No accounts found."
-            scrollable
-            scrollHeight="flex"
-            size="small"
-            style={DataTableStyle}
-          >
-            <Column
-              field="full_name"
-              header="Full Name"
-              body={nameBodyTemplate}
-              style={TableHeaderStyle}
-            />
-            <Column
-              field="phone_number"
-              header="Phone Number"
-              style={TableHeaderStyle}
-            />
-            <Column field="email" header="Email" style={TableHeaderStyle} />
-            <Column field="role" header="Role" style={TableHeaderStyle} />
-            <Column
-              field="created_at"
-              header="Joined On"
-              body={(rowData) => formatDate(rowData.created_at)}
-              style={TableHeaderStyle}
-            />
-            <Column
-              field="status"
-              header="Status"
-              body={statusBodyTemplate}
-              style={TableHeaderStyle}
-            />
-            <Column
-              header="Actions"
-              body={actionsBodyTemplate}
-              style={TableHeaderStyle}
-            />
-          </DataTable>
-        )}
+      <div className="h-table">
+        <DataTable
+          value={accounts}
+          dataKey="id"
+          paginator
+          rows={10}
+          rowsPerPageOptions={[10, 20, 50]}
+          emptyMessage="No accounts found."
+          scrollable
+          scrollHeight="flex"
+          size="small"
+          style={DataTableStyle}
+          className="bg-white p-2 rounded-md"
+        >
+          <Column
+            field="full_name"
+            header="Full Name"
+            body={nameBodyTemplate}
+            style={TableHeaderStyle}
+          />
+          <Column
+            field="phone_number"
+            header="Phone Number"
+            style={TableHeaderStyle}
+          />
+          <Column field="email" header="Email" style={TableHeaderStyle} />
+          <Column field="role" header="Role" style={TableHeaderStyle} />
+          <Column
+            field="created_at"
+            header="Joined On"
+            body={(rowData) => formatDate(rowData.created_at)}
+            style={TableHeaderStyle}
+          />
+          <Column
+            field="status"
+            header="Status"
+            body={statusBodyTemplate}
+            style={TableHeaderStyle}
+          />
+          <Column
+            header="Actions"
+            body={actionsBodyTemplate}
+            style={TableHeaderStyle}
+          />
+        </DataTable>
       </div>
 
       <UpdateUserRoleDialog

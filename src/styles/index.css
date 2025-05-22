@@ -195,7 +195,7 @@
     @apply hover:bg-[#F10027]/10 text-[#F10027];
   }
   .h-table {
-    @apply h-[calc(100vh-10rem)];
+    @apply h-[calc(100vh-9.5rem)];
   }
 }
 

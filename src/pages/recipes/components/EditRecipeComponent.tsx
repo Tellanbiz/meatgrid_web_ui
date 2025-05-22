@@ -86,7 +86,7 @@ const EditRecipeComponent = () => {
   const handleRemoveImage = () => {
     // Reset the upload state to clear any newly uploaded images
     dispatch(resetUploadState());
-    
+
     // Set the flag to indicate image removal
     setIsImageRemoved(true);
   };
@@ -148,19 +148,20 @@ const EditRecipeComponent = () => {
 
   if (recipeStatus == "loading" && !recipe) {
     return (
-      <div className="w-full h-full flex items-center justify-center">
+      <div className="w-full h-screen flex items-center justify-center">
         <ProgressIndicator />
       </div>
     );
   }
+
   return (
-    <div className="bg-white rounded-xl w-full h-screen flex flex-col">
+    <div className="bg-white rounded-xl w-full h-screen flex flex-col p-6">
       <div className="rounded-xl w-full mx-auto space-y-6">
         <div className="grid grid-cols-2 gap-x-10">
           <div className="space-y-6">
             <div className="flex items-center gap-4 flex-wrap">
               {uploadStatus === "loading" ? (
-                <div className="w-full h-32 flex items-center justify-center border rounded">
+                <div className="w-full h-full flex items-center justify-center border rounded">
                   <ProgressIndicator />
                 </div>
               ) : images.length > 0 ? (

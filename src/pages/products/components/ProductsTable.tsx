@@ -201,7 +201,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
           mode="indeterminate"
           style={{ height: "4px" }}
           className="mb-2"
-        ></ProgressBar>
+        />
       )}
 
       <DataTable

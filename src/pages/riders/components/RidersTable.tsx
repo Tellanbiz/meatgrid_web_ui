@@ -135,47 +135,48 @@ const RidersTable = ({ onVerify }: RidersTableProps) => {
   };
 
   return (
-    <div className="h-full">
+    <div>
       {isFetchingRiders && (
-        <ProgressBar
-          mode="indeterminate"
-          style={{ height: "6px" }}
-        ></ProgressBar>
+        <ProgressBar mode="indeterminate" style={{ height: "4px" }} />
       )}
-      <DataTable
-        value={riders}
-        dataKey="id"
-        tableStyle={DataTableStyle}
-        paginator
-        rows={10}
-        rowsPerPageOptions={[5, 10, 25]}
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} riders"
-        scrollable
-        scrollHeight="flex"
-        size="small"
-      >
-        <Column
-          header="Rider"
-          body={profileTemplate}
-          headerStyle={TableHeaderStyle}
-        />
-        <Column
-          header="Verification Status"
-          body={verificationTemplate}
-          headerStyle={TableHeaderStyle}
-        />
-        <Column
-          header="Verified On"
-          body={verificationDateTemplate}
-          headerStyle={TableHeaderStyle}
-        />
-        <Column
-          header="Actions"
-          body={actionsBodyTemplate}
-          headerStyle={TableHeaderStyle}
-        />
-      </DataTable>
+
+      <div className="card h-table">
+        <DataTable
+          value={riders}
+          dataKey="id"
+          tableStyle={DataTableStyle}
+          paginator
+          rows={10}
+          rowsPerPageOptions={[5, 10, 25]}
+          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} riders"
+          scrollable
+          scrollHeight="flex"
+          size="small"
+          className="bg-white"
+        >
+          <Column
+            header="Rider"
+            body={profileTemplate}
+            headerStyle={TableHeaderStyle}
+          />
+          <Column
+            header="Verification Status"
+            body={verificationTemplate}
+            headerStyle={TableHeaderStyle}
+          />
+          <Column
+            header="Verified On"
+            body={verificationDateTemplate}
+            headerStyle={TableHeaderStyle}
+          />
+          <Column
+            header="Actions"
+            body={actionsBodyTemplate}
+            headerStyle={TableHeaderStyle}
+          />
+        </DataTable>
+      </div>
     </div>
   );
 };

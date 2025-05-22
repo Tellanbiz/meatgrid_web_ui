@@ -63,12 +63,12 @@ const CategoriesPage = () => {
       <div className="h-full overflow-hidden">
         {/* Loading state */}
         {status === "loading" && (
-          <ProgressBar mode="indeterminate" style={{ height: "6px" }} />
+          <ProgressBar mode="indeterminate" style={{ height: "4px" }} />
         )}
 
         {/* Content */}
         {!error && (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-2">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {categories.map((category) => (
               <CategoryCard
                 key={category.id}

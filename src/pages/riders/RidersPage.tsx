@@ -1,4 +1,4 @@
-import { RefreshCcw, Plus } from "lucide-react";
+import { RefreshCcw } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { useState, useEffect } from "react";
@@ -8,14 +8,12 @@ import { selectIsFetchingRiders } from "../../store/features/riders/riderSelecto
 import RidersTable from "./components/RidersTable";
 import VerifyRiderDialog from "./components/VerifyRiderDialog";
 import { useModal } from "../../hooks/use-modal";
-import { useNavigate } from "react-router-dom";
 
 const RidersPage = () => {
   const dispatch = useAppDispatch();
   const isFetchingRiders = useAppSelector(selectIsFetchingRiders);
   const [isVerifyDialogOpen, setIsVerifyDialogOpen] = useModal();
   const [selectedRider, setSelectedRider] = useState<Rider | null>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(fetchRiders());
@@ -46,14 +44,10 @@ const RidersPage = () => {
             />
             <span className="ml-2">Refresh</span>
           </Button>
-          <Button size="sm" onClick={() => navigate("/riders/add")}>
-            <Plus className="h-4 w-4" />
-            <span className="ml-2">Add Rider</span>
-          </Button>
         </div>
       </div>
 
-      <div className="flex-1 mt-4 min-h-0 card">
+      <div className="flex-1 mt-4">
         <RidersTable onVerify={handleVerifyDialogOpen} />
       </div>
 

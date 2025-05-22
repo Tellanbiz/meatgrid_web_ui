@@ -8,7 +8,6 @@ import {
 import { useAppDispatch, useAppSelector } from "../../../store/hooks.ts";
 import { fetchCoupons } from "../../../store/features/coupons/couponThunks.ts";
 import { Coupon } from "../../../store/features/coupons/couponTypes.ts";
-import LoadingPage from "../../../components/LoadingPage.tsx";
 import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
@@ -18,6 +17,7 @@ import {
 } from "../../../components/ui/dropdown-menu.tsx";
 import { Button } from "../../../components/ui/button.tsx";
 import { MoreVertical, Pencil } from "lucide-react";
+import { ProgressBar } from "primereact/progressbar";
 
 const CouponsTable = () => {
   const navigate = useNavigate();
@@ -145,16 +145,16 @@ const CouponsTable = () => {
     );
   };
 
-  if (status === "loading") {
-    return <LoadingPage />;
-  }
-
   if (status === "failed") {
     return <div className="p-4 text-red-500">Error: {error}</div>;
   }
 
   return (
     <div className="h-full">
+      {status === "loading" && (
+        <ProgressBar mode="indeterminate" style={{ height: "4px" }} />
+      )}
+
       <DataTable
         value={coupons}
         dataKey="id"
@@ -167,7 +167,7 @@ const CouponsTable = () => {
         rowsPerPageOptions={[10, 20, 50]}
         scrollable
         scrollHeight="flex"
-        className="bg-white"
+        className="bg-white p-2 rounded-md"
       >
         <Column field="name" header="Name" headerStyle={TableHeaderStyle} />
         <Column

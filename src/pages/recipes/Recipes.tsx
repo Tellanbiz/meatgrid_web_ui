@@ -42,7 +42,7 @@ const Recipes = () => {
         </div>
       </div>
 
-      <div className="card mt-2 h-table">
+      <div className="mt-2 h-table">
         <RecipeTable />
       </div>
     </div>

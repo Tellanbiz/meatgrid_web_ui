@@ -8,7 +8,6 @@ import {
 } from "../../../constants/TableStyles";
 
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import ProgressIndicator from "../../../components/ProgressIndicator.tsx";
 import { PrimaryButton } from "../../../components/Button.tsx";
 import { EllipsisVertical, Pencil, Trash } from "lucide-react";
 import { Button } from "../../../components/ui/button";
@@ -33,6 +32,7 @@ import {
   fetchRecipes,
 } from "../../../store/features/recipe/recipeThunks.ts";
 import { Recipe } from "../../../store/features/recipe/recipeTypes.ts";
+import { ProgressBar } from "primereact/progressbar";
 
 const RecipeTable = () => {
   const dispatch = useAppDispatch();
@@ -74,14 +74,6 @@ const RecipeTable = () => {
     />
   );
 
-  if (status === "loading") {
-    return (
-      <div className="w-full h-full flex justify-center items-center">
-        <ProgressIndicator />
-      </div>
-    );
-  }
-
   if (status === "failed") {
     return <div className="p-4 text-red-500">Error: {error}</div>;
   }
@@ -99,6 +91,10 @@ const RecipeTable = () => {
 
   return (
     <div className="h-full">
+      {status === "loading" && (
+        <ProgressBar mode="indeterminate" style={{ height: "4px" }} />
+      )}
+
       <DataTable
         value={recipes}
         dataKey="id"
@@ -115,6 +111,7 @@ const RecipeTable = () => {
         rowsPerPageOptions={[10, 20, 50]}
         scrollable
         scrollHeight="flex"
+        className="bg-white p-2 rounded-md"
       >
         <Column
           field="image"

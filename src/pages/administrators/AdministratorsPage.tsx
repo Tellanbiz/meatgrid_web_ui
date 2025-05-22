@@ -143,60 +143,58 @@ const AdministratorsPage = () => {
           <span className="ml-2">Refresh</span>
         </Button>
       </div>
+      {isLoading && (
+        <ProgressBar mode="indeterminate" style={{ height: "4px" }} />
+      )}
       <div className="card h-table">
-        {isLoading && (
-          <ProgressBar mode="indeterminate" style={{ height: "6px" }} />
-        )}
-        {!isLoading && (
-          <DataTable
-            value={admins}
-            dataKey="id"
-            paginator
-            rows={10}
-            rowsPerPageOptions={[10, 20, 50]}
-            emptyMessage="No administrators found."
-            scrollable
-            scrollHeight="flex"
-            size="small"
-            style={DataTableStyle}
-          >
-            <Column
-              field="full_name"
-              header="Full Name"
-              body={nameBodyTemplate}
-              style={TableHeaderStyle}
-            />
-            <Column
-              field="phone_number"
-              header="Phone Number"
-              style={TableHeaderStyle}
-            />
-            <Column
-              field="email"
-              header="Email"
-              body={(rowData) => rowData.email || "No Email Provided"}
-              style={TableHeaderStyle}
-            />
-            <Column field="role" header="Role" style={TableHeaderStyle} />
-            <Column
-              field="status"
-              header="Status"
-              body={statusBodyTemplate}
-              style={TableHeaderStyle}
-            />
-            <Column
-              field="created_at"
-              header="Created At"
-              body={(rowData) => formatDate(rowData.created_at)}
-              style={TableHeaderStyle}
-            />
-            <Column
-              header="Actions"
-              body={actionsBodyTemplate}
-              style={TableHeaderStyle}
-            />
-          </DataTable>
-        )}
+        <DataTable
+          value={admins}
+          dataKey="id"
+          paginator
+          rows={10}
+          rowsPerPageOptions={[10, 20, 50]}
+          emptyMessage="No administrators found."
+          scrollable
+          scrollHeight="flex"
+          size="small"
+          style={DataTableStyle}
+        >
+          <Column
+            field="full_name"
+            header="Full Name"
+            body={nameBodyTemplate}
+            style={TableHeaderStyle}
+          />
+          <Column
+            field="phone_number"
+            header="Phone Number"
+            style={TableHeaderStyle}
+          />
+          <Column
+            field="email"
+            header="Email"
+            body={(rowData) => rowData.email || "No Email Provided"}
+            style={TableHeaderStyle}
+          />
+          <Column field="role" header="Role" style={TableHeaderStyle} />
+          <Column
+            field="status"
+            header="Status"
+            body={statusBodyTemplate}
+            style={TableHeaderStyle}
+          />
+          <Column
+            field="created_at"
+            header="Created At"
+            body={(rowData) => formatDate(rowData.created_at)}
+            style={TableHeaderStyle}
+          />
+          <Column
+            header="Actions"
+            body={actionsBodyTemplate}
+            style={TableHeaderStyle}
+          />
+        </DataTable>
       </div>
 
       {/* Revoke Administrator Access Confirmation Dialog */}
