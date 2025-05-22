@@ -13,12 +13,11 @@ import {
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu";
 import { Button } from "../../../components/ui/button";
-import { MoreVertical, Settings } from "lucide-react";
+import { MoreVertical, Settings, Check, X } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { fetchStaffs } from "../../../store/features/staff/staffThunks";
 import { toast } from "sonner";
 import { Staff } from "../../../store/features/staff/staffTypes";
-import { Switch } from "../../../components/ui/switch";
 import {
   selectIsFetchingStaffs,
   selectStaffError,
@@ -76,8 +75,14 @@ const StaffsTable = ({ onUpdatePermissions }: StaffsTableProps) => {
   };
 
   const booleanTemplate = (rowData: Staff, field: keyof Staff) => {
-    return (
-      <Switch checked={!!rowData[field]} disabled className="cursor-default" />
+    return rowData[field] ? (
+      <div className="flex justify-center">
+        <Check className="h-5 w-5 text-green-500" />
+      </div>
+    ) : (
+      <div className="flex justify-center">
+        <X className="h-5 w-5 text-red-500" />
+      </div>
     );
   };
 
