@@ -1,18 +1,22 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Product } from "./productTypes";
 import { CorporateProduct } from "./corporateProductTypes";
+import { StoreProduct } from "./storeProductTypes";
 import { createProduct, fetchProducts, updateProduct } from "./productThunks";
 import {
   fetchCorporateProducts,
   updateCorporateProduct,
 } from "./corporateProductThunks";
+import { fetchStoreProducts } from "./storeProductThunks";
 
 interface ProductState {
   products: Product[];
   corporateProducts: CorporateProduct[];
+  storeProducts: StoreProduct[];
   currentOperation:
     | "fetch"
     | "fetch_corporate"
+    | "fetch_store"
     | "create"
     | "update"
     | "update_corporate"
@@ -26,6 +30,7 @@ interface ProductState {
 const initialState: ProductState = {
   products: [],
   corporateProducts: [],
+  storeProducts: [],
   currentOperation: null,
   status: "idle",
   error: null,
@@ -87,6 +92,29 @@ const productSlice = createSlice({
       .addCase(fetchCorporateProducts.rejected, (state, action) => {
         state.status = "failed";
         state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch corporate products";
+      })
+      // Fetch store products
+      .addCase(fetchStoreProducts.pending, (state) => {
+        state.status = "loading";
+        state.currentOperation = "fetch_store";
+        state.error = null;
+      })
+      .addCase(
+        fetchStoreProducts.fulfilled,
+        (state, action: PayloadAction<StoreProduct[]>) => {
+          state.status = "succeeded";
+          // Ensure we're handling the payload correctly
+          if (Array.isArray(action.payload)) {
+            state.storeProducts = action.payload;
+          } else {
+            console.error("Expected array but got:", action.payload);
+            state.storeProducts = [];
+          }
+        }
+      )
+      .addCase(fetchStoreProducts.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch store products";
       })
       // Create product
       .addCase(createProduct.pending, (state) => {
