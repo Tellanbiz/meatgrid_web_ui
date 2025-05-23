@@ -3,8 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { Plus, RefreshCw, Search } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { selectIsFetchingProducts } from "../../store/features/products/productSelectors";
+import {
+  selectIsFetchingProducts,
+  selectProducts,
+} from "../../store/features/products/productSelectors";
+import ExportButton from "../../components/ExportButton";
+import ExportService from "../../service/ExportService";
+import ReportService from "../../service/ReportService";
 import { fetchProducts } from "../../store/features/products/productThunks";
+
 import { fetchStores } from "../../store/features/stores/storeThunks";
 import { selectStores } from "../../store/features/stores/storeSelectors";
 import { useState, useEffect } from "react";
@@ -27,12 +34,24 @@ const ProductsPage = () => {
   const isFetchingProducts = useAppSelector(selectIsFetchingProducts);
   const stores = useAppSelector(selectStores);
 
+  const products = useAppSelector(selectProducts);
+
   const handleAddProduct = () => {
     navigate("/products/new");
   };
 
   const handleRefresh = () => {
     dispatch(fetchProducts());
+  };
+
+  const handleExportExcel = () => {
+    const config = ReportService.getConfig("products");
+    ExportService.exportToExcel(products, config);
+  };
+
+  const handleExportPDF = async () => {
+    const config = ReportService.getConfig("products");
+    await ExportService.exportToPDF(products, config);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,6 +120,11 @@ const ProductsPage = () => {
               />
               <span className="ml-2">Refresh</span>
             </Button>
+
+            <ExportButton
+              onExportExcel={handleExportExcel}
+              onExportPDF={handleExportPDF}
+            />
 
             <Button onClick={handleAddProduct} size="sm">
               <Plus className="h-4 w-4 mr-1" />
