@@ -47,7 +47,7 @@ export const data = {
         },
         {
           title: "Delivery Schedules",
-          url: "/schedules",
+          url: "/delivery-schedules",
           icon: "solar:calendar-bold-duotone",
           requiredPermissions: ["allow_orders_view"],
         },
