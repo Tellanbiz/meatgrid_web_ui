@@ -18,7 +18,6 @@ import processProductReducer from "./features/process-products/processProductSli
 import accountSlice from "./features/accounts/accountSlice";
 import staffReducer from "./features/staff/staffSlice";
 import riderReducer from "./features/riders/riderSlice";
-import scheduledDeliveryReducer from "./features/scheduled-delivery/scheduledDeliverySlice";
 import batchReducer from "./features/batches/batchSlice";
 import scheduleReducer from "./features/schedules/scheduleSlice";
 
@@ -43,7 +42,6 @@ export const store = configureStore({
     accounts: accountSlice,
     staff: staffReducer,
     riders: riderReducer,
-    scheduledDelivery: scheduledDeliveryReducer,
     batches: batchReducer,
     schedules: scheduleReducer,
   },

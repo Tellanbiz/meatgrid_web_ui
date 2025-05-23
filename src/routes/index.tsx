@@ -38,10 +38,10 @@ import AddCouponPage from "../pages/coupons/AddCouponPage.js";
 import OrdersPage from "../pages/orders/OrdersPage.js";
 import AdministratorsPage from "../pages/administrators/AdministratorsPage";
 import UpdateAdminPermissionsPage from "../pages/administrators/UpdateAdminPermissionsPage";
-import ScheduledDeliveriesPage from "../pages/scheduled-deliveries/ScheduledDeliveriesPage.js";
 import CorporateProductsPage from "../pages/products/CorporateProductsPage.js";
 import OrganizationsPage from "../pages/organizations/OrganizationsPage.js";
 import BatchesPage from "../pages/batches/BatchesPage";
+import SchedulesPage from "../pages/schedules/SchedulesPage.js";
 
 const routes: RouteObject[] = [
   {
@@ -301,7 +301,7 @@ const routes: RouteObject[] = [
         ),
       },
       {
-         path: "warehouses/:warehouseId/products",
+        path: "warehouses/:warehouseId/products",
         element: (
           <PrivateRoute requiredPermissions={["allow_warehouse_submit"]}>
             <CorporateProductsPage />
@@ -397,10 +397,10 @@ const routes: RouteObject[] = [
         ),
       },
       {
-        path: "scheduled-deliveries",
+        path: "delivery-schedules",
         element: (
-          <PrivateRoute requiredPermissions={["allow_orders_view"]}>
-            <ScheduledDeliveriesPage />
+          <PrivateRoute requiredPermissions={["allow_configuration_view"]}>
+            <SchedulesPage />
           </PrivateRoute>
         ),
       },

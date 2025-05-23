@@ -94,3 +94,23 @@ export const formatDate = (dateString: string): string => {
     hour12: true,
   });
 };
+
+export const convert12to24 = (time12: string): string => {
+  const match = time12?.match(/^(\d{1,2}):(\d{2})(AM|PM)$/i);
+  if (!match) return "";
+  const [, hours, minutes, period] = match;
+  let hour = parseInt(hours);
+
+  if (period.toUpperCase() === "PM" && hour < 12) hour += 12;
+  if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+  return `${hour.toString().padStart(2, "0")}:${minutes}`;
+};
+
+export const convert24to12 = (time24: string): string => {
+  const [hours, minutes] = time24.split(":");
+  const hour = parseInt(hours);
+  const suffix = hour >= 12 ? "PM" : "AM";
+  const hour12 = hour % 12 || 12;
+  return `${hour12}:${minutes}${suffix}`;
+};

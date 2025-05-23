@@ -57,12 +57,6 @@ export const sidebarData = {
           requiredPermissions: ["allow_orders_view"],
         },
         {
-          title: "Scheduled Deliveries",
-          url: "/scheduled-deliveries",
-          icon: "solar:calendar-bold-duotone",
-          requiredPermissions: ["allow_orders_view"],
-        },
-        {
           title: "Payment Methods",
           url: "/payment-methods",
           icon: "solar:card-bold-duotone",
@@ -196,14 +190,10 @@ export const sidebarData = {
       icon: "solar:settings-bold-duotone",
       items: [
         {
-          title: "Personal Settings",
-          url: "/personal-settings",
-          icon: "solar:user-bold-duotone",
-        },
-        {
-          title: "Global Settings",
-          url: "/global-settings",
-          icon: "solar:settings-bold-duotone",
+          title: "Delivery Schedules",
+          url: "/delivery-schedules",
+          icon: "solar:calendar-bold-duotone",
+          requiredPermissions: ["allow_configuration_view"],
         },
       ],
     },

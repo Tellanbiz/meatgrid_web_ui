@@ -27,7 +27,7 @@ const DeleteDialog = ({
         <DialogTitle>{title}</DialogTitle>
         <p className="text-sm text-muted-foreground mt-2">{description}</p>
         <DialogFooter className="mt-4">
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button

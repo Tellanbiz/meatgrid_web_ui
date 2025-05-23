@@ -25,19 +25,23 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
 
   React.useEffect(() => {
     if (value) {
-      const timeParts = value.match(/(\d+):(\d+)\s*(AM|PM)/i);
+      // Updated regex to handle both formats for backward compatibility
+      const timeParts = value.match(/(\d+):(\d+)\s*(AM|PM)|(\d+):(\d+)(AM|PM)/i);
       if (timeParts) {
-        setSelectedHour(parseInt(timeParts[1]));
-        setSelectedMinute(parseInt(timeParts[2]));
-        setSelectedPeriod(timeParts[3].toUpperCase());
+        // If the first capture group is undefined, use the second set of groups
+        const hour = timeParts[1] || timeParts[4];
+        const minute = timeParts[2] || timeParts[5];
+        const period = (timeParts[3] || timeParts[6]).toUpperCase();
+        setSelectedHour(parseInt(hour));
+        setSelectedMinute(parseInt(minute));
+        setSelectedPeriod(period);
       }
     }
   }, [value]);
 
   const handleApply = () => {
-    const timeString = `${selectedHour}:${selectedMinute
-      .toString()
-      .padStart(2, "0")} ${selectedPeriod}`;
+    // Remove space between time and AM/PM
+    const timeString = `${selectedHour}:${selectedMinute.toString().padStart(2, "0")}${selectedPeriod}`;
     onChange?.(timeString);
     setOpen(false);
   };
