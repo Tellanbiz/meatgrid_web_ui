@@ -20,6 +20,7 @@ import staffReducer from "./features/staff/staffSlice";
 import riderReducer from "./features/riders/riderSlice";
 import scheduledDeliveryReducer from "./features/scheduled-delivery/scheduledDeliverySlice";
 import batchReducer from "./features/batches/batchSlice";
+import scheduleReducer from "./features/schedules/scheduleSlice";
 
 export const store = configureStore({
   reducer: {
@@ -44,6 +45,7 @@ export const store = configureStore({
     riders: riderReducer,
     scheduledDelivery: scheduledDeliveryReducer,
     batches: batchReducer,
+    schedules: scheduleReducer,
   },
   devTools: process.env.NODE_ENV != "production",
 });
