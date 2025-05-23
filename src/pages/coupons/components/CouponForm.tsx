@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import TextField from "../../../components/TextField";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -38,10 +38,13 @@ const CouponForm = ({
     amount: 0,
     max_used: 0,
   });
+  
+  const isInitialRender = useRef(true);
 
   useEffect(() => {
-    if (initialValues) {
+    if (isInitialRender.current && initialValues) {
       setForm(initialValues);
+      isInitialRender.current = false;
     }
   }, [initialValues]);
 
