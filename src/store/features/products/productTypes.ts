@@ -1,3 +1,14 @@
+// Base product interface that contains common fields
+export interface BaseProduct {
+  id: string;
+  image: string;
+  name: string;
+  regular_price: number;
+  weight: number;
+  unit_type: string;
+}
+
+// Full product interface for admin/management purposes
 export interface Product {
   id: string;
   images: string[];

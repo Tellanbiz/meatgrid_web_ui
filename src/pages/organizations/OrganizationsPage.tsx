@@ -95,7 +95,7 @@ const OrganizationsPage = () => {
     <div className="h-full p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Organizations</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-x-2">
           <Button
             variant="outline"
             size="sm"
@@ -115,7 +115,7 @@ const OrganizationsPage = () => {
         <ProgressBar mode="indeterminate" style={{ height: "4px" }} />
       )}
 
-      <div className="card h-table">
+      <div className="h-table">
         <DataTable
           value={accounts}
           dataKey="id"
@@ -127,6 +127,7 @@ const OrganizationsPage = () => {
           scrollHeight="flex"
           size="small"
           style={DataTableStyle}
+          className="h-full bg-white p-2 rounded-md"
         >
           <Column
             field="full_name"

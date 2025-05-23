@@ -301,6 +301,14 @@ const routes: RouteObject[] = [
         ),
       },
       {
+         path: "warehouses/:warehouseId/products",
+        element: (
+          <PrivateRoute requiredPermissions={["allow_warehouse_submit"]}>
+            <CorporateProductsPage />
+          </PrivateRoute>
+        ),
+      },
+      {
         path: "payment-methods",
         element: (
           <PrivateRoute requiredPermissions={["allow_payment_method_view"]}>

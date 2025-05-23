@@ -10,31 +10,33 @@ import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { updateCorporateProduct } from "../../../store/features/products/corporateProductThunks";
 import { CorporateProduct } from "../../../store/features/products/corporateProductTypes";
 import {
   selectIsUpdatingCorporateProduct,
-  selectProductError,
+  selectIsUpdatingStoreProduct,
   selectProductSuccessMessage,
 } from "../../../store/features/products/productSelectors";
-import { clearProductMessages } from "../../../store/features/products/productSlice";
 import { formatCurrency, formatWeight } from "../../../utils/formatters";
+import { updateStoreProduct } from "../../../store/features/products/storeProductThunks";
+import { StoreProduct } from "../../../store/features/products/storeProductTypes";
 
 interface UpdateCorporateProductDialogProps {
+  context: "organization" | "store";
   open: boolean;
   onClose: () => void;
-  product: CorporateProduct | null;
-  organizationId: string;
+  product: CorporateProduct | StoreProduct | null;
+  contextId: string;
   onSuccess?: () => void;
 }
 
 const UpdateCorporateProductDialog = ({
+  context = "organization",
   open,
   onClose,
   product,
-  organizationId,
+  contextId,
   onSuccess,
 }: UpdateCorporateProductDialogProps) => {
   const dispatch = useAppDispatch();
@@ -44,8 +46,12 @@ const UpdateCorporateProductDialog = ({
   const [regularPrice, setRegularPrice] = useState<number>(0);
 
   // Redux selectors for loading state and messages
-  const isLoading = useAppSelector(selectIsUpdatingCorporateProduct);
-  const error = useAppSelector(selectProductError);
+  const isUpdatingCorporateProduct = useAppSelector(
+    selectIsUpdatingCorporateProduct
+  );
+  const isUpdatingStoreProduct = useAppSelector(selectIsUpdatingStoreProduct);
+  const isLoading = isUpdatingCorporateProduct || isUpdatingStoreProduct;
+
   const successMessage = useAppSelector(selectProductSuccessMessage);
 
   // Set initial form values when product changes
@@ -59,40 +65,52 @@ const UpdateCorporateProductDialog = ({
   // Handle success and error messages
   useEffect(() => {
     if (successMessage) {
-      toast.success(successMessage);
-      dispatch(clearProductMessages());
-      // Call onSuccess callback if provided, then close the dialog
       if (onSuccess) {
         onSuccess();
       }
       onClose();
     }
-    if (error) {
-      toast.error(error);
-      dispatch(clearProductMessages());
-    }
-  }, [successMessage, error, dispatch, onClose, onSuccess]);
+  }, [successMessage, dispatch, onClose, onSuccess]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!product || !organizationId) return;
+    if (!product || !contextId) return;
+    if (context === "organization") {
+      dispatch(
+        updateCorporateProduct({
+          user_id: contextId,
+          product_id: product.id,
+          weight: weight,
+          regular_price: regularPrice,
+        })
+      );
+    } else if (context === "store") {
+      dispatch(
+        updateStoreProduct({
+          store_id: contextId,
+          product_id: product.id,
+          weight: weight,
+          regular_price: regularPrice,
+        })
+      );
+    }
+  };
 
-    dispatch(
-      updateCorporateProduct({
-        user_id: organizationId,
-        product_id: product.id,
-        weight: weight,
-        regular_price: regularPrice,
-      })
-    );
+  const getOrganizationName = (product: CorporateProduct | StoreProduct) => {
+    if ("org" in product) {
+      return product.org.full_name;
+    }
+    return product.store.name;
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Update Corporate Product</DialogTitle>
+          <DialogTitle>
+            Update {context === "organization" ? "Corporate" : "Store"} Product
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
@@ -110,7 +128,9 @@ const UpdateCorporateProductDialog = ({
               <div>
                 <h3 className="font-medium text-gray-900">{product.name}</h3>
                 <p className="text-xs text-gray-500">
-                  {product.org.full_name} • {formatCurrency(product.regular_price)} • {formatWeight(product.weight, product.unit_type)}
+                  {getOrganizationName(product)} •{" "}
+                  {formatCurrency(product.regular_price)} •{" "}
+                  {formatWeight(product.weight, product.unit_type)}
                 </p>
               </div>
             </div>

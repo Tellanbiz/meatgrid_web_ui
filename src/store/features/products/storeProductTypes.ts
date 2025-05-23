@@ -1,10 +1,6 @@
-export interface StoreProduct {
-  id: string;
-  image: string;
-  name: string;
-  regular_price: number;
-  weight: number;
-  unit_type: string;
+import { BaseProduct } from "./productTypes";
+
+export interface StoreProduct extends BaseProduct {
   store: {
     id: string;
     name: string;

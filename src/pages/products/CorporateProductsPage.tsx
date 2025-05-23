@@ -1,16 +1,20 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import BackButton from "../../components/BackButton";
 import {
   selectCorporateProducts,
+  selectStoreProducts,
   selectIsFetchingCorporateProducts,
-  selectProducts,
+  selectIsFetchingStoreProducts,
+  selectProductSuccessMessage,
+  selectProductError,
 } from "../../store/features/products/productSelectors";
 import { ProgressBar } from "primereact/progressbar";
 import { fetchCorporateProducts } from "../../store/features/products/corporateProductThunks";
-import { fetchProducts } from "../../store/features/products/productThunks";
 import { CorporateProduct } from "../../store/features/products/corporateProductTypes";
+import { StoreProduct } from "../../store/features/products/storeProductTypes";
+import { BaseProduct } from "../../store/features/products/productTypes";
 import { Button } from "../../components/ui/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -24,36 +28,46 @@ import {
   AddCorporateProductDialog,
 } from "./components";
 import { formatCurrency, formatWeight } from "../../utils/formatters";
+import { fetchStoreProducts } from "../../store/features/products/storeProductThunks";
 
 const CorporateProductsPage = () => {
   const dispatch = useAppDispatch();
-  const { organizationId } = useParams();
+  const { organizationId, warehouseId } = useParams();
+  const location = useLocation();
+
+  const isOrganizationContext = location.pathname.includes("/organizations/");
+  const contextId = organizationId || warehouseId;
+
   const [searchString, setSearchString] = useState("");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] =
-    useState<CorporateProduct | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<
+    CorporateProduct | StoreProduct | null
+  >(null);
 
   const corporateProducts = useAppSelector(selectCorporateProducts);
-  const isFetching = useAppSelector(selectIsFetchingCorporateProducts);
-  const allProducts = useAppSelector(selectProducts);
+  const storeProducts = useAppSelector(selectStoreProducts);
+  const isFetchingCorporateProducts = useAppSelector(
+    selectIsFetchingCorporateProducts
+  );
+  const isFetchingStoreProducts = useAppSelector(selectIsFetchingStoreProducts);
+  const isLoading = isFetchingCorporateProducts || isFetchingStoreProducts;
 
   // Fetch corporate products for this organization
   useEffect(() => {
-    if (organizationId) {
-      dispatch(fetchCorporateProducts({ user_id: organizationId }));
+    if (contextId) {
+      if (isOrganizationContext && organizationId) {
+        dispatch(fetchCorporateProducts({ user_id: contextId }));
+      } else if (warehouseId) {
+        dispatch(fetchStoreProducts({ store_id: warehouseId }));
+      }
     }
-  }, [dispatch, organizationId]);
-
-  // Fetch all products for the add product dialog
-  useEffect(() => {
-    if (addDialogOpen && allProducts.length === 0) {
-      dispatch(fetchProducts());
-    }
-  }, [addDialogOpen, allProducts, dispatch]);
+  }, [dispatch, organizationId, warehouseId, contextId, isOrganizationContext]);
 
   // Error handling
-  const error = useAppSelector((state) => state.products.error);
+  const error = useAppSelector(selectProductError);
+  const successMessage = useAppSelector(selectProductSuccessMessage);
+
   useEffect(() => {
     if (error) {
       toast.error(error);
@@ -61,15 +75,31 @@ const CorporateProductsPage = () => {
     }
   }, [error, dispatch]);
 
+
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(clearProductMessages());
+    }
+  }, [successMessage, dispatch]);
+
   const handleRefresh = () => {
-    if (organizationId) {
-      dispatch(fetchCorporateProducts({ user_id: organizationId }));
+    if (contextId) {
+      if (isOrganizationContext && organizationId) {
+        dispatch(fetchCorporateProducts({ user_id: organizationId }));
+      } else if (warehouseId) {
+        dispatch(fetchStoreProducts({ store_id: warehouseId }));
+      }
     }
   };
 
   const refreshProducts = () => {
-    if (organizationId) {
-      dispatch(fetchCorporateProducts({ user_id: organizationId }));
+    if (contextId) {
+      if (isOrganizationContext && organizationId) {
+        dispatch(fetchCorporateProducts({ user_id: organizationId }));
+      } else if (warehouseId) {
+        dispatch(fetchStoreProducts({ store_id: warehouseId }));
+      }
     }
   };
 
@@ -81,7 +111,14 @@ const CorporateProductsPage = () => {
     setAddDialogOpen(false);
   };
 
-  const imageBodyTemplate = (rowData: CorporateProduct) => {
+  const getOrganizationName = (product: CorporateProduct | StoreProduct) => {
+    if ("org" in product) {
+      return product.org.full_name;
+    }
+    return product.store.name;
+  };
+
+  const imageBodyTemplate = (rowData: CorporateProduct | StoreProduct) => {
     return (
       <div className="flex items-center py-2">
         <div className="flex-shrink-0">
@@ -99,13 +136,15 @@ const CorporateProductsPage = () => {
           <div className="text-sm font-medium text-gray-900">
             {rowData.name}
           </div>
-          <div className="text-xs text-gray-500">{rowData.org.full_name}</div>
+          <div className="text-xs text-gray-500">
+            {getOrganizationName(rowData)}
+          </div>
         </div>
       </div>
     );
   };
 
-  const priceBodyTemplate = (rowData: CorporateProduct) => {
+  const priceBodyTemplate = (rowData: BaseProduct) => {
     return (
       <div className="text-sm font-medium">
         {formatCurrency(rowData.regular_price)}
@@ -113,7 +152,7 @@ const CorporateProductsPage = () => {
     );
   };
 
-  const weightBodyTemplate = (rowData: CorporateProduct) => {
+  const weightBodyTemplate = (rowData: BaseProduct) => {
     return (
       <div className="text-sm">
         {formatWeight(rowData.weight, rowData.unit_type)}
@@ -121,11 +160,11 @@ const CorporateProductsPage = () => {
     );
   };
 
-  const unitTypeBodyTemplate = (rowData: CorporateProduct) => {
+  const unitTypeBodyTemplate = (rowData: BaseProduct) => {
     return <div className="text-sm">{rowData.unit_type}</div>;
   };
 
-  const actionsBodyTemplate = (rowData: CorporateProduct) => {
+  const actionsBodyTemplate = (rowData: CorporateProduct | StoreProduct) => {
     return (
       <div className="flex items-center justify-center w-full">
         <Button
@@ -140,7 +179,7 @@ const CorporateProductsPage = () => {
     );
   };
 
-  const handleEditProduct = (product: CorporateProduct) => {
+  const handleEditProduct = (product: CorporateProduct | StoreProduct) => {
     setSelectedProduct(product);
     setEditDialogOpen(true);
   };
@@ -151,23 +190,24 @@ const CorporateProductsPage = () => {
   };
 
   const getFilteredProducts = () => {
+    const products = isOrganizationContext ? corporateProducts : storeProducts;
     const search = searchString.trim().toLowerCase();
-    if (search === "") return corporateProducts;
+    if (search === "") return products;
 
-    return corporateProducts.filter(
+    return products.filter(
       (product) =>
         product.name.toLowerCase().includes(search) ||
-        product.org.full_name.toLowerCase().includes(search)
+        getOrganizationName(product).toLowerCase().includes(search)
     );
   };
 
   const filteredProducts = getFilteredProducts();
 
   return (
-    <div className="h-full flex flex-col p-6">
-      <div className="flex flex-col gap-4 bg-background border-b border-gray-100 pb-4">
+    <div className="h-full p-6">
+      <div className="mb-4">
         <div className="flex justify-between items-center">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-x-2">
             <BackButton />
             <div className="relative max-w-md">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
@@ -175,21 +215,20 @@ const CorporateProductsPage = () => {
                 placeholder="Search products..."
                 value={searchString}
                 onChange={(e) => setSearchString(e.target.value)}
-                className="pl-9 h-10 border-gray-200 focus-visible:ring-1 focus-visible:ring-primary"
+                className="pl-9 h-9 border-gray-200 focus-visible:ring-1 focus-visible:ring-primary"
               />
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-x-2">
             <Button
               variant="outline"
               onClick={handleRefresh}
-              disabled={isFetching}
+              disabled={isLoading}
               size="sm"
-              className="px-2"
             >
               <RefreshCw
-                className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
+                className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
               />
               <span className="ml-2">Refresh</span>
             </Button>
@@ -202,14 +241,11 @@ const CorporateProductsPage = () => {
         </div>
       </div>
 
-      <div className="flex-1 card rounded-md shadow-sm border border-gray-100 overflow-hidden bg-white">
-        {isFetching && (
-          <ProgressBar
-            mode="indeterminate"
-            style={{ height: "4px" }}
-            className="mb-2"
-          />
-        )}
+      {isLoading && (
+        <ProgressBar mode="indeterminate" style={{ height: "4px" }} />
+      )}
+
+      <div className="h-table">
         <DataTable
           value={filteredProducts}
           paginator
@@ -219,12 +255,15 @@ const CorporateProductsPage = () => {
           emptyMessage={
             searchString.trim() !== ""
               ? "No matching products found"
-              : "No corporate products found"
+              : `No ${
+                  isOrganizationContext ? "organization" : "store"
+                } products found`
           }
           tableStyle={DataTableStyle}
           scrollable
           scrollHeight="flex"
           size="small"
+          className="bg-white p-2 rounded-md"
         >
           <Column
             header="Product"
@@ -261,18 +300,20 @@ const CorporateProductsPage = () => {
 
       {/* Update Dialog */}
       <UpdateCorporateProductDialog
+        context={isOrganizationContext ? "organization" : "store"}
+        contextId={contextId || ""}
         open={editDialogOpen}
         onClose={handleCloseEditDialog}
         product={selectedProduct}
-        organizationId={organizationId || ""}
         onSuccess={refreshProducts}
       />
 
       {/* Add Product Dialog */}
       <AddCorporateProductDialog
+        context={isOrganizationContext ? "organization" : "store"}
+        contextId={contextId || ""}
         open={addDialogOpen}
         onClose={handleCloseAddDialog}
-        organizationId={organizationId || ""}
         onSuccess={refreshProducts}
       />
     </div>

@@ -1,10 +1,6 @@
-export interface CorporateProduct {
-  id: string;
-  image: string;
-  name: string;
-  regular_price: number;
-  weight: number;
-  unit_type: string;
+import { BaseProduct } from "./productTypes";
+
+export interface CorporateProduct extends BaseProduct {
   org: {
     id: string;
     full_name: string;

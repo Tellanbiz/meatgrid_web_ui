@@ -17,25 +17,28 @@ import { updateCorporateProduct } from "../../../store/features/products/corpora
 import { Product } from "../../../store/features/products/productTypes";
 import {
   selectIsUpdatingCorporateProduct,
-  selectProductError,
   selectProductSuccessMessage,
   selectProducts,
   selectIsFetchingProducts,
+  selectIsUpdatingStoreProduct,
 } from "../../../store/features/products/productSelectors";
-import { clearProductMessages } from "../../../store/features/products/productSlice";
 import { formatCurrency, formatWeight } from "../../../utils/formatters";
+import { updateStoreProduct } from "../../../store/features/products/storeProductThunks";
+import { fetchProducts } from "../../../store/features/products/productThunks";
 
 interface AddCorporateProductDialogProps {
+  context: "organization" | "store";
+  contextId: string;
   open: boolean;
   onClose: () => void;
-  organizationId: string;
   onSuccess?: () => void;
 }
 
 const AddCorporateProductDialog = ({
+  context = "organization",
+  contextId,
   open,
   onClose,
-  organizationId,
   onSuccess,
 }: AddCorporateProductDialogProps) => {
   const dispatch = useAppDispatch();
@@ -48,10 +51,16 @@ const AddCorporateProductDialog = ({
 
   // Redux selectors
   const products = useAppSelector(selectProducts);
-  const isLoading = useAppSelector(selectIsUpdatingCorporateProduct);
+  const isUpdatingCorporateProduct = useAppSelector(
+    selectIsUpdatingCorporateProduct
+  );
+  const isUpdatingStoreProduct = useAppSelector(selectIsUpdatingStoreProduct);
   const isFetchingProducts = useAppSelector(selectIsFetchingProducts);
-  const error = useAppSelector(selectProductError);
   const successMessage = useAppSelector(selectProductSuccessMessage);
+
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
   // Reset form when dialog opens
   useEffect(() => {
@@ -66,23 +75,17 @@ const AddCorporateProductDialog = ({
   // Handle success and error messages
   useEffect(() => {
     if (successMessage) {
-      toast.success(selectedProduct ? `${selectedProduct.name} added successfully to organization products` : successMessage);
-      dispatch(clearProductMessages());
       if (onSuccess) {
         onSuccess();
       }
       onClose();
     }
-    if (error) {
-      toast.error(error);
-      dispatch(clearProductMessages());
-    }
-  }, [successMessage, error, dispatch, onClose, onSuccess, selectedProduct]);
+  }, [successMessage, dispatch, onClose, onSuccess, selectedProduct, context]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!selectedProduct || !organizationId) {
+    if (!selectedProduct || !contextId) {
       toast.error("Please select a product");
       return;
     }
@@ -97,14 +100,25 @@ const AddCorporateProductDialog = ({
       return;
     }
 
-    dispatch(
-      updateCorporateProduct({
-        user_id: organizationId,
-        product_id: selectedProduct.id,
-        weight: weight,
-        regular_price: regularPrice,
-      })
-    );
+    if (context === "organization") {
+      dispatch(
+        updateCorporateProduct({
+          user_id: contextId,
+          product_id: selectedProduct.id,
+          weight: weight,
+          regular_price: regularPrice,
+        })
+      );
+    } else if (context === "store") {
+      dispatch(
+        updateStoreProduct({
+          store_id: contextId,
+          product_id: selectedProduct.id,
+          weight: weight,
+          regular_price: regularPrice,
+        })
+      );
+    }
   };
 
   // Filter products based on search query
@@ -129,24 +143,31 @@ const AddCorporateProductDialog = ({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Add Corporate Product</DialogTitle>
+          <DialogTitle>
+            Add {context === "organization" ? "Organization" : "Store"} Product
+          </DialogTitle>
           <DialogDescription>
-            Select a product to add to this organization's products
+            Select a product to add to this {context} products
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 pt-4 flex-1 overflow-hidden flex flex-col">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 pt-4 flex-1 overflow-hidden flex flex-col"
+        >
           <div className="flex-0">
             {selectedProduct ? (
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex-shrink-0">
-                  {selectedProduct.images && selectedProduct.images.length > 0 ? (
+                  {selectedProduct.images &&
+                  selectedProduct.images.length > 0 ? (
                     <img
                       src={selectedProduct.images[0]}
                       alt={selectedProduct.name}
                       className="h-12 w-12 rounded object-cover border border-gray-200"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://via.placeholder.com/40";
+                        (e.target as HTMLImageElement).src =
+                          "https://via.placeholder.com/40";
                       }}
                     />
                   ) : (
@@ -156,9 +177,15 @@ const AddCorporateProductDialog = ({
                   )}
                 </div>
                 <div>
-                  <h3 className="font-medium text-gray-900">{selectedProduct.name}</h3>
+                  <h3 className="font-medium text-gray-900">
+                    {selectedProduct.name}
+                  </h3>
                   <p className="text-xs text-gray-500">
-                    {formatCurrency(selectedProduct.regular_price)} • {formatWeight(selectedProduct.weight, selectedProduct.unit_type)}
+                    {formatCurrency(selectedProduct.regular_price)} •{" "}
+                    {formatWeight(
+                      selectedProduct.weight,
+                      selectedProduct.unit_type
+                    )}
                   </p>
                 </div>
                 <Button
@@ -186,7 +213,9 @@ const AddCorporateProductDialog = ({
                   {isFetchingProducts ? (
                     <div className="flex flex-col items-center justify-center h-full">
                       <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                      <p className="mt-2 text-sm text-gray-500">Loading products...</p>
+                      <p className="mt-2 text-sm text-gray-500">
+                        Loading products...
+                      </p>
                     </div>
                   ) : filteredProducts.length === 0 ? (
                     <div className="flex items-center justify-center h-full text-sm text-gray-500">
@@ -207,7 +236,8 @@ const AddCorporateProductDialog = ({
                                 alt={product.name}
                                 className="h-10 w-10 rounded object-cover border border-gray-200"
                                 onError={(e) => {
-                                  (e.target as HTMLImageElement).src = "https://via.placeholder.com/40";
+                                  (e.target as HTMLImageElement).src =
+                                    "https://via.placeholder.com/40";
                                 }}
                               />
                             ) : (
@@ -221,7 +251,8 @@ const AddCorporateProductDialog = ({
                               {product.name}
                             </div>
                             <div className="text-xs text-gray-500">
-                              {formatCurrency(product.regular_price)} • {formatWeight(product.weight, product.unit_type)}
+                              {formatCurrency(product.regular_price)} •{" "}
+                              {formatWeight(product.weight, product.unit_type)}
                             </div>
                           </div>
                         </div>
@@ -237,7 +268,9 @@ const AddCorporateProductDialog = ({
             <div className="space-y-4 flex-0">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="weight">Weight ({selectedProduct.unit_type})</Label>
+                  <Label htmlFor="weight">
+                    Weight ({selectedProduct.unit_type})
+                  </Label>
                   <Input
                     id="weight"
                     type="number"
@@ -272,18 +305,23 @@ const AddCorporateProductDialog = ({
               variant="outline"
               onClick={onClose}
               className="mt-4"
-              disabled={isLoading}
+              disabled={isUpdatingCorporateProduct}
             >
               Cancel
             </Button>
             <Button
               type="submit"
               className="mt-4"
-              disabled={isLoading || !selectedProduct}
+              disabled={
+                isUpdatingCorporateProduct ||
+                isUpdatingStoreProduct ||
+                !selectedProduct
+              }
             >
-              {isLoading ? (
+              {isUpdatingCorporateProduct || isUpdatingStoreProduct ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Adding Product...
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Adding
+                  Product...
                 </>
               ) : (
                 "Add Product"
