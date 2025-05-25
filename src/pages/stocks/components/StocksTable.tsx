@@ -30,6 +30,7 @@ import { useModal } from "../../../hooks/use-modal";
 import UpdateStockDialog from "./UpdateStockDialog";
 import { toast } from "sonner";
 import { UpdateStockQuantityRequest } from "../../../store/features/stock/request/UpdateStockQuantityRequest";
+import { formatDate } from "../../../utils/dateUtils";
 
 const StocksTable = () => {
   const dispatch = useAppDispatch();
@@ -148,13 +149,7 @@ const StocksTable = () => {
         />
         <Column
           header="Created At"
-          body={(stock) =>
-            new Date(stock.created_at).toLocaleDateString("en-KE", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })
-          }
+          body={(stock) => formatDate(stock.created_at)}
           headerStyle={TableHeaderStyle}
         />
 

@@ -78,7 +78,7 @@ const RestockPage = () => {
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<string>("");
-  const [productQuantity, setProductQuantity] = useState<number>(1);
+  const [productQuantity, setProductQuantity] = useState<string>("1");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductToRestock | null>(
@@ -101,11 +101,15 @@ const RestockPage = () => {
   const handleSelectProduct = (product: Product) => {
     setSelectedProduct(product);
     setSelectedProductId(product.id);
-    setProductQuantity(1);
   };
 
   const handleAddProduct = () => {
-    if (!selectedProduct || productQuantity <= 0) return;
+    if (!selectedProduct || !productQuantity) return;
+    
+    const quantityValue = parseFloat(productQuantity);
+    if (isNaN(quantityValue) || quantityValue <= 0) {
+      return;
+    }
 
     const product = products.find((p) => p.id === selectedProductId);
     if (!product) return;
@@ -117,14 +121,14 @@ const RestockPage = () => {
     if (existingProductIndex !== -1) {
       // Update quantity of existing product
       const updatedProducts = [...productsToRestock];
-      updatedProducts[existingProductIndex].quantity += productQuantity;
+      updatedProducts[existingProductIndex].quantity += parseFloat(productQuantity);
       setProductsToRestock(updatedProducts);
     } else {
       // Add new product
       const newProduct: ProductToRestock = {
         id: product.id,
         name: product.name,
-        quantity: productQuantity,
+        quantity: parseFloat(productQuantity),
         unit_type: product.unit_type,
       };
       setProductsToRestock([...productsToRestock, newProduct]);
@@ -132,29 +136,35 @@ const RestockPage = () => {
 
     setSelectedProduct(null);
     setSelectedProductId("");
-    setProductQuantity(1);
+    setProductQuantity("1");
     setIsAddDialogOpen(false);
   };
 
   const handleEditProduct = (product: ProductToRestock) => {
     setEditingProduct(product);
-    setProductQuantity(product.quantity);
+    setProductQuantity(product.quantity.toString());
     setIsEditDialogOpen(true);
   };
 
   const handleUpdateProduct = () => {
-    if (!editingProduct || productQuantity <= 0) return;
+    if (!editingProduct || !productQuantity) return;
+    
+    const quantityValue = parseFloat(productQuantity);
+    if (isNaN(quantityValue) || quantityValue <= 0) {
+      toast.error("Please enter a valid quantity greater than zero");
+      return;
+    }
 
     const updatedProducts = productsToRestock.map((p) => {
       if (p.id === editingProduct.id) {
-        return { ...p, quantity: productQuantity };
+        return { ...p, quantity: quantityValue };
       }
       return p;
     });
 
     setProductsToRestock(updatedProducts);
     setEditingProduct(null);
-    setProductQuantity(1);
+    setProductQuantity("1");
     setIsEditDialogOpen(false);
   };
 
@@ -337,9 +347,10 @@ const RestockPage = () => {
                         type="number"
                         step="any"
                         value={productQuantity}
-                        onChange={(e) =>
-                          setProductQuantity(Number(e.target.value))
-                        }
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setProductQuantity(value === "" ? "" : value);
+                        }}
                         className="w-full"
                       />
                     </div>
@@ -355,7 +366,7 @@ const RestockPage = () => {
                     </Button>
                     <Button
                       type="submit"
-                      disabled={!selectedProduct || productQuantity <= 0}
+                      disabled={!selectedProduct || !productQuantity || isNaN(parseFloat(productQuantity)) || parseFloat(productQuantity) <= 0}
                     >
                       Add to Restock
                     </Button>
@@ -452,7 +463,10 @@ const RestockPage = () => {
                     type="number"
                     min="1"
                     value={productQuantity}
-                    onChange={(e) => setProductQuantity(Number(e.target.value))}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setProductQuantity(value === "" ? "" : value);
+                    }}
                     className="w-full"
                   />
                 </div>
@@ -466,7 +480,7 @@ const RestockPage = () => {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={productQuantity <= 0}>
+                <Button type="submit" disabled={!productQuantity || isNaN(parseFloat(productQuantity)) || parseFloat(productQuantity) <= 0}>
                   Update Quantity
                 </Button>
               </DialogFooter>

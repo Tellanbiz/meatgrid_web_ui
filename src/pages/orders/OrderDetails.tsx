@@ -24,8 +24,8 @@ const OrderDetails = () => {
   }, [dispatch, orderId]);
 
   return (
-    <>
-      <div className="flex items-center justify-between py bg-background z-20 p-6">
+    <div className="p-6">
+      <div className="flex items-center justify-between py bg-background z-20">
         <BackButton />
         <div className="flex flex-col space-y-1">
           <div className="flex items-center space-x-2">
@@ -65,7 +65,7 @@ const OrderDetails = () => {
           <OrderDetailsComponent order={selectedOrderDetails} />
         )}
       </div>
-    </>
+    </div>
   );
 };
 
