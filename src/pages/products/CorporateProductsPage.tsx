@@ -9,7 +9,10 @@ import {
   selectIsFetchingStoreProducts,
   selectProductSuccessMessage,
   selectProductError,
+  selectIsDeletingStoreProduct,
 } from "../../store/features/products/productSelectors";
+import { deleteStoreProduct } from "../../store/features/products/storeProductThunks";
+import DeleteDialog from "../../components/DeleteDialog";
 import { ProgressBar } from "primereact/progressbar";
 import { fetchCorporateProducts } from "../../store/features/products/corporateProductThunks";
 import { CorporateProduct } from "../../store/features/products/corporateProductTypes";
@@ -18,7 +21,14 @@ import { BaseProduct } from "../../store/features/products/productTypes";
 import { Button } from "../../components/ui/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { PlusCircle, Pencil, RefreshCw, Search } from "lucide-react";
+import {
+  Pencil,
+  RefreshCw,
+  Search,
+  MoreVertical,
+  Trash2,
+  Plus,
+} from "lucide-react";
 import { TableHeaderStyle, DataTableStyle } from "../../constants/TableStyles";
 import { Input } from "../../components/ui/input";
 import { toast } from "sonner";
@@ -29,6 +39,13 @@ import {
 } from "./components";
 import { formatCurrency, formatWeight } from "../../utils/formatters";
 import { fetchStoreProducts } from "../../store/features/products/storeProductThunks";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../components/ui/dropdown-menu";
+import { useModal } from "../../hooks/use-modal";
 
 const CorporateProductsPage = () => {
   const dispatch = useAppDispatch();
@@ -41,7 +58,11 @@ const CorporateProductsPage = () => {
   const [searchString, setSearchString] = useState("");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useModal();
   const [selectedProduct, setSelectedProduct] = useState<
+    CorporateProduct | StoreProduct | null
+  >(null);
+  const [productToDelete, setProductToDelete] = useState<
     CorporateProduct | StoreProduct | null
   >(null);
 
@@ -51,6 +72,7 @@ const CorporateProductsPage = () => {
     selectIsFetchingCorporateProducts
   );
   const isFetchingStoreProducts = useAppSelector(selectIsFetchingStoreProducts);
+  const isDeletingStoreProduct = useAppSelector(selectIsDeletingStoreProduct);
   const isLoading = isFetchingCorporateProducts || isFetchingStoreProducts;
 
   // Fetch corporate products for this organization
@@ -74,7 +96,6 @@ const CorporateProductsPage = () => {
       dispatch(clearProductMessages());
     }
   }, [error, dispatch]);
-
 
   useEffect(() => {
     if (successMessage) {
@@ -166,22 +187,56 @@ const CorporateProductsPage = () => {
 
   const actionsBodyTemplate = (rowData: CorporateProduct | StoreProduct) => {
     return (
-      <div className="flex items-center justify-center w-full">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="p-2"
-          onClick={() => handleEditProduct(rowData)}
-        >
-          <Pencil className="h-4 w-4 text-primary" />
-        </Button>
-      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon">
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            onSelect={() => handleEditProduct(rowData)}
+            className="flex items-center gap-2"
+          >
+            <Pencil className="h-4 w-4" /> Edit
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={() => handleDeleteProduct(rowData)}
+            className="flex items-center gap-2 text-red-600"
+          >
+            <Trash2 className="h-4 w-4" /> Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     );
   };
 
   const handleEditProduct = (product: CorporateProduct | StoreProduct) => {
     setSelectedProduct(product);
     setEditDialogOpen(true);
+  };
+
+  const handleDeleteProduct = (product: CorporateProduct | StoreProduct) => {
+    setProductToDelete(product);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!productToDelete || !warehouseId) return;
+
+    try {
+      await dispatch(
+        deleteStoreProduct({
+          store_id: warehouseId,
+          product_id: productToDelete.id,
+        })
+      ).unwrap();
+
+      setIsDeleteDialogOpen(false);
+      refreshProducts();
+    } catch (error) {
+      console.error("Failed to delete product:", error);
+    }
   };
 
   const handleCloseEditDialog = () => {
@@ -234,7 +289,7 @@ const CorporateProductsPage = () => {
             </Button>
 
             <Button onClick={handleAddProduct} size="sm" className="px-2">
-              <PlusCircle className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 mr-2" />
               Add Product
             </Button>
           </div>
@@ -298,7 +353,6 @@ const CorporateProductsPage = () => {
         </DataTable>
       </div>
 
-      {/* Update Dialog */}
       <UpdateCorporateProductDialog
         context={isOrganizationContext ? "organization" : "store"}
         contextId={contextId || ""}
@@ -315,6 +369,16 @@ const CorporateProductsPage = () => {
         open={addDialogOpen}
         onClose={handleCloseAddDialog}
         onSuccess={refreshProducts}
+      />
+
+      {/*  Dialog */}
+      <DeleteDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Delete Product"
+        description={`Are you sure you want to delete "${productToDelete?.name}"? This action cannot be undone.`}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeletingStoreProduct}
       />
     </div>
   );

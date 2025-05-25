@@ -7,7 +7,11 @@ import {
   fetchCorporateProducts,
   updateCorporateProduct,
 } from "./corporateProductThunks";
-import { fetchStoreProducts, updateStoreProduct } from "./storeProductThunks";
+import {
+  fetchStoreProducts,
+  updateStoreProduct,
+  deleteStoreProduct,
+} from "./storeProductThunks";
 
 interface ProductState {
   products: Product[];
@@ -22,6 +26,7 @@ interface ProductState {
     | "update_corporate"
     | "update_store"
     | "delete"
+    | "delete_store_product"
     | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
@@ -92,7 +97,10 @@ const productSlice = createSlice({
       )
       .addCase(fetchCorporateProducts.rejected, (state, action) => {
         state.status = "failed";
-        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch corporate products";
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : "Failed to fetch corporate products";
       })
       // Fetch store products
       .addCase(fetchStoreProducts.pending, (state) => {
@@ -115,7 +123,10 @@ const productSlice = createSlice({
       )
       .addCase(fetchStoreProducts.rejected, (state, action) => {
         state.status = "failed";
-        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch store products";
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : "Failed to fetch store products";
       })
       // Create product
       .addCase(createProduct.pending, (state) => {
@@ -154,9 +165,13 @@ const productSlice = createSlice({
       .addCase(updateCorporateProduct.fulfilled, (state, action) => {
         state.status = "succeeded";
         // Handle the case where action.payload might be an object with a message property
-        if (typeof action.payload === 'string') {
+        if (typeof action.payload === "string") {
           state.successMessage = action.payload;
-        } else if (action.payload && typeof action.payload === 'object' && 'message' in action.payload) {
+        } else if (
+          action.payload &&
+          typeof action.payload === "object" &&
+          "message" in action.payload
+        ) {
           // If it's an object with a message property, use that
           state.successMessage = action.payload.message as string;
         } else {
@@ -165,7 +180,10 @@ const productSlice = createSlice({
       })
       .addCase(updateCorporateProduct.rejected, (state, action) => {
         state.status = "failed";
-        state.error = typeof action.payload === 'string' ? action.payload : "Failed to update corporate product";
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : "Failed to update corporate product";
       })
       // Update store product
       .addCase(updateStoreProduct.pending, (state) => {
@@ -180,6 +198,20 @@ const productSlice = createSlice({
       .addCase(updateStoreProduct.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || "Failed to update store product";
+      })
+      // Delete store product
+      .addCase(deleteStoreProduct.pending, (state) => {
+        state.status = "loading";
+        state.currentOperation = "delete_store_product";
+        state.error = null;
+      })
+      .addCase(deleteStoreProduct.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.successMessage = action.payload;
+      })
+      .addCase(deleteStoreProduct.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Failed to delete store product";
       });
   },
 });

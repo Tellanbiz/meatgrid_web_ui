@@ -19,14 +19,10 @@ export const selectCorporateProductById = (
   );
 };
 
-export const selectStoreProductById = (
-  state: RootState,
-  productId: string
-) => {
+export const selectStoreProductById = (state: RootState, productId: string) => {
   return (
-    state.products.storeProducts.find(
-      (product) => product.id === productId
-    ) || null
+    state.products.storeProducts.find((product) => product.id === productId) ||
+    null
   );
 };
 
@@ -74,3 +70,7 @@ export const selectProductSuccessMessage = (state: RootState) =>
   state.products.successMessage;
 
 export const selectProductStatus = (state: RootState) => state.products.status;
+
+export const selectIsDeletingStoreProduct = (state: RootState) =>
+  state.products.status === "loading" &&
+  state.products.currentOperation === "delete_store_product";

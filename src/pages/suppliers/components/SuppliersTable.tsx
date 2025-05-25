@@ -174,6 +174,7 @@ const SuppliersTable = ({ onEdit }: SuppliersTableProps) => {
           ></Column>
         </DataTable>
       </div>
+      
       <DeleteDialog
         isLoading={isDeletingSupplier}
         onConfirm={handleConfirmDelete}

@@ -44,8 +44,8 @@ const AddCorporateProductDialog = ({
   const dispatch = useAppDispatch();
 
   // Form state
-  const [weight, setWeight] = useState<number>(1);
-  const [regularPrice, setRegularPrice] = useState<number>(0);
+  const [weight, setWeight] = useState<string>("1");
+  const [regularPrice, setRegularPrice] = useState<string>("0");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -65,8 +65,8 @@ const AddCorporateProductDialog = ({
   // Reset form when dialog opens
   useEffect(() => {
     if (open) {
-      setWeight(1);
-      setRegularPrice(0);
+      setWeight("1");
+      setRegularPrice("0");
       setSelectedProduct(null);
       setSearchQuery("");
     }
@@ -90,13 +90,16 @@ const AddCorporateProductDialog = ({
       return;
     }
 
-    if (weight <= 0) {
-      toast.error("Weight must be greater than zero");
+    const weightValue = parseFloat(weight);
+    const priceValue = parseFloat(regularPrice);
+
+    if (isNaN(weightValue) || weightValue <= 0) {
+      toast.error("Weight must be a valid number greater than zero");
       return;
     }
 
-    if (regularPrice <= 0) {
-      toast.error("Price must be greater than zero");
+    if (isNaN(priceValue) || priceValue <= 0) {
+      toast.error("Price must be a valid number greater than zero");
       return;
     }
 
@@ -105,8 +108,8 @@ const AddCorporateProductDialog = ({
         updateCorporateProduct({
           user_id: contextId,
           product_id: selectedProduct.id,
-          weight: weight,
-          regular_price: regularPrice,
+          weight: weightValue,
+          regular_price: priceValue,
         })
       );
     } else if (context === "store") {
@@ -114,8 +117,8 @@ const AddCorporateProductDialog = ({
         updateStoreProduct({
           store_id: contextId,
           product_id: selectedProduct.id,
-          weight: weight,
-          regular_price: regularPrice,
+          weight: weightValue,
+          regular_price: priceValue,
         })
       );
     }
@@ -135,8 +138,8 @@ const AddCorporateProductDialog = ({
   const handleProductSelect = (product: Product) => {
     setSelectedProduct(product);
     // Initialize price and weight based on the selected product
-    setRegularPrice(product.regular_price);
-    setWeight(product.weight);
+    setRegularPrice(product.regular_price.toString());
+    setWeight(product.weight.toString());
   };
 
   return (
@@ -275,9 +278,9 @@ const AddCorporateProductDialog = ({
                     id="weight"
                     type="number"
                     value={weight}
-                    onChange={(e) => setWeight(Number(e.target.value))}
+                    onChange={(e) => setWeight(e.target.value)}
                     min="0.01"
-                    step="0.01"
+                    step="any"
                     required
                     className="border-gray-200"
                   />
@@ -289,8 +292,9 @@ const AddCorporateProductDialog = ({
                     id="regularPrice"
                     type="number"
                     value={regularPrice}
-                    onChange={(e) => setRegularPrice(Number(e.target.value))}
+                    onChange={(e) => setRegularPrice(e.target.value)}
                     min="0"
+                    step="any"
                     required
                     className="border-gray-200"
                   />
