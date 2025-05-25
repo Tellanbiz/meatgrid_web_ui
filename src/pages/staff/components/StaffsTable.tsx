@@ -76,11 +76,11 @@ const StaffsTable = ({ onUpdatePermissions }: StaffsTableProps) => {
 
   const booleanTemplate = (rowData: Staff, field: keyof Staff) => {
     return rowData[field] ? (
-      <div className="flex justify-center">
+      <div className="flex justify-start">
         <Check className="h-5 w-5 text-green-500" />
       </div>
     ) : (
-      <div className="flex justify-center">
+      <div className="flex justify-start">
         <X className="h-5 w-5 text-red-500" />
       </div>
     );
