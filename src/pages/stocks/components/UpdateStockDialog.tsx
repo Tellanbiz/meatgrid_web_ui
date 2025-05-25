@@ -54,7 +54,6 @@ const UpdateStockDialog = ({
 
   const onSubmit = (data: UpdateStockSchema) => {
     onUpdate(data.quantity);
-    onClose();
   };
 
   return (
@@ -76,6 +75,7 @@ const UpdateStockDialog = ({
               <Input
                 id="quantity"
                 type="number"
+                step="any"
                 {...register("quantity", { valueAsNumber: true })}
               />
               {errors.quantity && (
