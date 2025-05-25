@@ -276,161 +276,155 @@ const RestockPage = () => {
           </CardContent>
         </Card>
 
-        {selectedStore && selectedStorageType && (
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0">
-              <CardTitle>Products to Restock</CardTitle>
-              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="flex items-center gap-2" variant="default">
-                    <Plus className="h-4 w-4" />
-                    Add Product
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Add Product for Restocking</DialogTitle>
-                    <DialogDescription>
-                      Select a product and specify quantity
-                    </DialogDescription>
-                  </DialogHeader>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardTitle>Products to Restock</CardTitle>
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="flex items-center gap-2" variant="default">
+                  <Plus className="h-4 w-4" />
+                  Add Product
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add Product for Restocking</DialogTitle>
+                  <DialogDescription>
+                    Select a product and specify quantity
+                  </DialogDescription>
+                </DialogHeader>
 
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleAddProduct();
-                    }}
-                  >
-                    <div className="grid gap-4 py-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="product">Product</Label>
-                        <Select
-                          value={selectedProductId}
-                          onValueChange={(value) => {
-                            const product = products.find(
-                              (p) => p.id === value
-                            );
-                            if (product) {
-                              handleSelectProduct(product);
-                            }
-                          }}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select a product" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {products.map((product) => (
-                              <SelectItem key={product.id} value={product.id}>
-                                {product.name} ({product.unit_type})
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="quantity">
-                          Quantity{" "}
-                          {selectedProduct
-                            ? `(${selectedProduct.unit_type})`
-                            : ""}
-                        </Label>
-                        <Input
-                          id="quantity"
-                          type="number"
-                          step="any"
-                          value={productQuantity}
-                          onChange={(e) =>
-                            setProductQuantity(Number(e.target.value))
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleAddProduct();
+                  }}
+                >
+                  <div className="grid gap-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="product">Product</Label>
+                      <Select
+                        value={selectedProductId}
+                        onValueChange={(value) => {
+                          const product = products.find((p) => p.id === value);
+                          if (product) {
+                            handleSelectProduct(product);
                           }
-                          className="w-full"
-                        />
-                      </div>
+                        }}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select a product" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {products.map((product) => (
+                            <SelectItem key={product.id} value={product.id}>
+                              {product.name} ({product.unit_type})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
 
-                    <DialogFooter>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setIsAddDialogOpen(false)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        type="submit"
-                        disabled={!selectedProduct || productQuantity <= 0}
-                      >
-                        Add to Restock
-                      </Button>
-                    </DialogFooter>
-                  </form>
-                </DialogContent>
-              </Dialog>
-            </CardHeader>
-            <CardContent>
-              {productsToRestock.length === 0 ? (
-                <div className="text-center py-12 border rounded-md bg-gray-50">
-                  <p className="text-muted-foreground">
-                    No products added for restocking yet.
-                  </p>
-                  <Button
-                    variant="outline"
-                    className="mt-4"
-                    onClick={() => setIsAddDialogOpen(true)}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Product
-                  </Button>
-                </div>
-              ) : (
-                <div className="border rounded-md overflow-hidden">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[400px]">
-                          Product Name
-                        </TableHead>
-                        <TableHead>Quantity</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                    <div className="space-y-2">
+                      <Label htmlFor="quantity">
+                        Quantity{" "}
+                        {selectedProduct
+                          ? `(${selectedProduct.unit_type})`
+                          : ""}
+                      </Label>
+                      <Input
+                        id="quantity"
+                        type="number"
+                        step="any"
+                        value={productQuantity}
+                        onChange={(e) =>
+                          setProductQuantity(Number(e.target.value))
+                        }
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+
+                  <DialogFooter>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsAddDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={!selectedProduct || productQuantity <= 0}
+                    >
+                      Add to Restock
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </CardHeader>
+          <CardContent>
+            {productsToRestock.length === 0 ? (
+              <div className="text-center py-12 border rounded-md bg-gray-50">
+                <p className="text-muted-foreground">
+                  No products added for restocking yet.
+                </p>
+                <Button
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() => setIsAddDialogOpen(true)}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Product
+                </Button>
+              </div>
+            ) : (
+              <div className="border rounded-md overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[400px]">Product Name</TableHead>
+                      <TableHead>Quantity</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {productsToRestock.map((product) => (
+                      <TableRow key={product.id}>
+                        <TableCell className="font-medium">
+                          {product.name}
+                        </TableCell>
+                        <TableCell>
+                          {product.quantity} {product.unit_type}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditProduct(product)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteProduct(product.id)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {productsToRestock.map((product) => (
-                        <TableRow key={product.id}>
-                          <TableCell className="font-medium">
-                            {product.name}
-                          </TableCell>
-                          <TableCell>
-                            {product.quantity} {product.unit_type}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleEditProduct(product)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleDeleteProduct(product.id)}
-                                className="text-red-500 hover:text-red-700"
-                              >
-                                <Trash className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent>
