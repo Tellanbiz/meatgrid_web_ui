@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle, Loader2, RefreshCcw } from "lucide-react";
+import { ArrowRight, Loader2, RefreshCcw } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import BackButton from "../../components/BackButton";
 import { Input } from "../../components/ui/input";
@@ -263,7 +263,7 @@ const SelectProductsPage = () => {
     rawMaterials.length === 0 || processedProducts.length !== 1;
 
   return (
-    <div>
+    <div className="h-full p-6 space-y-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <BackButton />
@@ -373,7 +373,7 @@ const SelectProductsPage = () => {
               ))
             ) : (
               <p className="text-sm text-gray-500 text-center">
-                No processed products added.
+                No processed product added.
               </p>
             )}
           </div>
@@ -426,6 +426,7 @@ const SelectProductsPage = () => {
                 </p>
                 <Input
                   type="number"
+                  step="any"
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
                   placeholder="Enter quantity"
@@ -441,7 +442,14 @@ const SelectProductsPage = () => {
               >
                 Cancel
               </Button>
-              <Button type="submit">Add</Button>
+              <Button
+                type="submit"
+                disabled={
+                  !selectedProduct || parseFloat(quantity) <= 0 || !quantity
+                }
+              >
+                Add
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -462,12 +470,14 @@ const SelectProductsPage = () => {
                   onChange={(e) => setProcessedDate(e.target.value)}
                   placeholder="mm/dd/yy"
                   required
+                  className="w-fit"
                 />
                 <Input
                   type="time"
                   value={processedTime}
                   onChange={(e) => setProcessedTime(e.target.value)}
                   required
+                  className="w-fit"
                 />
               </div>
             </div>
@@ -481,12 +491,14 @@ const SelectProductsPage = () => {
                   onChange={(e) => setExpiryDate(e.target.value)}
                   placeholder="mm/dd/yy"
                   required
+                  className="w-fit"
                 />
                 <Input
                   type="time"
                   value={expiryTime}
                   onChange={(e) => setExpiryTime(e.target.value)}
                   required
+                  className="w-fit"
                 />
               </div>
             </div>
@@ -516,7 +528,6 @@ const SelectProductsPage = () => {
                 </>
               ) : (
                 <>
-                  <CheckCircle className="mr-2 h-4 w-4" />
                   Complete
                 </>
               )}
