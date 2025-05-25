@@ -76,7 +76,7 @@ const TransferStockPage = () => {
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<string>("");
-  const [productQuantity, setProductQuantity] = useState<number>(1);
+  const [productQuantity, setProductQuantity] = useState<string>("1");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] =
@@ -99,17 +99,20 @@ const TransferStockPage = () => {
     if (value === receivingStore) {
       setReceivingStore("");
     }
-    setProductsToTransfer([]);
   };
 
   const handleSelectProduct = (product: Product) => {
     setSelectedProduct(product);
     setSelectedProductId(product.id);
-    setProductQuantity(1);
   };
 
   const handleAddProduct = () => {
-    if (!selectedProduct || productQuantity <= 0) return;
+    if (
+      !selectedProduct ||
+      !productQuantity ||
+      parseFloat(productQuantity) <= 0
+    )
+      return;
 
     const product = products.find((p) => p.id === selectedProductId);
     if (!product) return;
@@ -117,36 +120,41 @@ const TransferStockPage = () => {
     const newProduct: ProductToTransfer = {
       id: product.id,
       name: product.name,
-      quantity: productQuantity,
+      quantity: parseFloat(productQuantity),
       unit_type: product.unit_type,
     };
 
     setProductsToTransfer([...productsToTransfer, newProduct]);
     setSelectedProduct(null);
     setSelectedProductId("");
-    setProductQuantity(1);
+    setProductQuantity("1");
     setIsAddDialogOpen(false);
+  };
+
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProductQuantity(e.target.value);
   };
 
   const handleEditProduct = (product: ProductToTransfer) => {
     setEditingProduct(product);
-    setProductQuantity(product.quantity);
+    setProductQuantity(product.quantity.toString());
     setIsEditDialogOpen(true);
   };
 
   const handleUpdateProduct = () => {
-    if (!editingProduct || productQuantity <= 0) return;
+    if (!editingProduct || !productQuantity || parseFloat(productQuantity) <= 0)
+      return;
 
     const updatedProducts = productsToTransfer.map((p) => {
       if (p.id === editingProduct.id) {
-        return { ...p, quantity: productQuantity };
+        return { ...p, quantity: parseFloat(productQuantity) };
       }
       return p;
     });
 
     setProductsToTransfer(updatedProducts);
     setEditingProduct(null);
-    setProductQuantity(1);
+    setProductQuantity("1");
     setIsEditDialogOpen(false);
   };
 
@@ -281,155 +289,152 @@ const TransferStockPage = () => {
           </CardContent>
         </Card>
 
-        {originalStore && receivingStore && storageType && (
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0">
-              <CardTitle>Products to Transfer</CardTitle>
-              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="flex items-center gap-2" variant="default">
-                    <Plus className="h-4 w-4" />
-                    Add Product
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Add Product for Transfer</DialogTitle>
-                    <DialogDescription>
-                      Select a product and specify quantity
-                    </DialogDescription>
-                  </DialogHeader>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardTitle>Products to Transfer</CardTitle>
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="flex items-center gap-2" variant="default">
+                  <Plus className="h-4 w-4" />
+                  Add Product
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add Product for Transfer</DialogTitle>
+                  <DialogDescription>
+                    Select a product and specify quantity
+                  </DialogDescription>
+                </DialogHeader>
 
-                  <div className="grid gap-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="product">Product</Label>
-                      <Select
-                        value={selectedProductId}
-                        onValueChange={(value) => {
-                          const product = products.find((p) => p.id === value);
-                          if (product) {
-                            handleSelectProduct(product);
-                          }
-                        }}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a product" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {products
-                            .filter((p) => p.stock_info?.total_instock > 0)
-                            .map((product) => (
-                              <SelectItem key={product.id} value={product.id}>
-                                {product.name} - Available:{" "}
-                                {product.stock_info?.total_instock}{" "}
-                                {product.unit_type}
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="quantity">
-                        Quantity{" "}
-                        {selectedProduct
-                          ? `(${selectedProduct.unit_type})`
-                          : ""}
-                      </Label>
-                      <Input
-                        id="quantity"
-                        type="number"
-                        min="1"
-                        value={productQuantity}
-                        onChange={(e) =>
-                          setProductQuantity(Number(e.target.value))
+                <div className="grid gap-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="product">Product</Label>
+                    <Select
+                      value={selectedProductId}
+                      onValueChange={(value) => {
+                        const product = products.find((p) => p.id === value);
+                        if (product) {
+                          handleSelectProduct(product);
                         }
-                        className="w-full"
-                      />
-                    </div>
+                      }}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a product" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {products
+                          .filter((p) => p.stock_info?.total_instock > 0)
+                          .map((product) => (
+                            <SelectItem key={product.id} value={product.id}>
+                              {product.name} - Available:{" "}
+                              {product.stock_info?.total_instock}{" "}
+                              {product.unit_type}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
-                  <DialogFooter>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsAddDialogOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      onClick={handleAddProduct}
-                      disabled={!selectedProduct || productQuantity <= 0}
-                    >
-                      Add to Transfer
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </CardHeader>
-            <CardContent>
-              {productsToTransfer.length === 0 ? (
-                <div className="text-center py-12 border rounded-md bg-gray-50">
-                  <p className="text-muted-foreground">
-                    No products added for transfer yet.
-                  </p>
+                  <div className="space-y-2">
+                    <Label htmlFor="quantity">
+                      Quantity{" "}
+                      {selectedProduct ? `(${selectedProduct.unit_type})` : ""}
+                    </Label>
+                    <Input
+                      id="quantity"
+                      type="number"
+                      step="any"
+                      value={productQuantity}
+                      onChange={handleQuantityChange}
+                      className="w-full"
+                      min="0"
+                    />
+                  </div>
+                </div>
+
+                <DialogFooter>
                   <Button
                     variant="outline"
-                    className="mt-4"
-                    onClick={() => setIsAddDialogOpen(true)}
+                    onClick={() => setIsAddDialogOpen(false)}
                   >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Product
+                    Cancel
                   </Button>
-                </div>
-              ) : (
-                <div className="border rounded-md overflow-hidden">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[400px]">
-                          Product Name
-                        </TableHead>
-                        <TableHead>Quantity</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                  <Button
+                    onClick={handleAddProduct}
+                    disabled={
+                      !selectedProduct ||
+                      parseFloat(productQuantity) <= 0 ||
+                      !productQuantity
+                    }
+                  >
+                    Add to Transfer
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </CardHeader>
+          <CardContent>
+            {productsToTransfer.length === 0 ? (
+              <div className="text-center py-12 border rounded-md bg-gray-50">
+                <p className="text-muted-foreground">
+                  No products added for transfer yet.
+                </p>
+                <Button
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() => setIsAddDialogOpen(true)}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Product
+                </Button>
+              </div>
+            ) : (
+              <div className="border rounded-md overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[400px]">Product Name</TableHead>
+                      <TableHead>Quantity</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {productsToTransfer.map((product) => (
+                      <TableRow key={product.id}>
+                        <TableCell className="font-medium">
+                          {product.name}
+                        </TableCell>
+                        <TableCell>
+                          {product.quantity} {product.unit_type}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditProduct(product)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteProduct(product.id)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {productsToTransfer.map((product) => (
-                        <TableRow key={product.id}>
-                          <TableCell className="font-medium">
-                            {product.name}
-                          </TableCell>
-                          <TableCell>
-                            {product.quantity} {product.unit_type}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleEditProduct(product)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleDeleteProduct(product.id)}
-                                className="text-red-500 hover:text-red-700"
-                              >
-                                <Trash className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent>
@@ -449,10 +454,11 @@ const TransferStockPage = () => {
                 <Input
                   id="edit-quantity"
                   type="number"
-                  min="1"
+                  step="any"
                   value={productQuantity}
-                  onChange={(e) => setProductQuantity(Number(e.target.value))}
+                  onChange={(e) => setProductQuantity(e.target.value)}
                   className="w-full"
+                  min="0"
                 />
               </div>
             </div>
@@ -466,7 +472,7 @@ const TransferStockPage = () => {
               </Button>
               <Button
                 onClick={handleUpdateProduct}
-                disabled={productQuantity <= 0}
+                disabled={parseFloat(productQuantity) <= 0 || !productQuantity}
               >
                 Update Quantity
               </Button>

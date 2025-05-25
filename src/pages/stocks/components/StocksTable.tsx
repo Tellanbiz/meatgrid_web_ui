@@ -57,7 +57,6 @@ const StocksTable = () => {
     setIsModalOpen(true);
   };
   const handleCloseModal = () => {
-    setSelectedStock(null);
     setIsModalOpen(false);
   };
   const handleUpdateStock = async (newQuantity: number) => {

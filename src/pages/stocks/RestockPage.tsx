@@ -338,7 +338,7 @@ const RestockPage = () => {
                         <Input
                           id="quantity"
                           type="number"
-                          min="1"
+                          step="any"
                           value={productQuantity}
                           onChange={(e) =>
                             setProductQuantity(Number(e.target.value))
