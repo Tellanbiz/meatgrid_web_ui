@@ -42,8 +42,8 @@ const UpdateCorporateProductDialog = ({
   const dispatch = useAppDispatch();
 
   // Form state
-  const [weight, setWeight] = useState<number>(0);
-  const [regularPrice, setRegularPrice] = useState<number>(0);
+  const [weight, setWeight] = useState<string>("0");
+  const [regularPrice, setRegularPrice] = useState<string>("0");
 
   // Redux selectors for loading state and messages
   const isUpdatingCorporateProduct = useAppSelector(
@@ -57,8 +57,8 @@ const UpdateCorporateProductDialog = ({
   // Set initial form values when product changes
   useEffect(() => {
     if (product) {
-      setWeight(product.weight);
-      setRegularPrice(product.regular_price);
+      setWeight(product.weight.toString());
+      setRegularPrice(product.regular_price.toString());
     }
   }, [product]);
 
@@ -75,14 +75,18 @@ const UpdateCorporateProductDialog = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!product || !contextId) return;
+    if (!product || !contextId || !weight || !regularPrice) return;
+
+    const weightValue = parseFloat(weight);
+    const priceValue = parseFloat(regularPrice);
+
     if (context === "organization") {
       dispatch(
         updateCorporateProduct({
           user_id: contextId,
           product_id: product.id,
-          weight: weight,
-          regular_price: regularPrice,
+          weight: weightValue,
+          regular_price: priceValue,
         })
       );
     } else if (context === "store") {
@@ -90,8 +94,8 @@ const UpdateCorporateProductDialog = ({
         updateStoreProduct({
           store_id: contextId,
           product_id: product.id,
-          weight: weight,
-          regular_price: regularPrice,
+          weight: weightValue,
+          regular_price: priceValue,
         })
       );
     }
@@ -141,9 +145,9 @@ const UpdateCorporateProductDialog = ({
             <Input
               id="weight"
               type="number"
+              step="any"
               value={weight}
-              onChange={(e) => setWeight(Number(e.target.value))}
-              min="0"
+              onChange={(e) => setWeight(e.target.value)}
               required
               className="border-gray-200"
             />
@@ -154,8 +158,9 @@ const UpdateCorporateProductDialog = ({
             <Input
               id="regularPrice"
               type="number"
+              step="any"
               value={regularPrice}
-              onChange={(e) => setRegularPrice(Number(e.target.value))}
+              onChange={(e) => setRegularPrice(e.target.value)}
               min="0"
               required
               className="border-gray-200"

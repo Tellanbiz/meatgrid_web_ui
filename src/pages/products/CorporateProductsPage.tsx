@@ -56,7 +56,7 @@ const CorporateProductsPage = () => {
   const contextId = organizationId || warehouseId;
 
   const [searchString, setSearchString] = useState("");
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useModal();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useModal();
   const [selectedProduct, setSelectedProduct] = useState<
