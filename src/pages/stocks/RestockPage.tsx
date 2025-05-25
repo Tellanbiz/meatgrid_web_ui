@@ -51,6 +51,7 @@ import {
 } from "../../store/features/stock/stockSelectors";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { clearStockMessages } from "../../store/features/stock/stockSlice";
 
 interface ProductToRestock {
   id: string;
@@ -95,8 +96,9 @@ const RestockPage = () => {
   useEffect(() => {
     if (stocksError) {
       toast.error(stocksError);
+      dispatch(clearStockMessages());
     }
-  }, [stocksError]);
+  }, [stocksError, dispatch]);
 
   const handleSelectProduct = (product: Product) => {
     setSelectedProduct(product);

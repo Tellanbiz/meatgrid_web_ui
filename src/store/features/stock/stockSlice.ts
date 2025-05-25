@@ -34,7 +34,25 @@ const initialState: StocksState = {
 const stockSlice = createSlice({
   name: "stocks",
   initialState,
-  reducers: {},
+  reducers: {
+    clearStocks: (state) => {
+      state.stocks = [];
+      state.currentOperation = null;
+      state.status = "idle";
+      state.error = null;
+      state.successMessage = null;
+    },
+    resetStockState: (state) => {
+      state.status = "idle";
+      state.error = null;
+      state.currentOperation = null;
+      state.successMessage = null;
+    },
+    clearStockMessages: (state) => {
+      state.successMessage = null;
+      state.error = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchStocks.pending, (state) => {
@@ -92,4 +110,9 @@ const stockSlice = createSlice({
   },
 });
 
+export const {
+  clearStocks,
+  resetStockState,
+  clearStockMessages,
+} = stockSlice.actions;
 export default stockSlice.reducer;
