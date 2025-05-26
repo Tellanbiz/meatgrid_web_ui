@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { useLocation, useParams } from "react-router-dom";
-import BackButton from "../../components/BackButton";
+import BackButton from "@/components/buttons/BackButton";
 import {
   selectCorporateProducts,
   selectStoreProducts,
@@ -12,13 +12,13 @@ import {
   selectIsDeletingStoreProduct,
 } from "../../store/features/products/productSelectors";
 import { deleteStoreProduct } from "../../store/features/products/storeProductThunks";
-import DeleteDialog from "../../components/DeleteDialog";
+import DeleteDialog from "@/components/dialogs/DeleteDialog";
 import { ProgressBar } from "primereact/progressbar";
 import { fetchCorporateProducts } from "../../store/features/products/corporateProductThunks";
 import { CorporateProduct } from "../../store/features/products/corporateProductTypes";
 import { StoreProduct } from "../../store/features/products/storeProductTypes";
 import { BaseProduct } from "../../store/features/products/productTypes";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import {
@@ -29,8 +29,11 @@ import {
   Trash2,
   Plus,
 } from "lucide-react";
-import { TableHeaderStyle, DataTableStyle } from "../../constants/TableStyles";
-import { Input } from "../../components/ui/input";
+import {
+  TableHeaderStyle,
+  DataTableStyle,
+} from "../../shared/constants/TableStyles";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { clearProductMessages } from "../../store/features/products/productSlice";
 import {
@@ -44,8 +47,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
-import { useModal } from "../../hooks/use-modal";
+} from "@/components/ui/dropdown-menu";
+import { useModal } from "../../shared/hooks/use-modal";
 
 const CorporateProductsPage = () => {
   const dispatch = useAppDispatch();

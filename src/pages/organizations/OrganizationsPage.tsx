@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -14,8 +14,11 @@ import { UserAccount } from "../../store/features/accounts/accountTypes";
 import { ProgressBar } from "primereact/progressbar";
 import { toast } from "sonner";
 import { CheckCircle, RefreshCcw, XCircle } from "lucide-react";
-import { DataTableStyle, TableHeaderStyle } from "../../constants/TableStyles";
-import { Badge } from "../../components/ui/badge";
+import {
+  DataTableStyle,
+  TableHeaderStyle,
+} from "../../shared/constants/TableStyles";
+import { Badge } from "@/components/ui/badge";
 import { formatDate } from "../../utils/dateUtils";
 
 const OrganizationsPage = () => {

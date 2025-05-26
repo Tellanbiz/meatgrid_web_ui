@@ -12,7 +12,7 @@ import {
 import { Schedule } from "../../store/features/schedules/scheduleTypes";
 import NewScheduleDialog from "./components/NewScheduleDialog";
 import EditScheduleDialog from "./components/EditScheduleDialog";
-import { useModal } from "../../hooks/use-modal";
+import { useModal } from "../../shared/hooks/use-modal";
 import { toast } from "sonner";
 import { clearScheduleMessages } from "../../store/features/schedules/scheduleSlice";
 

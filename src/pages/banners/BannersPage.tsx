@@ -6,8 +6,7 @@ import {
   selectIsDeletingBanner,
 } from "../../store/features/banners/bannerSelectors";
 import { selectTags } from "../../store/features/tags/tagSelectors";
-import LoadingPage from "../../components/LoadingPage";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Plus, RefreshCcw } from "lucide-react";
 import { useEffect } from "react";
 import {
@@ -20,11 +19,12 @@ import { selectCategories } from "../../store/features/categories/categorySelect
 import { fetchCategories } from "../../store/features/categories/categoryThunks";
 import { useNavigate } from "react-router-dom";
 import BannerList from "./components/BannerList";
-import DeleteDialog from "../../components/DeleteDialog";
+import DeleteDialog from "@/components/dialogs/DeleteDialog";
 import { Banner } from "../../store/features/banners/bannerTypes";
 import { toast } from "sonner";
-import { useModal } from "../../hooks/use-modal";
+import { useModal } from "../../shared/hooks/use-modal";
 import { clearBannerMessages } from "../../store/features/banners/bannerSlice";
+import LoadingPage from "@/components/navigation/LoadingPage";
 
 const BannersPage = () => {
   const navigate = useNavigate();

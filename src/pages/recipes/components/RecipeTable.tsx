@@ -5,19 +5,19 @@ import { DataTable } from "primereact/datatable";
 import {
   DataTableStyle,
   TableHeaderStyle,
-} from "../../../constants/TableStyles";
+} from "../../../shared/constants/TableStyles.ts";
 
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { EllipsisVertical, Pencil, Trash } from "lucide-react";
-import { Button } from "../../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../../components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
-import DeleteDialog from "../../../components/DeleteDialog";
+import DeleteDialog from "@/components/dialogs/DeleteDialog.tsx";
 import { toast } from "sonner";
 import {
   deleteRecipe,
@@ -25,7 +25,7 @@ import {
 } from "../../../store/features/recipe/recipeThunks.ts";
 import { Recipe } from "../../../store/features/recipe/recipeTypes.ts";
 import { ProgressBar } from "primereact/progressbar";
-import { useModal } from "../../../hooks/use-modal.ts";
+import { useModal } from "../../../shared/hooks/use-modal.ts";
 
 const RecipeTable = () => {
   const dispatch = useAppDispatch();

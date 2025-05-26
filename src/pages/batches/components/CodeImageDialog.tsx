@@ -5,10 +5,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "../../../components/ui/dialog";
-import { Button } from "../../../components/ui/button";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
-import { Skeleton } from "../../../components/ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 
 interface CodeImageDialogProps {
@@ -75,7 +75,7 @@ const CodeImageDialog: React.FC<CodeImageDialogProps> = ({
           </div>
         </div>
         <DialogFooter className="sm:justify-end">
-          <Button 
+          <Button
             type="button"
             onClick={handleDownload}
             disabled={isDownloading}

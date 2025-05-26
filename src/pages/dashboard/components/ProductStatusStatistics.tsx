@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/helpers/utils";
 
 const ProductStatusStatistics: FC = () => {
   const [date, setDate] = React.useState<Date>(new Date());

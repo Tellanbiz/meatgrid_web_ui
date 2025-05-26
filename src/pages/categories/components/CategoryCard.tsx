@@ -13,7 +13,7 @@ import { Pencil, Trash } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { selectIsDeletingCategory } from "../../../store/features/categories/categorySelectors";
 import { deleteCategory } from "../../../store/features/categories/categoryThunks";
-import DeleteDialog from "../../../components/DeleteDialog";
+import DeleteDialog from "@/components/dialogs/DeleteDialog";
 
 interface CategoryCardProps {
   category: Category;

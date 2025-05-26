@@ -1,13 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "../../components/ui/tabs";
-import { Button } from "../../components/ui/button";
-import { Checkbox } from "../../components/ui/checkbox";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { AdminPermissions } from "../../store/features/accounts/accountTypes";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
@@ -22,10 +17,10 @@ import {
 } from "../../store/features/accounts/accountThunks";
 import { toast } from "sonner";
 import { Loader2, Store, Package, Users, Tag, Settings } from "lucide-react";
-import BackButton from "../../components/BackButton";
-import LoadingPage from "../../components/LoadingPage";
-import { cn } from "../../lib/utils";
+import BackButton from "@/components/buttons/BackButton";
+import { cn } from "../../shared/helpers/utils";
 import { clearAccountMessages } from "../../store/features/accounts/accountSlice";
+import LoadingPage from "@/components/navigation/LoadingPage";
 
 const PERMISSION_GROUPS = [
   {

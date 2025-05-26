@@ -15,8 +15,8 @@ import { clearCouponMessages } from "../../store/features/coupons/couponSlice";
 import { toast } from "sonner";
 import CouponForm, { CouponFormData } from "./components/CouponForm";
 import { Loader2 } from "lucide-react";
-import { Button } from "../../components/ui/button";
-import BackButton from "../../components/BackButton";
+import { Button } from "@/components/ui/button";
+import BackButton from "@/components/buttons/BackButton";
 
 const EditCouponPage = () => {
   const { id } = useParams<{ id: string }>();

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import TextField from "../../../components/TextField";
+import TextField from "@/components/common/TextField.tsx";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
@@ -12,7 +12,7 @@ import {
 } from "../../../store/features/coupons/couponThunks.ts";
 import { selectCouponError } from "../../../store/features/coupons/couponSelectors.ts";
 import { resetCouponsState } from "../../../store/features/coupons/couponSlice.ts";
-import { Button } from "../../../components/ui/button.tsx";
+import { Button } from "@/components/ui/button.tsx";
 import { Loader2 } from "lucide-react";
 
 const AddCouponComponent = () => {

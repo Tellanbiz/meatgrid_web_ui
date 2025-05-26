@@ -4,9 +4,9 @@ import { Column } from "primereact/column";
 import {
   DataTableStyle,
   TableHeaderStyle,
-} from "../../../constants/TableStyles";
+} from "../../../shared/constants/TableStyles";
 import { Product } from "../../../store/features/products/productTypes";
-import { Badge } from "../../../components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { fetchProducts } from "../../../store/features/products/productThunks";
 import { ProgressBar } from "primereact/progressbar";
@@ -14,13 +14,13 @@ import { toast } from "sonner";
 import { fetchCategories } from "../../../store/features/categories/categoryThunks";
 import { fetchTags } from "../../../store/features/tags/tagThunks";
 import { MoreVertical, Pencil, Trash2 } from "lucide-react";
-import { Button } from "../../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../../components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import React from "react";
 import { resetProductState } from "../../../store/features/products/productSlice";
 import { fetchStores } from "../../../store/features/stores/storeThunks";

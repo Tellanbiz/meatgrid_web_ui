@@ -22,8 +22,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../../components/ui/form";
-import { Button } from "../../../components/ui/button";
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
 import {
   selectIsCancellingOrder,
   selectOrderError,
@@ -62,7 +62,6 @@ const CancelOrderModal = ({
       reason: "",
     },
   });
-
 
   useEffect(() => {
     if (successMessage) {

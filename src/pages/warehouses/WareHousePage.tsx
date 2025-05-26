@@ -5,10 +5,13 @@ import {
   RefreshCcw,
   Package,
 } from "lucide-react";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { DataTableStyle, TableHeaderStyle } from "../../constants/TableStyles";
+import {
+  DataTableStyle,
+  TableHeaderStyle,
+} from "../../shared/constants/TableStyles";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -109,7 +112,7 @@ const WareHousePage = () => {
           </Button>
         </div>
       </div>
-      
+
       {isFetchingStores && (
         <ProgressBar mode="indeterminate" style={{ height: "4px" }} />
       )}

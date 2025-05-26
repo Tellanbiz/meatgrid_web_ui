@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import TextField from "../../../components/TextField";
+import TextField from "@/components/common/TextField";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Button } from "../../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 
 export interface CouponFormData {
@@ -38,7 +38,7 @@ const CouponForm = ({
     amount: 0,
     max_used: 0,
   });
-  
+
   const isInitialRender = useRef(true);
 
   useEffect(() => {

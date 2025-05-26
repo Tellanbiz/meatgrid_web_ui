@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import {
@@ -7,7 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import RevokeAdminDialog from "./components/RevokeAdminDialog";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
@@ -22,11 +22,14 @@ import { AdminAccount } from "../../store/features/accounts/accountTypes";
 import { ProgressBar } from "primereact/progressbar";
 import { toast } from "sonner";
 import { MoreVertical, RefreshCcw, Shield, UserMinus2 } from "lucide-react";
-import { DataTableStyle, TableHeaderStyle } from "../../constants/TableStyles";
-import { Badge } from "../../components/ui/badge";
+import {
+  DataTableStyle,
+  TableHeaderStyle,
+} from "../../shared/constants/TableStyles";
+import { Badge } from "@/components/ui/badge";
 import { formatDate } from "../../utils/dateUtils";
 import { useNavigate } from "react-router-dom";
-import { useModal } from "../../hooks/use-modal";
+import { useModal } from "../../shared/hooks/use-modal";
 import { clearAccountMessages } from "../../store/features/accounts/accountSlice";
 
 const AdministratorsPage = () => {

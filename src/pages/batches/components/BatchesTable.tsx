@@ -4,24 +4,24 @@ import { Column } from "primereact/column";
 import {
   DataTableStyle,
   TableHeaderStyle,
-} from "../../../constants/TableStyles";
+} from "../../../shared/constants/TableStyles";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { fetchBatches } from "../../../store/features/batches/batchThunks";
 import { ProgressBar } from "primereact/progressbar";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { QrCode, Barcode } from "lucide-react";
-import { Button } from "../../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
 import { Batch } from "../../../store/features/batches/batchTypes";
 import { selectBatches } from "../../../store/features/batches/batchSelectors";
-import { AvatarStack } from "../../../components/ui/avatar-stack";
+import { AvatarStack } from "@/components/common/avatar-stack";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "../../../components/ui/tooltip";
+} from "@/components/ui/tooltip";
 import CodeImageDialog from "./CodeImageDialog";
 
 interface BatchesTableProps {

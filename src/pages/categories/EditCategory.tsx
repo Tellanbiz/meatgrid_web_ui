@@ -1,5 +1,5 @@
 import EditCategoryPage from "./components/EditCategoryPage";
-import Breadcrumbs from "../../components/breadcrumbs";
+import Breadcrumbs from "@/components/common/breadcrumbs";
 
 const EditCategory = () => {
   return (

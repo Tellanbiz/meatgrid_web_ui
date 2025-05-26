@@ -1,6 +1,6 @@
 import RecipeTable from "./components/RecipeTable";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Plus, RefreshCcw } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { selectIsFetchingRecipes } from "../../store/features/recipe/recipeSelectors";

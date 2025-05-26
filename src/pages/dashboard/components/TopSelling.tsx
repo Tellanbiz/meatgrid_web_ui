@@ -1,20 +1,30 @@
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Badge } from "../../../components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { Search, Loader2 } from "lucide-react";
-import { Input } from "../../../components/ui/input";
+import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { DateRange } from "react-day-picker";
-import { DateRangePicker } from "../../../components/ui/date-range-picker";
-import { Button } from "../../../components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/popover";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { format } from "date-fns";
 import { DurationOption, getDateRange } from "../../../utils/dateUtils";
-import { DataTableStyle, TableHeaderStyle } from "../../../constants/TableStyles";
+import {
+  DataTableStyle,
+  TableHeaderStyle,
+} from "../../../shared/constants/TableStyles";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../../store/store";
 import { fetchTopProducts } from "../../../store/features/reports/reportThunks";
-import { selectTopProducts, selectIsFetchingTopProducts } from "../../../store/features/reports/reportSelectors";
+import {
+  selectTopProducts,
+  selectIsFetchingTopProducts,
+} from "../../../store/features/reports/reportSelectors";
 
 interface TopSellingItem {
   name: string;
@@ -28,7 +38,8 @@ const TopSelling = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [searchTerm, setSearchTerm] = useState("");
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [selectedDuration, setSelectedDuration] = useState<DurationOption>("last_7_days");
+  const [selectedDuration, setSelectedDuration] =
+    useState<DurationOption>("last_7_days");
   const [datePopoverOpen, setDatePopoverOpen] = useState(false);
 
   const topProducts = useSelector(selectTopProducts);
@@ -36,16 +47,20 @@ const TopSelling = () => {
 
   const fetchData = () => {
     if (selectedDuration === "custom" && dateRange?.from && dateRange?.to) {
-      dispatch(fetchTopProducts({
-        start_date: format(dateRange.from, "yyyy-MM-dd"),
-        end_date: format(dateRange.to, "yyyy-MM-dd")
-      }));
+      dispatch(
+        fetchTopProducts({
+          start_date: format(dateRange.from, "yyyy-MM-dd"),
+          end_date: format(dateRange.to, "yyyy-MM-dd"),
+        })
+      );
     } else {
       const [start_date, end_date] = getDateRange(selectedDuration);
-      dispatch(fetchTopProducts({
-        start_date,
-        end_date
-      }));
+      dispatch(
+        fetchTopProducts({
+          start_date,
+          end_date,
+        })
+      );
     }
   };
 
@@ -94,27 +109,30 @@ const TopSelling = () => {
     const [start_date, end_date] = getDateRange(selectedDuration);
     const startDate = new Date(start_date);
     const endDate = new Date(end_date);
-    return `${format(startDate, "LLL dd, y")} - ${format(endDate, "LLL dd, y")}`;
+    return `${format(startDate, "LLL dd, y")} - ${format(
+      endDate,
+      "LLL dd, y"
+    )}`;
   };
 
-  const items: TopSellingItem[] = topProducts.map(product => ({
+  const items: TopSellingItem[] = topProducts.map((product) => ({
     name: product.name,
     sold: product.order_count,
     weight: product.unit_type,
     price: product.regular_price,
-    images: product.images || '/placeholder-product.png'
+    images: product.images || "/placeholder-product.png",
   }));
 
   const itemNameTemplate = (rowData: TopSellingItem) => (
     <div className="flex items-center gap-3">
       <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-        <img 
-          src={rowData.images} 
+        <img
+          src={rowData.images}
           alt={rowData.name}
           className="w-full h-full object-cover"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
-            target.src = '/placeholder-product.png';
+            target.src = "/placeholder-product.png";
           }}
         />
       </div>
@@ -137,7 +155,7 @@ const TopSelling = () => {
     </div>
   );
 
-  const filteredItems = items.filter(item =>
+  const filteredItems = items.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -222,7 +240,7 @@ const TopSelling = () => {
             emptyMessage="No products found"
             scrollable
             scrollHeight="400px"
-            style={{ height: '400px' }}
+            style={{ height: "400px" }}
           >
             <Column
               field="name"
@@ -234,11 +252,11 @@ const TopSelling = () => {
                 position: "sticky",
                 top: 0,
                 zIndex: 1,
-                paddingLeft: '1rem'
+                paddingLeft: "1rem",
               }}
-              style={{ 
-                minWidth: '300px',
-                paddingLeft: '1rem'
+              style={{
+                minWidth: "300px",
+                paddingLeft: "1rem",
               }}
               body={itemNameTemplate}
             />
@@ -252,7 +270,7 @@ const TopSelling = () => {
                 textAlign: "center",
                 position: "sticky",
                 top: 0,
-                zIndex: 1
+                zIndex: 1,
               }}
               body={revenueTemplate}
             />
@@ -267,7 +285,7 @@ const TopSelling = () => {
                 justifyContent: "center",
                 position: "sticky",
                 top: 0,
-                zIndex: 1
+                zIndex: 1,
               }}
               style={{ textAlign: "center" }}
               body={soldTemplate}

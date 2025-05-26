@@ -1,5 +1,5 @@
 import { RefreshCcw } from "lucide-react";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { useEffect, useState } from "react";
 import { fetchStaffs } from "../../store/features/staff/staffThunks";
@@ -8,7 +8,7 @@ import StaffsTable from "./components/StaffsTable";
 import UpdateStaffPermissionsDialog from "../accounts/components/UpdateStaffPermissionsDialog";
 import { selectIsFetchingStaffs } from "../../store/features/staff/staffSelectors";
 import { selectStores } from "../../store/features/stores/storeSelectors";
-import { useModal } from "../../hooks/use-modal";
+import { useModal } from "../../shared/hooks/use-modal";
 import { fetchStores } from "../../store/features/stores/storeThunks";
 
 const StaffsPage = () => {

@@ -25,7 +25,7 @@ import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { updateOrderStatus } from "../../../store/features/orders/orderThunks";
 import { toast } from "sonner";
 import { resetUpdateOrderStatusState } from "../../../store/features/orders/orderSlice";
-import { Button } from "../../../components/ui/button";
+import { Button } from "@/components/ui/button";
 
 const OrderDetailsComponent = ({ order }: { order: OrderDetails }) => {
   const dispatch = useAppDispatch();
@@ -227,7 +227,9 @@ const OrderDetailsComponent = ({ order }: { order: OrderDetails }) => {
               <div className="flex justify-center items-center bg-background text-primary rounded-full h-10 w-10">
                 {order.store.name.charAt(0).toUpperCase()}
               </div>
-              <p className="text-sm font-light text-black">{order.store.name}</p>
+              <p className="text-sm font-light text-black">
+                {order.store.name}
+              </p>
             </div>
             <Divider />
             <p className="text-sm text-gray-600">{order.store.address}</p>

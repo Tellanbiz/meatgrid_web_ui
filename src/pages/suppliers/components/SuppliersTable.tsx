@@ -4,15 +4,15 @@ import { ProgressBar } from "primereact/progressbar";
 import {
   DataTableStyle,
   TableHeaderStyle,
-} from "../../../constants/TableStyles";
+} from "../../../shared/constants/TableStyles";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../../components/ui/dropdown-menu";
-import { Button } from "../../../components/ui/button";
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { Supplier } from "../../../store/features/suppliers/supplierTypes";
 import { useEffect, useState } from "react";
@@ -21,7 +21,7 @@ import {
   fetchSuppliers,
 } from "../../../store/features/suppliers/supplierThunks";
 import { toast } from "sonner";
-import DeleteDialog from "../../../components/DeleteDialog";
+import DeleteDialog from "@/components/dialogs/DeleteDialog";
 import { resetSupplierState } from "../../../store/features/suppliers/supplierSlice";
 import {
   selectIsDeletingSupplier,
@@ -170,7 +170,7 @@ const SuppliersTable = ({ onEdit }: SuppliersTableProps) => {
           ></Column>
         </DataTable>
       </div>
-      
+
       <DeleteDialog
         isLoading={isDeletingSupplier}
         onConfirm={handleConfirmDelete}

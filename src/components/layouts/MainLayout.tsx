@@ -1,9 +1,9 @@
-import { TopNavigation } from "@/components/TopNavigation";
+import { TopNavigation } from "@/components/navigation/TopNavigation";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { SidebarInset } from "@/components/SidebarInset";
 import { Outlet } from "react-router-dom";
-import { data } from "@/data/nav-data";
 import { SideBar } from "../navigation/Sidebar";
+import { sidebarData } from "../navigation/data";
+import { cn } from "@/shared/helpers/utils";
 
 export default function MainLayout() {
   return (
@@ -14,13 +14,19 @@ export default function MainLayout() {
         </div>
         <div className="flex-1 flex flex-col min-w-0 h-full">
           <div className="flex-shrink-0">
-            <TopNavigation items={data.navMain} />
+            <TopNavigation items={sidebarData.navMain} />
           </div>
-          <SidebarInset className="flex-1 w-full overflow-auto">
+          <div
+            className={cn(
+              "bg-background relative flex flex-1 flex-col w-full overflow-auto",
+              "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
+              "flex-1 w-full overflow-auto"
+            )}
+          >
             <div className="flex flex-1 flex-col w-full  space-y-6">
               <Outlet />
             </div>
-          </SidebarInset>
+          </div>
         </div>
       </div>
     </SidebarProvider>

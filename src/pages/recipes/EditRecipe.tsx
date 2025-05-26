@@ -1,5 +1,5 @@
 import EditRecipeComponent from "./components/EditRecipeComponent";
-import BackButton from "../../components/BackButton";
+import BackButton from "@/components/buttons/BackButton";
 
 const EditRecipe = () => {
   return (

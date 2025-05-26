@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Plus, RefreshCcw } from "lucide-react";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   selectCategories,

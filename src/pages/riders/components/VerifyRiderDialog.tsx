@@ -5,8 +5,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../../components/ui/dialog";
-import { Button } from "../../../components/ui/button";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Rider } from "../../../store/features/riders/riderTypes";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { verifyRider } from "../../../store/features/riders/riderThunks";

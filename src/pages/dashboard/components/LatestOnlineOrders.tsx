@@ -1,10 +1,10 @@
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Badge } from "../../../components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import {
   DataTableStyle,
   TableHeaderStyle,
-} from "../../../constants/TableStyles";
+} from "../../../shared/constants/TableStyles";
 import { Link } from "react-router-dom";
 
 type Order = {

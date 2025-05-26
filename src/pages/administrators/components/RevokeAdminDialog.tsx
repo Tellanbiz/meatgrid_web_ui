@@ -1,7 +1,5 @@
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import {
-  selectIsUpdatingUserRole,
-} from "../../../store/features/accounts/accountSelectors";
+import { selectIsUpdatingUserRole } from "../../../store/features/accounts/accountSelectors";
 import { updateUserRole } from "../../../store/features/accounts/accountThunks";
 import { AdminAccount } from "../../../store/features/accounts/accountTypes";
 import {
@@ -11,8 +9,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../../components/ui/dialog";
-import { Button } from "../../../components/ui/button";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 
 interface RevokeAdminDialogProps {
@@ -41,7 +39,7 @@ const RevokeAdminDialog = ({
           role: "indivual",
         })
       ).unwrap();
-      
+
       // Call the success callback if provided
       if (onSuccess) {
         onSuccess();
@@ -65,9 +63,8 @@ const RevokeAdminDialog = ({
         <DialogHeader>
           <DialogTitle>Revoke Administrator Access</DialogTitle>
           <DialogDescription>
-            {admin && 
-              `Are you sure you want to revoke administrator access from ${admin.full_name}? This action will change their role to Individual.`
-            }
+            {admin &&
+              `Are you sure you want to revoke administrator access from ${admin.full_name}? This action will change their role to Individual.`}
           </DialogDescription>
         </DialogHeader>
 

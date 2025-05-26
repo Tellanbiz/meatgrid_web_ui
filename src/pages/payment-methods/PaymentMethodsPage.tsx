@@ -1,12 +1,12 @@
 import { EllipsisVertical, Pencil, Plus, RefreshCcw } from "lucide-react";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { DataTable } from "primereact/datatable";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import { Column } from "primereact/column";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
@@ -22,18 +22,21 @@ import {
   fetchPaymentMethods,
   updatePaymentMethod,
 } from "../../store/features/payment-methods/paymentMethodThunks";
-import { DataTableStyle, TableHeaderStyle } from "../../constants/TableStyles";
+import {
+  DataTableStyle,
+  TableHeaderStyle,
+} from "../../shared/constants/TableStyles";
 import { ProgressBar } from "primereact/progressbar";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "../../components/ui/dialog";
+} from "@/components/ui/dialog";
 import PaymentMethodForm, {
   PaymentMethodFormData,
 } from "./components/PaymentMethodForm";
-import { useModal } from "../../hooks/use-modal";
+import { useModal } from "../../shared/hooks/use-modal";
 import { PaymentMethod } from "../../store/features/payment-methods/paymentMethodTypes";
 import { toast } from "sonner";
 import { resetPaymentMethodState } from "../../store/features/payment-methods/paymentMethodSlice";

@@ -1,20 +1,19 @@
 import { EllipsisVertical, Pencil, Trash2 } from "lucide-react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button } from "../../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   DataTableStyle,
   TableHeaderStyle,
-} from "../../../constants/TableStyles";
+} from "../../../shared/constants/TableStyles";
 import { StorageType } from "../../../store/features/storages/storageTypes";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../../components/ui/dropdown-menu";
-import LoadingPage from "../../../components/LoadingPage";
-
+} from "@/components/ui/dropdown-menu";
+import LoadingPage from "@/components/navigation/LoadingPage.tsx";
 interface StorageTypeTableProps {
   storageTypes: StorageType[];
   isLoading: boolean;

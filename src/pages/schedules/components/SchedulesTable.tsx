@@ -4,16 +4,16 @@ import { Column } from "primereact/column";
 import {
   DataTableStyle,
   TableHeaderStyle,
-} from "../../../constants/TableStyles";
+} from "../../../shared/constants/TableStyles";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { Button } from "../../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { MoreVertical, Pencil, Trash2, Loader2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../../components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import { Schedule } from "../../../store/features/schedules/scheduleTypes";
 import {
   selectIsFetchingSchedules,
@@ -21,15 +21,15 @@ import {
   selectIsDeletingSchedule,
   selectIsUpdatingSchedule,
 } from "../../../store/features/schedules/scheduleSelectors";
-import { Badge } from "../../../components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import {
   updateSchedule,
   deleteSchedule,
   fetchSchedules,
 } from "../../../store/features/schedules/scheduleThunks";
 import { Switch } from "@/components/ui/switch";
-import DeleteDialog from "../../../components/DeleteDialog";
-import { useModal } from "../../../hooks/use-modal";
+import DeleteDialog from "@/components/dialogs/DeleteDialog";
+import { useModal } from "../../../shared/hooks/use-modal";
 import { ProgressBar } from "primereact/progressbar";
 
 interface SchedulesTableProps {

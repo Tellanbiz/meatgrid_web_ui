@@ -1,13 +1,12 @@
 import ProductsTable from "./components/ProductsTable";
 import { useNavigate } from "react-router-dom";
 import { Plus, RefreshCw, Search } from "lucide-react";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   selectIsFetchingProducts,
   selectProducts,
 } from "../../store/features/products/productSelectors";
-import ExportButton from "../../components/ExportButton";
 import ExportService from "../../service/ExportService";
 import ReportService from "../../service/ReportService";
 import { fetchProducts } from "../../store/features/products/productThunks";
@@ -15,14 +14,15 @@ import { fetchProducts } from "../../store/features/products/productThunks";
 import { fetchStores } from "../../store/features/stores/storeThunks";
 import { selectStores } from "../../store/features/stores/storeSelectors";
 import { useState, useEffect } from "react";
-import { Input } from "../../components/ui/input";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/ui/select";
+} from "@/components/ui/select";
+import ExportButton from "@/components/buttons/ExportButton";
 
 const ProductsPage = () => {
   const navigate = useNavigate();

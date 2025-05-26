@@ -10,8 +10,8 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import ImageThumbnail from "@/components/ImageThumbnail";
-import ProgressIndicator from "@/components/ProgressIndicator";
+import ImageThumbnail from "@/components/common/ImageThumbnail";
+import ProgressIndicator from "@/components/common/ProgressIndicator";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { uploadImages } from "@/store/features/uploads/uploadThunks";
 import { resetUploadState } from "@/store/features/uploads/uploadSlice";

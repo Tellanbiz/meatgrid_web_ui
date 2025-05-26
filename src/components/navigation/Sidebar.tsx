@@ -9,11 +9,11 @@ import {
   selectIsLoggingOut,
   selectLogoutSuccess,
   selectAuthStatus,
-} from "../../store/features/auth/authSelectors";
+} from "@/store/features/auth/authSelectors";
 import {
   fetchAdminAccount,
   logoutUser,
-} from "../../store/features/auth/authThunks";
+} from "@/store/features/auth/authThunks";
 
 export function SideBar() {
   const location = useLocation();
@@ -48,7 +48,7 @@ export function SideBar() {
   };
 
   return (
-    <aside className="h-screen w-[260px] bg-white border-r shadow-sm flex flex-col overflow-hidden rounded-l-2xl">
+    <aside className="h-screen w-[260px] bg-[#111226] border-r border-gray-800 shadow-sm flex flex-col overflow-hidden">
       {/* Company Header */}
       <div className="flex items-center gap-3 px-4 py-4">
         <img
@@ -57,7 +57,7 @@ export function SideBar() {
           className="w-10 h-10 rounded-lg bg-cover"
         />
         <div>
-          <div className="font-semibold text-base text-primary-500 leading-tight">
+          <div className="font-semibold text-base text-white leading-tight">
             {sidebarData.company.name}
           </div>
           <div className="text-xs text-gray-400 leading-tight">Admin Panel</div>
@@ -68,7 +68,7 @@ export function SideBar() {
         {filteredNav.map((section) => (
           <div key={section.title} className="mb-2">
             {section.url === "#" && (
-              <div className="px-4 pt-3 pb-1 text-xs font-semibold text-gray-400 tracking-widest uppercase">
+              <div className="px-4 pt-3 pb-2 text-xs font-semibold text-gray-400 tracking-widest uppercase">
                 {section.title}
               </div>
             )}
@@ -85,7 +85,7 @@ export function SideBar() {
                     <li key={item.title} className="flex flex-row space-x-2">
                       <div
                         className={`${
-                          isActive ? "bg-red-600" : ""
+                          isActive ? "bg-red-500" : ""
                         } w-1 h-[40px] rounded-tr-md py-1`}
                       ></div>
                       <NavLink
@@ -94,8 +94,8 @@ export function SideBar() {
                           `flex flex-grow items-center gap-3 py-2 pl-2 pr-4 rounded-lg text-sm font-medium transition-colors
                           ${
                             isActive
-                              ? "bg-gray-100"
-                              : "text-gray-700 hover:bg-gray-50"
+                              ? "bg-gray-800/100"
+                              : "text-gray-300 hover:bg-gray-800/30"
                           }
                           ${isActive ? "pl-0" : ""}`
                         }
@@ -104,14 +104,10 @@ export function SideBar() {
                         <Icon
                           icon={item.icon}
                           width={20}
-                          className={
-                            isActive ? "text-red-600" : "text-gray-600"
-                          }
+                          className={isActive ? "text-white" : "text-gray-400"}
                         />
                         <span
-                          className={
-                            isActive ? "text-red-600" : "text-gray-600"
-                          }
+                          className={isActive ? "text-white" : "text-gray-300"}
                         >
                           {item.title}
                         </span>
@@ -129,8 +125,8 @@ export function SideBar() {
                       `flex items-center gap-3 py-2 pl-2 pr-4 rounded-lg text-sm font-medium transition-colors
                       ${
                         isActive
-                          ? "bg-gray-100 border-l-4 border-red-500 text-primary-700 pl-0"
-                          : "text-gray-700 hover:bg-gray-50 pl-4"
+                          ? "bg-gray-800/50 border-l-4 border-red-500 text-red-500 pl-0"
+                          : "text-gray-300 hover:bg-gray-800/30 pl-4"
                       }`
                     }
                     style={{ marginLeft: 0 }}
@@ -153,22 +149,26 @@ export function SideBar() {
         ))}
       </nav>
       {/* User Profile */}
-      <div className="mt-auto px-3 py-3 border-t bg-gray-50 flex items-center gap-3">
+      <div className="mt-auto px-3 py-3 border-t border-gray-800 bg-black/20 flex items-center gap-3">
         {user ? (
           <>
             {user.picture ? (
               <img
                 src={user.picture}
                 alt={user.full_name || "User"}
-                className="w-9 h-9 rounded-full border"
+                className="w-9 h-9 rounded-full border border-gray-700"
               />
             ) : (
-              <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center border">
-                <Icon icon="solar:user-linear" width={20} className="text-gray-600" />
+              <div className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700">
+                <Icon
+                  icon="solar:user-linear"
+                  width={20}
+                  className="text-gray-400"
+                />
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <div className="font-medium text-sm text-gray-900 truncate">
+              <div className="font-medium text-sm text-white truncate">
                 {user.full_name || "User"}
               </div>
               <div className="text-xs text-gray-400 truncate">
@@ -178,25 +178,37 @@ export function SideBar() {
           </>
         ) : (
           <>
-            <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center border">
-              <Icon icon="solar:user-linear" width={20} className="text-gray-600" />
+            <div className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700">
+              <Icon
+                icon="solar:user-linear"
+                width={20}
+                className="text-gray-400"
+              />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="font-medium text-sm text-gray-900 truncate">
+              <div className="font-medium text-sm text-white truncate">
                 Loading...
               </div>
             </div>
           </>
         )}
-        <button 
-          className="p-2 hover:bg-gray-200 rounded-full"
+        <button
+          className="p-2 hover:bg-gray-800/50 rounded-full transition-colors"
           onClick={handleLogoutClick}
           disabled={isLoggingOut}
         >
           {isLoggingOut ? (
-            <Icon icon="solar:spinner-linear" width={20} className="text-gray-400 animate-spin" />
+            <Icon
+              icon="solar:spinner-linear"
+              width={20}
+              className="text-gray-400 animate-spin"
+            />
           ) : (
-            <Icon icon="solar:logout-2-linear" width={20} className="text-gray-400" />
+            <Icon
+              icon="solar:logout-2-linear"
+              width={20}
+              className="text-gray-400"
+            />
           )}
         </button>
       </div>
@@ -206,12 +218,12 @@ export function SideBar() {
           width: 5px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #e5e7eb;
+          background: #2a2a3a;
           border-radius: 4px;
         }
         .custom-scrollbar {
           scrollbar-width: thin;
-          scrollbar-color: #e5e7eb #fff;
+          scrollbar-color: #2a2a3a #111226;
         }
       `}</style>
     </aside>

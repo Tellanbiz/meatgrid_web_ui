@@ -1,8 +1,8 @@
 import { JSX } from "react";
 import { Navigate } from "react-router-dom";
-import { usePermissions } from "../hooks/usePermissions";
 import { AdminPermissions } from "../store/features/auth/authTypes";
-import NotAuthorized from "../components/NotAuthorized";
+import NotAuthorized from "../components/navigation/NotAuthorized";
+import { usePermissions } from "@/shared/hooks/usePermissions";
 
 interface PrivateRouteProps {
   children: JSX.Element;

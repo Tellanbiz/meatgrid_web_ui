@@ -3,8 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "../../store/hooks.ts";
 import { resetStatus } from "../../store/features/auth/authSlice.ts";
-import { Button } from "../../components/ui/button.tsx";
-import { Input } from "../../components/ui/input.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import { Input } from "@/components/ui/input.tsx";
 import { loginUser } from "../../store/features/auth/authThunks.ts";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 

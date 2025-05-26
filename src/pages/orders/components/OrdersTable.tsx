@@ -1,23 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import StatusBadge from "../../../components/StatusBadge";
+import StatusBadge from "@/components/common/StatusBadge";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import {
   DataTableStyle,
   TableHeaderStyle,
-} from "../../../constants/TableStyles";
-import ExportService from "../../../service/ExportService";
-import ReportService from "../../../service/ReportService";
-import ExportButton from "../../../components/ExportButton";
+} from "@/shared/constants/TableStyles";
+import ExportService from "@/service/ExportService";
+import ReportService from "@/service/ReportService";
+import ExportButton from "@/components/buttons/ExportButton";
 
-import { orderStatusColors } from "../../../constants/StatusColors";
+import { orderStatusColors } from "@/shared/constants/StatusColors";
 import {
   Order,
   OrderStatus,
   OrderFilters,
-} from "../../../store/features/orders/orderTypes";
+} from "@/store/features/orders/orderTypes";
 import { DurationOption, getDateRange } from "../../../utils/dateUtils";
 import {
   DropdownMenu,
@@ -26,10 +26,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical, XCircle, Search, Eye } from "lucide-react";
-import { Button } from "../../../components/ui/button";
-import { fetchOrders } from "../../../store/features/orders/orderThunks";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import ProgressIndicator from "../../../components/ProgressIndicator";
+import { Button } from "@/components/ui/button";
+import { fetchOrders } from "@/store/features/orders/orderThunks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import ProgressIndicator from "@/components/common/ProgressIndicator";
 import { toast } from "sonner";
 import { NavLink, useNavigate } from "react-router-dom";
 
@@ -37,17 +37,17 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "../../../components/ui/popover";
+} from "@/components/ui/popover";
 
-import { selectStores } from "../../../store/features/stores/storeSelectors";
-import { selectPaymentMethods } from "../../../store/features/payment-methods/paymentMethodSelectors";
+import { selectStores } from "@/store/features/stores/storeSelectors";
+import { selectPaymentMethods } from "@/store/features/payment-methods/paymentMethodSelectors";
 import CancelOrderModal from "./CancelOrderModal";
-import { selectIsFetchingOrders } from "../../../store/features/orders/orderSelectors";
+import { selectIsFetchingOrders } from "@/store/features/orders/orderSelectors";
 import { ProgressBar } from "primereact/progressbar";
-import { fetchStores } from "../../../store/features/stores/storeThunks";
-import { fetchPaymentMethods } from "../../../store/features/payment-methods/paymentMethodThunks";
-import { DateRangePicker } from "../../../components/ui/date-range-picker";
-import { Input } from "../../../components/ui/input";
+import { fetchStores } from "@/store/features/stores/storeThunks";
+import { fetchPaymentMethods } from "@/store/features/payment-methods/paymentMethodThunks";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { Input } from "@/components/ui/input";
 
 const OrdersTable = () => {
   const dispatch = useAppDispatch();

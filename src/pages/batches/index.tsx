@@ -3,8 +3,8 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { selectIsFetchingBatches } from "../../store/features/batches/batchSelectors";
 import { fetchBatches } from "../../store/features/batches/batchThunks";
 import { RefreshCw, Search } from "lucide-react";
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import BatchesTable from "./components/BatchesTable";
 
 const BatchesPage = () => {
@@ -45,9 +45,7 @@ const BatchesPage = () => {
               className="px-2"
             >
               <RefreshCw
-                className={`h-4 w-4 ${
-                  isFetchingBatches ? "animate-spin" : ""
-                }`}
+                className={`h-4 w-4 ${isFetchingBatches ? "animate-spin" : ""}`}
               />
               <span className="ml-2">Refresh</span>
             </Button>

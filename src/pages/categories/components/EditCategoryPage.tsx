@@ -22,18 +22,16 @@ import {
 } from "@/components/ui/select";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchCategories } from "@/store/features/categories/categoryThunks";
-import {
-  resetUploadState,
-} from "@/store/features/uploads/uploadSlice";
+import { resetUploadState } from "@/store/features/uploads/uploadSlice";
 import { updateCategory } from "@/store/features/categories/categoryThunks";
-import ImageThumbnail from "@/components/ImageThumbnail";
-import ProgressIndicator from "@/components/ProgressIndicator";
+import ImageThumbnail from "@/components/common/ImageThumbnail";
+import ProgressIndicator from "@/components/common/ProgressIndicator";
 import { toast } from "sonner";
 import { ApiError } from "@/types/ApiError";
 import { Category } from "@/store/features/categories/categoryTypes";
 import { UpdateCategoryRequest } from "@/store/features/categories/request/UpdateCategoryRequest";
 import { Loader2 } from "lucide-react";
-import { Textarea } from "../../../components/ui/textarea";
+import { Textarea } from "@/components/ui/textarea";
 import { uploadImages } from "../../../store/features/uploads/uploadThunks";
 
 const formSchema = z.object({

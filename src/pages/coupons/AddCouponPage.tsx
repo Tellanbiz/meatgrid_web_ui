@@ -10,7 +10,7 @@ import { createCoupon } from "../../store/features/coupons/couponThunks";
 import { clearCouponMessages } from "../../store/features/coupons/couponSlice";
 import { toast } from "sonner";
 import CouponForm, { CouponFormData } from "./components/CouponForm";
-import BackButton from "../../components/BackButton";
+import BackButton from "@/components/buttons/BackButton";
 
 const AddCouponPage = () => {
   const navigate = useNavigate();

@@ -1,5 +1,5 @@
 import { RefreshCcw } from "lucide-react";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { useState, useEffect } from "react";
 import { fetchRiders } from "../../store/features/riders/riderThunks";
@@ -7,7 +7,7 @@ import { Rider } from "../../store/features/riders/riderTypes";
 import { selectIsFetchingRiders } from "../../store/features/riders/riderSelectors";
 import RidersTable from "./components/RidersTable";
 import VerifyRiderDialog from "./components/VerifyRiderDialog";
-import { useModal } from "../../hooks/use-modal";
+import { useModal } from "../../shared/hooks/use-modal";
 
 const RidersPage = () => {
   const dispatch = useAppDispatch();

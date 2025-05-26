@@ -7,7 +7,7 @@ export const sidebarData = {
     {
       title: "General",
       url: "#",
-      icon: "solar:box-bold-duotone",
+      icon: "solar:home-smile-bold-duotone",
       isActive: true,
       requiredPermissions: ["allow_product_view", "allow_category_view"],
       requireAll: false,
@@ -31,13 +31,13 @@ export const sidebarData = {
         {
           title: "Products",
           url: "/products",
-          icon: "solar:tag-bold-duotone",
+          icon: "solar:tag-price-bold-duotone",
           requiredPermissions: ["allow_product_view"],
         },
         {
           title: "Categories",
           url: "/categories",
-          icon: "solar:folder-bold-duotone",
+          icon: "solar:folder-with-files-bold-duotone",
           requiredPermissions: ["allow_category_view"],
         },
       ],
@@ -53,13 +53,13 @@ export const sidebarData = {
         {
           title: "Orders",
           url: "/orders",
-          icon: "solar:cart-bold-duotone",
+          icon: "solar:cart-3-bold-duotone",
           requiredPermissions: ["allow_orders_view"],
         },
         {
           title: "Payment Methods",
           url: "/payment-methods",
-          icon: "solar:card-bold-duotone",
+          icon: "solar:card-2-bold-duotone",
           requiredPermissions: ["allow_payment_method_view"],
         },
       ],
@@ -80,19 +80,19 @@ export const sidebarData = {
         {
           title: "Stock",
           url: "/stock",
-          icon: "solar:box-bold-duotone",
+          icon: "solar:box-minimalistic-bold-duotone",
           requiredPermissions: ["allow_stock_view"],
         },
         {
           title: "Batches",
           url: "/batches",
-          icon: "solar:box-minimalistic-bold-duotone",
+          icon: "solar:box-bold-duotone",
           requiredPermissions: ["allow_product_view"],
         },
         {
           title: "Suppliers",
           url: "/suppliers",
-          icon: "solar:users-group-rounded-bold-duotone",
+          icon: "solar:users-group-two-rounded-bold-duotone",
           requiredPermissions: ["allow_suppliers_view"],
         },
         {
@@ -104,7 +104,7 @@ export const sidebarData = {
         {
           title: "Storage Types",
           url: "/storage-types",
-          icon: "solar:archive-bold-duotone",
+          icon: "solar:archive-up-bold-duotone",
           requiredPermissions: ["allow_storage_type_view"],
         },
       ],
@@ -112,7 +112,7 @@ export const sidebarData = {
     {
       title: "Marketing",
       url: "#",
-      icon: "solar:tag-price-bold-duotone",
+      icon: "solar:megaphone-bold-duotone",
       isActive: true,
       requiredPermissions: ["allow_banners_view", "allow_promotional_tag_view"],
       requireAll: false,
@@ -120,12 +120,12 @@ export const sidebarData = {
         {
           title: "Recipes",
           url: "/recipes",
-          icon: "solar:book-open-bold-duotone",
+          icon: "solar:notebook-bold-duotone",
         },
         {
           title: "Coupons",
           url: "/coupons",
-          icon: "solar:star-bold-duotone",
+          icon: "solar:ticket-bold-duotone",
         },
         {
           title: "Banners",
@@ -136,7 +136,7 @@ export const sidebarData = {
         {
           title: "Promotion Tags",
           url: "/tags",
-          icon: "solar:tag-bold-duotone",
+          icon: "solar:tag-price-bold-duotone",
           requiredPermissions: ["allow_promotional_tag_view"],
         },
       ],
@@ -155,19 +155,19 @@ export const sidebarData = {
         {
           title: "Accounts",
           url: "/accounts",
-          icon: "solar:user-bold-duotone",
+          icon: "solar:user-id-bold-duotone",
           requiredPermissions: ["allow_accounts_view"],
         },
         {
           title: "Administrators",
           url: "/administrators",
-          icon: "solar:user-bold-duotone",
+          icon: "solar:user-rounded-bold-duotone",
           requiredPermissions: ["allow_adminstrators_view"],
         },
         {
           title: "Staff Members",
           url: "/staffs",
-          icon: "solar:user-bold-duotone",
+          icon: "solar:users-group-two-rounded-bold-duotone",
           requiredPermissions: ["allow_staff_view"],
         },
         {
@@ -179,7 +179,7 @@ export const sidebarData = {
         {
           title: "Riders",
           url: "/riders",
-          icon: "solar:user-bold-duotone",
+          icon: "solar:delivery-bold-duotone",
           requiredPermissions: ["allow_riders_view"],
         },
       ],
@@ -192,7 +192,7 @@ export const sidebarData = {
         {
           title: "Delivery Schedules",
           url: "/delivery-schedules",
-          icon: "solar:calendar-bold-duotone",
+          icon: "solar:calendar-mark-bold-duotone",
           requiredPermissions: ["allow_configuration_view"],
         },
       ],

@@ -7,7 +7,7 @@ import {
   selectCouponError,
   selectIsDeletingCoupon,
 } from "../../../store/features/coupons/couponSelectors";
-import DeleteDialog from "../../../components/DeleteDialog";
+import DeleteDialog from "@/components/dialogs/DeleteDialog.tsx";
 import {
   deleteCoupon,
   fetchCoupons,
@@ -18,16 +18,16 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from "../../../components/ui/dropdown-menu";
-import { Button } from "../../../components/ui/button";
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { MoreVertical, Pencil, Trash } from "lucide-react";
 import { ProgressBar } from "primereact/progressbar";
 import { Coupon } from "../../../store/features/coupons/couponTypes";
 import {
   TableHeaderStyle,
   DataTableStyle,
-} from "../../../constants/TableStyles";
-import { useModal } from "../../../hooks/use-modal";
+} from "../../../shared/constants/TableStyles.ts";
+import { useModal } from "../../../shared/hooks/use-modal.ts";
 import { clearCouponMessages } from "../../../store/features/coupons/couponSlice.ts";
 
 const CouponsTable = () => {
@@ -259,7 +259,6 @@ const CouponsTable = () => {
         onOpenChange={() => {
           setOpenDeleteDialog(false);
         }}
-        
         onConfirm={handleDeleteConfirm}
         title="Delete Coupon"
         description={`Are you sure you want to delete the coupon "${couponToDelete?.name}"? This action cannot be undone.`}

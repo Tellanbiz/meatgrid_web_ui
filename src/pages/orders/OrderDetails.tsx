@@ -4,10 +4,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store.ts";
 import { fetchOrderById } from "../../store/features/orders/orderThunks";
 import OrderDetailsComponent from "./components/OrderDetailsComponent";
-import LoadingPage from "../../components/LoadingPage.tsx";
-import { Badge } from "../../components/ui/badge.tsx";
-import BackButton from "../../components/BackButton";
-import { orderStatusColors } from "../../constants/StatusColors.ts";
+import { Badge } from "@/components/ui/badge.tsx";
+import BackButton from "@/components/buttons/BackButton.tsx";
+import { orderStatusColors } from "@/shared/constants/StatusColors.ts";
+import LoadingPage from "@/components/navigation/LoadingPage.tsx";
 
 const OrderDetails = () => {
   const { orderId } = useParams<{ orderId: string }>();

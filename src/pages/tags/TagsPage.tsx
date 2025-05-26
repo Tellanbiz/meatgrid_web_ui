@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchTags, createTag } from "../../store/features/tags/tagThunks";
 import TagsTable from "./components/TagsTable";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Plus, RefreshCcw } from "lucide-react";
 import {
   selectIsCreatingTag,

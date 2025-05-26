@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Pencil, Trash2, Check, X } from "lucide-react";
 import { Tag } from "../../../store/features/tags/tagTypes";
 import TagModal, { TagFormValues } from "./TagModal";
-import LoadingPage from "../../../components/LoadingPage";
+import LoadingPage from "@/components/navigation/LoadingPage.tsx";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { toast } from "sonner";
 import {
@@ -16,8 +16,8 @@ import {
   selectIsFetchingTags,
   selectIsDeletingTag,
 } from "../../../store/features/tags/tagSelectors";
-import DeleteDialog from "../../../components/DeleteDialog";
-import { Button } from "../../../components/ui/button";
+import DeleteDialog from "@/components/dialogs/DeleteDialog";
+import { Button } from "@/components/ui/button";
 
 const TagsTable = () => {
   const dispatch = useAppDispatch();

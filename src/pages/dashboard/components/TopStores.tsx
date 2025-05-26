@@ -1,23 +1,23 @@
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Badge } from "../../../components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { Search, Loader2 } from "lucide-react";
-import { Input } from "../../../components/ui/input";
+import { Input } from "@/components/ui/input";
 import { useState, useEffect, useCallback } from "react";
 import { DateRange } from "react-day-picker";
-import { DateRangePicker } from "../../../components/ui/date-range-picker";
-import { Button } from "../../../components/ui/button";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "../../../components/ui/popover";
+} from "@/components/ui/popover";
 import { format } from "date-fns";
 import { DurationOption, getDateRange } from "../../../utils/dateUtils";
 import {
   DataTableStyle,
   TableHeaderStyle,
-} from "../../../constants/TableStyles";
+} from "../../../shared/constants/TableStyles";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../../store/store";
 import { fetchTopStores } from "../../../store/features/reports/reportThunks";

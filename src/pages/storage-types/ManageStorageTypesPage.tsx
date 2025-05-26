@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { selectStorageTypeById } from "../../store/features/storages/storageSelectors";
-import Breadcrumbs from "../../components/breadcrumbs";
+import Breadcrumbs from "@/components/common/breadcrumbs";
 import StorageTypeForm, {
   StorageTypeFormData,
 } from "./components/StorageTypeForm";

@@ -4,15 +4,15 @@ import { ProgressBar } from "primereact/progressbar";
 import {
   DataTableStyle,
   TableHeaderStyle,
-} from "../../../constants/TableStyles";
+} from "../../../shared/constants/TableStyles";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../../components/ui/dropdown-menu";
-import { Button } from "../../../components/ui/button";
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { MoreVertical, Settings, Check, X } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { fetchStaffs } from "../../../store/features/staff/staffThunks";

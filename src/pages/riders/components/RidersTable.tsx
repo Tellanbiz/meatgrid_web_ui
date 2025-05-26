@@ -1,7 +1,7 @@
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { ProgressBar } from "primereact/progressbar";
-import { Button } from "../../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { MoreVertical, ShieldCheck, ShieldX } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
@@ -9,11 +9,11 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../../components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import {
   DataTableStyle,
   TableHeaderStyle,
-} from "../../../constants/TableStyles";
+} from "../../../shared/constants/TableStyles";
 import {
   selectIsFetchingRiders,
   selectRiderError,
@@ -22,7 +22,7 @@ import {
 } from "../../../store/features/riders/riderSelectors";
 import { useEffect } from "react";
 import { Rider } from "../../../store/features/riders/riderTypes";
-import { Badge } from "../../../components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { fetchRiders } from "../../../store/features/riders/riderThunks";
 import { clearRiderMessages } from "../../../store/features/riders/riderSlice";
 import { toast } from "sonner";

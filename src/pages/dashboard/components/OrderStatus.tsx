@@ -1,6 +1,6 @@
 import { FC, JSX, useState } from "react";
 import { DateRange } from "react-day-picker";
-import { DateRangePicker } from "../../../components/ui/date-range-picker";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
 
 interface OrderStatusCardProps {
   title: string;

@@ -1,11 +1,11 @@
 import { Plus, RefreshCcw } from "lucide-react";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import SupplierDialog from "./components/SupplierDialog";
 import SuppliersTable from "./components/SuppliersTable";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchSuppliers } from "../../store/features/suppliers/supplierThunks";
 import { Supplier } from "../../store/features/suppliers/supplierTypes";
-import { useModal } from "../../hooks/use-modal";
+import { useModal } from "../../shared/hooks/use-modal";
 import { useState } from "react";
 import { selectIsFetchingSuppliers } from "../../store/features/suppliers/supplierSelectors";
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import {
@@ -8,7 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   selectAccounts,
@@ -23,11 +23,14 @@ import {
 import { ProgressBar } from "primereact/progressbar";
 import { toast } from "sonner";
 import { CheckCircle, MoreVertical, RefreshCcw, XCircle } from "lucide-react";
-import { DataTableStyle, TableHeaderStyle } from "../../constants/TableStyles";
-import { Badge } from "../../components/ui/badge";
+import {
+  DataTableStyle,
+  TableHeaderStyle,
+} from "../../shared/constants/TableStyles";
+import { Badge } from "@/components/ui/badge";
 import { formatDate } from "../../utils/dateUtils";
 import UpdateUserRoleDialog from "./components/UpdateUserRoleDialog";
-import { useModal } from "../../hooks/use-modal";
+import { useModal } from "../../shared/hooks/use-modal";
 import UpdateStaffPermissionsDialog from "./components/UpdateStaffPermissionsDialog";
 import { selectStores } from "../../store/features/stores/storeSelectors";
 import { fetchStores } from "../../store/features/stores/storeThunks";
@@ -37,7 +40,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/ui/select";
+} from "@/components/ui/select";
 
 const AccountsPage = () => {
   const navigate = useNavigate();
