@@ -8,7 +8,6 @@ import {
 } from "../../../constants/TableStyles";
 
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { PrimaryButton } from "../../../components/Button.tsx";
 import { EllipsisVertical, Pencil, Trash } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import {
@@ -18,14 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import DeleteDialog from "../../../components/DeleteDialog";
 import { toast } from "sonner";
 import {
   deleteRecipe,
@@ -33,6 +25,7 @@ import {
 } from "../../../store/features/recipe/recipeThunks.ts";
 import { Recipe } from "../../../store/features/recipe/recipeTypes.ts";
 import { ProgressBar } from "primereact/progressbar";
+import { useModal } from "../../../hooks/use-modal.ts";
 
 const RecipeTable = () => {
   const dispatch = useAppDispatch();
@@ -43,7 +36,7 @@ const RecipeTable = () => {
     (state) => state.recipes
   );
   const [selectedRecipes, setSelectedRecipes] = useState<Recipe[]>([]);
-  const [openDialog, setOpenDialog] = useState(false);
+  const [openDialog, setOpenDialog] = useModal();
   const [recipeToDelete, setRecipeToDelete] = useState<Recipe | null>(null);
   const [deletionInProgress, setDeletionInProgress] = useState(false);
 
@@ -64,7 +57,7 @@ const RecipeTable = () => {
       toast.error(deleteError || "Failed to delete recipe.");
       setDeletionInProgress(false);
     }
-  }, [deleteStatus, deletionInProgress, deleteError]);
+  }, [deleteStatus, deletionInProgress, deleteError, setOpenDialog]);
 
   const imageTemplate = (rowData: Recipe) => (
     <img
@@ -159,36 +152,22 @@ const RecipeTable = () => {
         />
       </DataTable>
 
-      {/* ShadCN Dialog for delete confirmation */}
-      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Recipe</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete{" "}
-              <span className="font-semibold text-black">
-                {recipeToDelete?.name}
-              </span>
-              ?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex justify-end gap-2">
-            <button
-              onClick={() => setOpenDialog(false)}
-              className="text-sm px-4 py-1 rounded bg-gray-100 hover:bg-gray-200"
-            >
-              Cancel
-            </button>
-
-            <PrimaryButton
-              text={deleteStatus === "loading" ? "Deleting..." : "Yes, Delete"}
-              disabled={deleteStatus === "loading"}
-              onClick={handleDeleteConfirm}
-              className="text-sm py-1 rounded bg-red-600 text-white hover:bg-red-700"
-            />
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteDialog
+        open={openDialog}
+        onOpenChange={setOpenDialog}
+        title="Delete Recipe"
+        description={
+          <>
+            Are you sure you want to delete{" "}
+            <span className="font-semibold text-black">
+              {recipeToDelete?.name}
+            </span>
+            ?
+          </>
+        }
+        isLoading={deleteStatus === "loading"}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 };
