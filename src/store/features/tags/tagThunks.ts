@@ -47,3 +47,17 @@ export const updateTag = createAsyncThunk<
     return rejectWithValue(error.response?.data?.error || "Error updating tag");
   }
 });
+
+export const deleteTag = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: string }
+>("tags/deleteTag", async (tagId, { rejectWithValue }) => {
+  try {
+    const response = await axios.delete(`/marketing/tags/${tagId}`);
+    return response.data.message || "Tag deleted successfully";
+  } catch (err: unknown) {
+    const error = err as ApiError;
+    return rejectWithValue(error.response?.data?.error || "Error deleting tag");
+  }
+});

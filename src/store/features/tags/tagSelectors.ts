@@ -14,6 +14,9 @@ export const selectIsCreatingTag = (state: RootState) =>
 export const selectIsUpdatingTag = (state: RootState) =>
   state.tags.status === "loading" && state.tags.currentOperation === "update";
 
+export const selectIsDeletingTag = (state: RootState) =>
+  state.tags.status === "loading" && state.tags.currentOperation === "delete";
+
 export const selectTagError = (state: RootState) => state.tags.error;
 
 export const selectTagSuccessMessage = (state: RootState) =>

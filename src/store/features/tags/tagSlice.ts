@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { fetchTags, createTag, updateTag } from "./tagThunks";
+import { fetchTags, createTag, updateTag, deleteTag } from "./tagThunks";
 import { LoadingState, LoadingStatus } from "../../../types/LoadingStatus";
 import { Tag } from "./tagTypes";
 
@@ -70,6 +70,21 @@ const tagSlice = createSlice({
       .addCase(updateTag.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || "Failed to update tag";
+      })
+      // Delete tag
+      .addCase(deleteTag.pending, (state) => {
+        state.currentOperation = "delete";
+        state.status = "loading";
+        state.error = null;
+        state.successMessage = null;
+      })
+      .addCase(deleteTag.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.successMessage = action.payload;
+      })
+      .addCase(deleteTag.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Failed to delete tag";
       });
   },
 });

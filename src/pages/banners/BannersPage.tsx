@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   selectBanners,
   selectIsFetchingBanners,
+  selectIsDeletingBanner,
 } from "../../store/features/banners/bannerSelectors";
 import { selectTags } from "../../store/features/tags/tagSelectors";
 import LoadingPage from "../../components/LoadingPage";
@@ -19,6 +20,10 @@ import { selectCategories } from "../../store/features/categories/categorySelect
 import { fetchCategories } from "../../store/features/categories/categoryThunks";
 import { useNavigate } from "react-router-dom";
 import BannerList from "./components/BannerList";
+import DeleteDialog from "../../components/DeleteDialog";
+import { Banner } from "../../store/features/banners/bannerTypes";
+import { toast } from "sonner";
+import { useModal } from "../../hooks/use-modal";
 
 const BannersPage = () => {
   const navigate = useNavigate();
@@ -27,8 +32,11 @@ const BannersPage = () => {
   const categories = useAppSelector(selectCategories);
   const tags = useAppSelector(selectTags);
   const isFetching = useAppSelector(selectIsFetchingBanners);
+  const isDeleting = useAppSelector(selectIsDeletingBanner);
 
   const [toggleLoadingId, setToggleLoadingId] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useModal();
+  const [bannerToDelete, setBannerToDelete] = useState<Banner | null>(null);
 
   useEffect(() => {
     dispatch(fetchCategories());
@@ -50,9 +58,24 @@ const BannersPage = () => {
     navigate("/banners/new");
   };
 
-  const handleDelete = async (id: string) => {
-    await dispatch(deleteBanner(id));
-    handleRefresh();
+  const handleDeleteClick = (bannerId: string) => {
+    const banner = banners.find((b) => b.id === bannerId);
+    if (banner) {
+      setBannerToDelete(banner);
+      setDeleteDialogOpen(true);
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (bannerToDelete?.id) {
+      try {
+        await dispatch(deleteBanner(bannerToDelete.id)).unwrap();
+        toast.success("Banner deleted successfully");
+        handleRefresh();
+      } catch {
+        toast.error("Failed to delete banner");
+      }
+    }
   };
 
   const handleToggleActive = async (id: string, active: boolean) => {
@@ -95,12 +118,21 @@ const BannersPage = () => {
             categories={categories}
             tags={tags}
             onEdit={handleEdit}
-            onDelete={handleDelete}
+            onDelete={handleDeleteClick}
             onToggleActive={handleToggleActive}
             toggleLoadingId={toggleLoadingId}
           />
         )}
       </div>
+
+      <DeleteDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Banner"
+        description={`Are you sure you want to delete this banner? This action cannot be undone.`}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+      />
     </div>
   );
 };

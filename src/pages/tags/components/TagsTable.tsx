@@ -1,14 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Check, X } from "lucide-react";
 import { Tag } from "../../../store/features/tags/tagTypes";
 import TagModal, { TagFormValues } from "./TagModal";
 import LoadingPage from "../../../components/LoadingPage";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { toast } from "sonner";
-import { fetchTags, updateTag } from "../../../store/features/tags/tagThunks";
+import {
+  fetchTags,
+  updateTag,
+  deleteTag,
+} from "../../../store/features/tags/tagThunks";
 import { UpdateTagRequest } from "../../../store/features/tags/request/UdateTagRequest";
-import { selectIsFetchingTags } from "../../../store/features/tags/tagSelectors";
+import {
+  selectIsFetchingTags,
+  selectIsDeletingTag,
+} from "../../../store/features/tags/tagSelectors";
+import DeleteDialog from "../../../components/DeleteDialog";
+import { Button } from "../../../components/ui/button";
 
 const TagsTable = () => {
   const dispatch = useAppDispatch();
@@ -18,26 +27,43 @@ const TagsTable = () => {
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [tagToDelete, setTagToDelete] = useState<Tag | null>(null);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const isFetchingTags = useAppSelector(selectIsFetchingTags);
+  const isDeletingTag = useAppSelector(selectIsDeletingTag);
 
   useEffect(() => {
-    if (currentOperation !== "update") return;
+    if (!currentOperation) return;
 
-    switch (status) {
-      case "loading":
-        setIsUpdating(true);
-        break;
-      case "failed":
-        setIsUpdating(false);
-        toast.error(error);
-        break;
-      case "succeeded":
-        setIsUpdating(false);
-        setEditModalOpen(false);
-        toast.success(successMessage);
-        dispatch(fetchTags());
-        break;
+    if (currentOperation === "update") {
+      switch (status) {
+        case "loading":
+          setIsUpdating(true);
+          break;
+        case "failed":
+          setIsUpdating(false);
+          toast.error(error);
+          break;
+        case "succeeded":
+          setIsUpdating(false);
+          setEditModalOpen(false);
+          toast.success(successMessage);
+          dispatch(fetchTags());
+          break;
+      }
+    } else if (currentOperation === "delete") {
+      switch (status) {
+        case "failed":
+          toast.error(error);
+          break;
+        case "succeeded":
+          toast.success(successMessage);
+          setDeleteDialogOpen(false);
+          setTagToDelete(null);
+          dispatch(fetchTags());
+          break;
+      }
     }
   }, [status, error, currentOperation, successMessage, dispatch]);
 
@@ -66,6 +92,17 @@ const TagsTable = () => {
     }
   };
 
+  const handleDeleteClick = (tag: Tag) => {
+    setTagToDelete(tag);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (tagToDelete?.id) {
+      dispatch(deleteTag(tagToDelete.id));
+    }
+  };
+
   if (isFetchingTags) return <LoadingPage />;
 
   if (status === "failed" && currentOperation === "fetch")
@@ -77,7 +114,7 @@ const TagsTable = () => {
         {tags.map((tag) => (
           <Card
             key={tag.id}
-            className="p-4 relative flex flex-col justify-between min-h-[30px]"
+            className="p-4 relative flex flex-col gap-y-1 min-h-[30px]"
           >
             <div className="space-y-2">
               <h2 className="text-sm">{tag.name}</h2>
@@ -87,20 +124,39 @@ const TagsTable = () => {
               <p className="text-sm text-muted-foreground">
                 Promotional Price: {tag.promotional_price}
               </p>
-              <p className="text-sm text-muted-foreground">
-                Mobile: {tag.is_mobile ? "Yes" : "No"}
+              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                Mobile:{" "}
+                {tag.is_mobile ? (
+                  <Check className="h-4 w-4 text-green-500" />
+                ) : (
+                  <X className="h-4 w-4 text-red-500" />
+                )}
               </p>
-              <p className="text-sm text-muted-foreground">
-                POS: {tag.is_pos ? "Yes" : "No"}
+              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                POS:{" "}
+                {tag.is_pos ? (
+                  <Check className="h-4 w-4 text-green-500" />
+                ) : (
+                  <X className="h-4 w-4 text-red-500" />
+                )}
               </p>
             </div>
 
-            <div className="flex gap-3 justify-end mt-1">
-              <Pencil
-                className="w-4 h-4 ml-5 cursor-pointer text-blue-500 hover:text-blue-700"
+            <div className="flex gap-x-1 justify-end">
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => openEditModal(tag)}
-              />
-              <Trash2 className="w-4 h-4 cursor-pointer text-red-400 hover:text-red-700" />
+              >
+                <Pencil className="w-4 h-4 text-blue-500 hover:text-blue-700" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleDeleteClick(tag)}
+              >
+                <Trash2 className="w-4 h-4 cursor-pointer text-red-400 hover:text-red-700" />
+              </Button>
             </div>
           </Card>
         ))}
@@ -115,6 +171,15 @@ const TagsTable = () => {
           onSubmit={handleUpdateTag}
         />
       )}
+
+      <DeleteDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Tag"
+        description={`Are you sure you want to delete the tag "${tagToDelete?.name}"? This action cannot be undone.`}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeletingTag}
+      />
     </>
   );
 };
