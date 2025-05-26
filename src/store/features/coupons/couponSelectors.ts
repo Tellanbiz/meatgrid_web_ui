@@ -17,6 +17,10 @@ export const selectIsUpdatingCoupon = (state: RootState) =>
   state.coupons.status === "loading" &&
   state.coupons.currentOperation === "update";
 
+export const selectIsDeletingCoupon = (state: RootState) =>
+  state.coupons.status === "loading" &&
+  state.coupons.currentOperation === "delete";
+
 export const selectCouponError = (state: RootState) => state.coupons.error;
 
 export const selectCouponSuccessMessage = (state: RootState) =>

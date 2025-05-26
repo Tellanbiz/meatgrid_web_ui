@@ -1,47 +1,81 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import {
-  DataTableStyle,
-  TableHeaderStyle,
-} from "../../../constants/TableStyles";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks.ts";
-import { fetchCoupons } from "../../../store/features/coupons/couponThunks.ts";
-import { Coupon } from "../../../store/features/coupons/couponTypes.ts";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import {
+  selectCouponError,
+  selectIsDeletingCoupon,
+} from "../../../store/features/coupons/couponSelectors";
+import DeleteDialog from "../../../components/DeleteDialog";
+import {
+  deleteCoupon,
+  fetchCoupons,
+} from "../../../store/features/coupons/couponThunks";
+import { toast } from "sonner";
 import {
   DropdownMenu,
+  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../../components/ui/dropdown-menu.tsx";
-import { Button } from "../../../components/ui/button.tsx";
-import { MoreVertical, Pencil } from "lucide-react";
+} from "../../../components/ui/dropdown-menu";
+import { Button } from "../../../components/ui/button";
+import { MoreVertical, Pencil, Trash } from "lucide-react";
 import { ProgressBar } from "primereact/progressbar";
+import { Coupon } from "../../../store/features/coupons/couponTypes";
+import {
+  TableHeaderStyle,
+  DataTableStyle,
+} from "../../../constants/TableStyles";
+import { useModal } from "../../../hooks/use-modal";
+import { clearCouponMessages } from "../../../store/features/coupons/couponSlice.ts";
 
 const CouponsTable = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const { coupons, status, error } = useAppSelector((state) => state.coupons);
+  const { coupons, status } = useAppSelector((state) => state.coupons);
+  const couponError = useAppSelector(selectCouponError);
+
+  const isDeletingCoupon = useAppSelector(selectIsDeletingCoupon);
+  const [couponToDelete, setCouponToDelete] = useState<Coupon | null>(null);
+  const [openDeleteDialog, setOpenDeleteDialog] = useModal();
 
   useEffect(() => {
     dispatch(fetchCoupons());
   }, [dispatch]);
+
+  const handleDeleteConfirm = async () => {
+    if (!couponToDelete) return;
+
+    try {
+      await dispatch(deleteCoupon(couponToDelete.id)).unwrap();
+      toast.success("Coupon deleted successfully");
+      setOpenDeleteDialog(false);
+      setCouponToDelete(null);
+      dispatch(fetchCoupons());
+    } catch {
+      console.log("Failed to delete coupon");
+    }
+  };
+
+  useEffect(() => {
+    if (couponError) {
+      toast.error(couponError);
+      dispatch(clearCouponMessages());
+    }
+  }, [couponError, dispatch]);
 
   const activeTemplate = (rowData: Coupon) => {
     const isActive = rowData.active;
 
     return (
       <div className="flex items-center">
-        {/* Status indicator dot */}
         <div
           className={`w-2 h-2 rounded-full mr-2 ${
             isActive ? "bg-green-500" : "bg-gray-400"
           }`}
         />
-
-        {/* Status text */}
         <span
           className={`text-sm ${
             isActive ? "text-green-700 font-medium" : "text-gray-600"
@@ -125,29 +159,35 @@ const CouponsTable = () => {
     );
   };
 
-  const actionsBodyTemplate = (rowData: Coupon) => {
-    return (
+  const actionsTemplate = (rowData: Coupon) => (
+    <div className="flex justify-end">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" className="h-8 w-8 p-0 focus-visible:ring-0">
+            <span className="sr-only">Open menu</span>
             <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem
-            onClick={() => navigate(`/coupons/edit/${rowData.id}`)}
-            className="flex items-center gap-2"
+            className="cursor-pointer"
+            onClick={() => navigate(`/coupons/${rowData.id}`)}
           >
-            <Pencil className="h-4 w-4" /> Edit Coupon
+            <Pencil className="mr-2 h-4 w-4" /> Edit
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer text-red-600 focus:text-red-600"
+            onClick={() => {
+              setCouponToDelete(rowData);
+              setOpenDeleteDialog(true);
+            }}
+          >
+            <Trash className="mr-2 h-4 w-4" /> Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    );
-  };
-
-  if (status === "failed") {
-    return <div className="p-4 text-red-500">Error: {error}</div>;
-  }
+    </div>
+  );
 
   return (
     <div className="h-full">
@@ -205,12 +245,25 @@ const CouponsTable = () => {
           headerStyle={TableHeaderStyle}
         />
         <Column
+          field="actions"
           header="Actions"
-          body={actionsBodyTemplate}
+          body={actionsTemplate}
           headerStyle={TableHeaderStyle}
           style={{ width: "100px" }}
         />
       </DataTable>
+
+      <DeleteDialog
+        open={openDeleteDialog}
+        isLoading={isDeletingCoupon}
+        onOpenChange={() => {
+          setOpenDeleteDialog(false);
+        }}
+        
+        onConfirm={handleDeleteConfirm}
+        title="Delete Coupon"
+        description={`Are you sure you want to delete the coupon "${couponToDelete?.name}"? This action cannot be undone.`}
+      />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { Coupon } from "./couponTypes";
-import { createCoupon, fetchCoupons, updateCoupon } from "./couponThunks";
+import { createCoupon, deleteCoupon, fetchCoupons, updateCoupon } from "./couponThunks";
 
 interface CouponsState {
   coupons: Coupon[];
@@ -82,6 +82,21 @@ const couponsSlice = createSlice({
       .addCase(updateCoupon.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || "Failed to update coupon";
+      })
+      // delete coupons
+      .addCase(deleteCoupon.pending, (state) => {
+        state.currentOperation = "delete";
+        state.status = "loading";
+        state.error = null;
+        state.successMessage = null;
+      })
+      .addCase(deleteCoupon.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.successMessage = action.payload;
+      })
+      .addCase(deleteCoupon.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Failed to delete coupon";
       });
   },
 });

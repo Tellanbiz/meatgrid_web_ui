@@ -52,3 +52,21 @@ export const updateCoupon = createAsyncThunk<
     );
   }
 });
+
+export const deleteCoupon = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: string }
+>("marketting/deleteCoupon", async (id, { rejectWithValue }) => {
+  try {
+    const response = await axios.delete(`/marketing/coupons/${id}`);
+    return response.data.message || "Coupon deleted successfully";
+  } catch (err: unknown) {
+    const error = err as ApiError;
+    return rejectWithValue(
+      error.response?.data?.error || "Failed to delete coupon"
+    );
+  }
+});
+
+
