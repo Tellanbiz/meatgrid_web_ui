@@ -31,7 +31,7 @@ const BannersPage = () => {
   const banners = useAppSelector(selectBanners);
   const categories = useAppSelector(selectCategories);
   const tags = useAppSelector(selectTags);
-  const isFetching = useAppSelector(selectIsFetchingBanners);
+  const isFetchingBanners = useAppSelector(selectIsFetchingBanners);
   const isDeleting = useAppSelector(selectIsDeletingBanner);
 
   const [toggleLoadingId, setToggleLoadingId] = useState<string | null>(null);
@@ -95,10 +95,10 @@ const BannersPage = () => {
             size="sm"
             className="px-2"
             onClick={handleRefresh}
-            disabled={isFetching}
+            disabled={isFetchingBanners}
           >
             <RefreshCcw
-              className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
+              className={`h-4 w-4 ${isFetchingBanners ? "animate-spin" : ""}`}
             />
             <span className="ml-2">Refresh</span>
           </Button>
@@ -110,7 +110,7 @@ const BannersPage = () => {
       </div>
 
       <div className="h-full overflow-hidden">
-        {isFetching ? (
+        {isFetchingBanners ? (
           <LoadingPage />
         ) : (
           <BannerList

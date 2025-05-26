@@ -42,29 +42,30 @@ const BannerCard = ({
   onToggleActive,
 }: BannerCardProps) => {
   return (
-    <Card className="shadow-md border rounded-lg gap-y-0">
+    <Card className="shadow-sm border rounded-lg gap-y-0 p-0">
       <CardHeader className="p-0">
         <img
           src={imageUrl}
           alt={name}
-          className="w-full h-32 object-cover rounded-t-lg"
+          className="w-full h-24 object-cover rounded-t-lg"
         />
       </CardHeader>
-      <CardContent className="p-4 space-y-2">
-        <CardTitle className="font-medium truncate p-0">{name}</CardTitle>
-        <div className="text-sm text-muted-foreground truncate">
+      <CardContent className="p-3 space-y-1.5">
+        <CardTitle className="font-medium truncate text-sm p-0">{name}</CardTitle>
+        <div className="text-xs text-muted-foreground truncate">
           {categoryName}
         </div>
-        <Badge variant="outline" className="text-xs">
+        <Badge variant="outline" className="text-[10px]">
           {tagName}
         </Badge>
       </CardContent>
-      <CardFooter className="flex justify-between items-center">
+      <CardFooter className="flex justify-between items-center py-2 px-3">
         <div className="flex items-center space-x-2">
           {toggleActiveLoading ? (
-            <Loader2 className="w-4 h-4 animate-spin [animation-duration:0.7s]" />
+            <Loader2 className="w-3.5 h-3.5 animate-spin [animation-duration:0.7s]" />
           ) : (
             <Switch
+              className="origin-left"
               checked={active}
               onCheckedChange={(checked) => onToggleActive(id, checked)}
             />
