@@ -8,6 +8,9 @@ import {
   DataTableStyle,
   TableHeaderStyle,
 } from "../../../constants/TableStyles";
+import ExportService from "../../../service/ExportService";
+import ReportService from "../../../service/ReportService";
+import ExportButton from "../../../components/ExportButton";
 
 import { orderStatusColors } from "../../../constants/StatusColors";
 import {
@@ -360,7 +363,7 @@ const OrdersTable = () => {
     <div className="h-table">
       {/* Filters Section */}
       <div className="flex flex-wrap items-center justify-between w-full mb-4">
-        <div className="flex flex-wrap gap-3 items-center">
+        <div className="flex-1 flex flex-wrap gap-3 items-center">
           {/* Order ID Search */}
           <div className="relative">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
@@ -581,6 +584,19 @@ const OrdersTable = () => {
               </div>
             </PopoverContent>
           </Popover>
+          {/* Export buttons */}
+        </div>
+        <div className="flex items-center gap-2">
+          <ExportButton
+            onExportExcel={() => {
+              const config = ReportService.getConfig("orders");
+              ExportService.exportToExcel(filteredOrders, config);
+            }}
+            onExportPDF={async () => {
+              const config = ReportService.getConfig("orders");
+              await ExportService.exportToPDF(filteredOrders, config);
+            }}
+          />
         </div>
       </div>
 
@@ -636,14 +652,12 @@ const OrdersTable = () => {
           field="address"
           header="Address"
           headerStyle={TableHeaderStyle}
-          className="text-xs"
         />
         <Column
           field="orderStatus"
           header="Status"
           body={(rowData) => statusTemplate(rowData)}
           headerStyle={TableHeaderStyle}
-          className="text-xs"
         />
         <Column
           field="total"
@@ -672,6 +686,7 @@ const OrdersTable = () => {
           )}
           headerStyle={TableHeaderStyle}
         />
+
         <Column
           body={actionsTemplate}
           header="Actions"

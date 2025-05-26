@@ -1,3 +1,4 @@
+import { PaymentMethod, Recipient } from "../store/features/orders/orderTypes";
 import { ExportOptions } from "./ExportService";
 
 type ReportConfig = {
@@ -10,6 +11,7 @@ type ReportKeys = "products" | "orders" | "customers";
 type ReportData = {
   [K in ReportKeys]: ReportConfig;
 };
+
 type StockInfo = {
   total_instock: number;
   total_reclaim: number;
@@ -94,18 +96,37 @@ export const Reports: ReportData = {
   orders: {
     fileName: "orders-list",
     columns: [
-      { field: "id", header: "Order ID" },
-      { field: "customer_name", header: "Customer" },
       {
-        field: "total",
+        field: "order_id",
+        header: "Order ID",
+        format: (value) => `MG${value}`,
+      },
+      {
+        field: "recipient",
+        header: "Customer",
+        format: (value) => (value as Recipient).full_name,
+      },
+      {
+        field: "total_cost",
         header: "Total",
-        format: (value) => `$${value}`,
+        format: (value) => (value as number).toLocaleString(),
       },
       { field: "status", header: "Status" },
       {
+        field: "payment_method",
+        header: "Payment Method",
+        format: (value) => (value as PaymentMethod).name,
+      },
+      { field: "address", header: "Address" },
+      {
         field: "created_at",
-        header: "Order Date",
-        format: (value) => new Date(value as string).toLocaleDateString(),
+        header: "Created At",
+        format: (value) =>
+          new Date(value as string).toLocaleDateString("en-KE", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          }),
       },
     ],
   },
@@ -122,7 +143,6 @@ export const Reports: ReportData = {
       },
     ],
   },
-  // Add more report configurations as needed
 };
 
 class ReportService {
