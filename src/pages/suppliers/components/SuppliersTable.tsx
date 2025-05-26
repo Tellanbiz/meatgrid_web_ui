@@ -22,7 +22,6 @@ import {
 } from "../../../store/features/suppliers/supplierThunks";
 import { toast } from "sonner";
 import DeleteDialog from "../../../components/DeleteDialog";
-import { DeleteSupplierRequest } from "../../../store/features/suppliers/request/DeleteSupplierRequest";
 import { resetSupplierState } from "../../../store/features/suppliers/supplierSlice";
 import {
   selectIsDeletingSupplier,
@@ -64,7 +63,6 @@ const SuppliersTable = ({ onEdit }: SuppliersTableProps) => {
   useEffect(() => {
     if (supplierError) {
       toast.error(supplierError);
-      setDeleteDialogOpen(false);
       dispatch(resetSupplierState());
     }
   }, [supplierError, dispatch]);
@@ -75,10 +73,8 @@ const SuppliersTable = ({ onEdit }: SuppliersTableProps) => {
   };
 
   const handleConfirmDelete = () => {
-    const payload: DeleteSupplierRequest = {
-      id: supplierToDelete?.id ?? "",
-    };
-    dispatch(deleteSupplier(payload));
+    if (!supplierToDelete) return;
+    dispatch(deleteSupplier(supplierToDelete.id));
   };
 
   const actionsBodyTemplate = (supplier: Supplier) => {

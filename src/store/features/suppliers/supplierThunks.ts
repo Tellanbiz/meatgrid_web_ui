@@ -4,7 +4,6 @@ import { ApiError } from "../../../types/ApiError";
 import { Supplier } from "./supplierTypes";
 import { UpdateSupplierRequest } from "./request/UpdateSupplierRequest";
 import { CreateSupplierRequest } from "./request/CreateSupplierRequest";
-import { DeleteSupplierRequest } from "./request/DeleteSupplierRequest";
 
 export const createSupplier = createAsyncThunk<
   string,
@@ -56,11 +55,11 @@ export const updateSupplier = createAsyncThunk<
 
 export const deleteSupplier = createAsyncThunk<
   string,
-  DeleteSupplierRequest,
+  string,
   { rejectValue: string }
->("suppliers/deleteSuplier", async (payload, { rejectWithValue }) => {
+>("suppliers/deleteSupplier", async (supplierId, { rejectWithValue }) => {
   try {
-    const response = await axios.post(`/suppliers`, payload);
+    const response = await axios.delete(`/suppliers/${supplierId}`);
     return response.data.message;
   } catch (err: unknown) {
     const error = err as ApiError;
