@@ -28,8 +28,7 @@ const bannerSlice = createSlice({
   name: "banners",
   initialState,
   reducers: {
-    resetBannerState: (state) => {
-      state.status = LoadingState.Idle;
+    clearBannerMessages: (state) => {
       state.error = null;
       state.successMessage = null;
     },
@@ -110,5 +109,5 @@ const bannerSlice = createSlice({
   },
 });
 
-export const { resetBannerState } = bannerSlice.actions;
+export const { clearBannerMessages } = bannerSlice.actions;
 export default bannerSlice.reducer;

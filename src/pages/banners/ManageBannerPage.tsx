@@ -19,7 +19,7 @@ import { fetchCategories } from "../../store/features/categories/categoryThunks"
 import { fetchTags } from "../../store/features/tags/tagThunks";
 import { uploadImages } from "../../store/features/uploads/uploadThunks";
 import { toast } from "sonner";
-import { resetBannerState } from "../../store/features/banners/bannerSlice";
+import { clearBannerMessages } from "../../store/features/banners/bannerSlice";
 
 const ManageBannerPage = () => {
   const navigate = useNavigate();
@@ -101,7 +101,7 @@ const ManageBannerPage = () => {
   useEffect(() => {
     if (successMessage) {
       toast.success(successMessage);
-      dispatch(resetBannerState());
+      dispatch(clearBannerMessages());
       navigate(-1);
     }
   }, [successMessage, navigate, dispatch]);
@@ -109,7 +109,7 @@ const ManageBannerPage = () => {
   useEffect(() => {
     if (errorMessage) {
       toast.error(errorMessage);
-      dispatch(resetBannerState());
+      dispatch(clearBannerMessages());
     }
   }, [errorMessage, dispatch]);
 

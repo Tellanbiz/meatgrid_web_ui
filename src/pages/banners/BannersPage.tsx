@@ -24,6 +24,7 @@ import DeleteDialog from "../../components/DeleteDialog";
 import { Banner } from "../../store/features/banners/bannerTypes";
 import { toast } from "sonner";
 import { useModal } from "../../hooks/use-modal";
+import { clearBannerMessages } from "../../store/features/banners/bannerSlice";
 
 const BannersPage = () => {
   const navigate = useNavigate();
@@ -71,9 +72,11 @@ const BannersPage = () => {
       try {
         await dispatch(deleteBanner(bannerToDelete.id)).unwrap();
         toast.success("Banner deleted successfully");
+        dispatch(clearBannerMessages());
         handleRefresh();
       } catch {
         toast.error("Failed to delete banner");
+        dispatch(clearBannerMessages());
       }
     }
   };
