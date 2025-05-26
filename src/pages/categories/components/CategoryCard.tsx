@@ -6,18 +6,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader as DialogHeaderBox,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Pencil, Trash } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { selectIsDeletingCategory } from "../../../store/features/categories/categorySelectors";
+import { deleteCategory } from "../../../store/features/categories/categoryThunks";
+import DeleteDialog from "../../../components/DeleteDialog";
 
 interface CategoryCardProps {
   category: Category;
@@ -29,16 +25,17 @@ export default function CategoryCard({
   parentCategory,
 }: CategoryCardProps) {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const [dialogOpen, setDialogOpen] = useState(false);
+  const isDeleting = useAppSelector(selectIsDeletingCategory);
 
   const handleConfirmDelete = async () => {
     try {
+      await dispatch(deleteCategory(category.id)).unwrap();
       toast.success(`Deleted "${category.name}" successfully!`);
     } catch {
       toast.error("Failed to delete category.");
-    } finally {
-      setDialogOpen(false);
     }
   };
 
@@ -103,25 +100,14 @@ export default function CategoryCard({
         </CardContent>
       </div>
 
-      {/* Separate Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeaderBox>
-            <DialogTitle>Delete "{category.name}"?</DialogTitle>
-          </DialogHeaderBox>
-          <p className="text-sm text-muted-foreground">
-            This action cannot be undone. Are you sure you want to continue?
-          </p>
-          <DialogFooter className="mt-4">
-            <Button variant="ghost" onClick={() => setDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={handleConfirmDelete}>
-              Confirm Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        title={`Delete "${category.name}"?`}
+        description="This action cannot be undone. Are you sure you want to continue?"
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
+      />
     </>
   );
 }

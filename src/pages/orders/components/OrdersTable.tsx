@@ -22,13 +22,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, XCircle, Search } from "lucide-react";
+import { MoreVertical, XCircle, Search, Eye } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { fetchOrders } from "../../../store/features/orders/orderThunks";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import ProgressIndicator from "../../../components/ProgressIndicator";
 import { toast } from "sonner";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 import {
   Popover,
@@ -48,6 +48,7 @@ import { Input } from "../../../components/ui/input";
 
 const OrdersTable = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   // Use proper selector pattern for orders state
   const { orders, selectedOrderNumber, selectedOrderState } = useAppSelector(
@@ -158,9 +159,6 @@ const OrdersTable = () => {
 
   const refreshOrders = useCallback(() => {
     const filters: OrderFilters = {};
-    console.log("Selected Duration:", selectedDuration);
-    console.log("Start Date:", startDate);
-    console.log("End Date:", endDate);
 
     if (selectedDuration !== "custom") {
       const [start_date, end_date] = getDateRange(selectedDuration);
@@ -268,7 +266,7 @@ const OrdersTable = () => {
 
   // View order handler
   const handleViewOrder = (order: Order) => {
-    window.location.href = `/orders/${order.order_id}`;
+    navigate(`/orders/${order.order_id}`);
   };
 
   // Cancel order handler
@@ -300,7 +298,7 @@ const OrdersTable = () => {
             onSelect={() => handleViewOrder(order)}
             className="flex items-center gap-2"
           >
-            <Search className="h-4 w-4" /> View
+            <Eye className="h-4 w-4" /> View
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => handleCancelOrder(order)}

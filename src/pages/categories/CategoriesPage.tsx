@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 const CategoriesPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { status, error } = useAppSelector((state) => state.categories);
+  const { status } = useAppSelector((state) => state.categories);
 
   const categories = useAppSelector(selectCategories);
   const isFetchingCategories = useAppSelector(selectIsFetchingCategories);
@@ -67,23 +67,15 @@ const CategoriesPage = () => {
         )}
 
         {/* Content */}
-        {!error && (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {categories.map((category) => (
-              <CategoryCard
-                key={category.id}
-                category={category}
-                parentCategory={getCategoryById(category.parent_id)}
-              />
-            ))}
-          </div>
-        )}
-
-        {error && (
-          <div className="text-center text-red-500 font-medium py-4">
-            {error}
-          </div>
-        )}
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {categories.map((category) => (
+            <CategoryCard
+              key={category.id}
+              category={category}
+              parentCategory={getCategoryById(category.parent_id)}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
