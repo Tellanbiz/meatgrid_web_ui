@@ -1,6 +1,6 @@
-import { Product } from "../../../store/features/products/productTypes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Product } from "@/store/features/products/productTypes";
 import { Trash2 } from "lucide-react";
 
 interface ProductItemProps {
