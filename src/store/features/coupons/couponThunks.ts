@@ -59,7 +59,7 @@ export const deleteCoupon = createAsyncThunk<
   { rejectValue: string }
 >("marketting/deleteCoupon", async (id, { rejectWithValue }) => {
   try {
-    const response = await axios.delete(`/marketing/coupons/${id}`);
+    const response = await axios.delete(`/marketing/coupons?id=${id}`);
     return response.data.message || "Coupon deleted successfully";
   } catch (err: unknown) {
     const error = err as ApiError;

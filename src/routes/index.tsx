@@ -14,22 +14,22 @@ import EditRecipe from "@/pages/recipes/EditRecipe";
 import PrivateRoute from "./PrivateRoute.js";
 import OrderDetails from "@/pages/orders/OrderDetails.js";
 import TagsPage from "@/pages/tags/TagsPage.js";
-import SupplierPage from "@/pages/suppliers/SupplierPage.js";
-import StocksPage from "@/routes/manufacturing/stocks/ui/pages/StocksPage.js";
-import WareHousePage from "@/pages/warehouses/WareHousePage.js";
-import ManageWareHousePage from "@/pages/warehouses/ManageWareHousePage.js";
+import SupplierPage from "@/routes/manufacturing/suppliers/pages/SupplierPage.js";
+import StocksPage from "@/routes/manufacturing/stocks/pages/StocksPage.js";
+import WareHousePage from "@/routes/manufacturing/warehouses/pages/WareHousePage.js";
+import ManageWareHousePage from "@/routes/manufacturing/warehouses/pages/ManageWareHousePage.js";
 import PaymentMethodsPage from "@/pages/payment-methods/PaymentMethodsPage.js";
 import BannersPage from "@/pages/banners/BannersPage.js";
 import ManageBannerPage from "@/pages/banners/ManageBannerPage.js";
 import ManageCategoryPage from "@/pages/categories/ManageCategoryPage.js";
 import CategoriesPage from "@/pages/categories/CategoriesPage.js";
-import StorageTypesPage from "@/pages/storage-types/StorageTypesPage.js";
-import ManageStorageTypesPage from "@/pages/storage-types/ManageStorageTypesPage.js";
+import StorageTypesPage from "@/routes/manufacturing/storage-types/pages/StorageTypesPage.js";
+import ManageStorageTypesPage from "@/routes/manufacturing/storage-types/pages/ManageStorageTypesPage.js";
 import ManageProductPage from "@/pages/products/ManageProductPage.js";
-import TransferStockPage from "@/routes/manufacturing/stocks/ui/pages/TransferStockPage.js";
-import RestockPage from "@/routes/manufacturing/stocks/ui/pages/RestockPage.js";
-import ProcessProductsPage from "@/routes/manufacturing/stocks/ui/pages/ProcessProductsPage.js";
-import SelectProductsPage from "@/routes/manufacturing/stocks/ui/pages/SelectProductsPage.js";
+import TransferStockPage from "@/routes/manufacturing/stocks/pages/TransferStockPage.js";
+import RestockPage from "@/routes/manufacturing/stocks/pages/RestockPage.js";
+import ProcessProductsPage from "@/routes/manufacturing/stocks/pages/ProcessProductsPage.js";
+import SelectProductsPage from "@/routes/manufacturing/stocks/pages/SelectProductsPage.js";
 import AccountsPage from "@/pages/accounts/AccountsPage.js";
 import StaffsPage from "@/pages/staff/StaffsPage.js";
 import RidersPage from "@/pages/riders/RidersPage.js";
@@ -40,7 +40,7 @@ import AdministratorsPage from "@/pages/administrators/AdministratorsPage";
 import UpdateAdminPermissionsPage from "@/pages/administrators/UpdateAdminPermissionsPage";
 import CorporateProductsPage from "@/pages/products/CorporateProductsPage.js";
 import OrganizationsPage from "@/pages/organizations/OrganizationsPage.js";
-import BatchesPage from "@/pages/batches/BatchesPage";
+import BatchesPage from "@/routes/manufacturing/batches/pages/BatchesPage";
 import SchedulesPage from "@/pages/schedules/SchedulesPage.js";
 
 const routes: RouteObject[] = [
@@ -68,6 +68,152 @@ const routes: RouteObject[] = [
         index: true,
         element: <Dashboard />,
       },
+      // Manufacturing Routes
+      {
+        path: "",
+        children: [
+          {
+            path: "stock",
+            children: [
+              {
+                index: true,
+                element: (
+                  <PrivateRoute requiredPermissions={["allow_stock_view"]}>
+                    <StocksPage />
+                  </PrivateRoute>
+                ),
+              },
+              {
+                path: "transfer",
+                element: (
+                  <PrivateRoute requiredPermissions={["allow_stock_submit"]}>
+                    <TransferStockPage />
+                  </PrivateRoute>
+                ),
+              },
+              {
+                path: "restock",
+                element: (
+                  <PrivateRoute requiredPermissions={["allow_stock_submit"]}>
+                    <RestockPage />
+                  </PrivateRoute>
+                ),
+              },
+              {
+                path: "process",
+                element: (
+                  <PrivateRoute requiredPermissions={["allow_stock_submit"]}>
+                    <ProcessProductsPage />
+                  </PrivateRoute>
+                ),
+              },
+              {
+                path: "process/select-products",
+                element: (
+                  <PrivateRoute requiredPermissions={["allow_stock_submit"]}>
+                    <SelectProductsPage />
+                  </PrivateRoute>
+                ),
+              },
+            ],
+          },
+          {
+            path: "suppliers",
+            element: (
+              <PrivateRoute requiredPermissions={["allow_suppliers_view"]}>
+                <SupplierPage />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: "warehouses",
+            children: [
+              {
+                index: true,
+                element: (
+                  <PrivateRoute requiredPermissions={["allow_warehouse_view"]}>
+                    <WareHousePage />
+                  </PrivateRoute>
+                ),
+              },
+              {
+                path: "new",
+                element: (
+                  <PrivateRoute
+                    requiredPermissions={["allow_warehouse_submit"]}
+                  >
+                    <ManageWareHousePage />
+                  </PrivateRoute>
+                ),
+              },
+              {
+                path: ":warehouseId/edit",
+                element: (
+                  <PrivateRoute
+                    requiredPermissions={["allow_warehouse_submit"]}
+                  >
+                    <ManageWareHousePage />
+                  </PrivateRoute>
+                ),
+              },
+              {
+                path: ":warehouseId/products",
+                element: (
+                  <PrivateRoute
+                    requiredPermissions={["allow_warehouse_submit"]}
+                  >
+                    <CorporateProductsPage />
+                  </PrivateRoute>
+                ),
+              },
+            ],
+          },
+          {
+            path: "batches",
+            element: (
+              <PrivateRoute requiredPermissions={["allow_product_view"]}>
+                <BatchesPage />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: "storage-types",
+            children: [
+              {
+                index: true,
+                element: (
+                  <PrivateRoute
+                    requiredPermissions={["allow_storage_type_view"]}
+                  >
+                    <StorageTypesPage />
+                  </PrivateRoute>
+                ),
+              },
+              {
+                path: "new",
+                element: (
+                  <PrivateRoute
+                    requiredPermissions={["allow_storage_type_submit"]}
+                  >
+                    <ManageStorageTypesPage />
+                  </PrivateRoute>
+                ),
+              },
+              {
+                path: ":storageTypeId/edit",
+                element: (
+                  <PrivateRoute
+                    requiredPermissions={["allow_storage_type_submit"]}
+                  >
+                    <ManageStorageTypesPage />
+                  </PrivateRoute>
+                ),
+              },
+            ],
+          },
+        ],
+      },
+      // Other Routes
       {
         path: "orders",
         element: (
@@ -137,14 +283,6 @@ const routes: RouteObject[] = [
         element: (
           <PrivateRoute requiredPermissions={["allow_category_submit"]}>
             <ManageCategoryPage />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "batches",
-        element: (
-          <PrivateRoute requiredPermissions={["allow_product_view"]}>
-            <BatchesPage />
           </PrivateRoute>
         ),
       },
@@ -229,114 +367,10 @@ const routes: RouteObject[] = [
         ),
       },
       {
-        path: "suppliers",
-        element: (
-          <PrivateRoute requiredPermissions={["allow_suppliers_view"]}>
-            <SupplierPage />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "stock",
-        element: (
-          <PrivateRoute requiredPermissions={["allow_stock_view"]}>
-            <StocksPage />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "stock/transfer",
-        element: (
-          <PrivateRoute requiredPermissions={["allow_stock_submit"]}>
-            <TransferStockPage />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "stock/restock",
-        element: (
-          <PrivateRoute requiredPermissions={["allow_stock_submit"]}>
-            <RestockPage />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "stock/process",
-        element: (
-          <PrivateRoute requiredPermissions={["allow_stock_submit"]}>
-            <ProcessProductsPage />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "stock/process/select-products",
-        element: (
-          <PrivateRoute requiredPermissions={["allow_stock_submit"]}>
-            <SelectProductsPage />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "warehouses",
-        element: (
-          <PrivateRoute requiredPermissions={["allow_warehouse_view"]}>
-            <WareHousePage />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "warehouses/new",
-        element: (
-          <PrivateRoute requiredPermissions={["allow_warehouse_submit"]}>
-            <ManageWareHousePage />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "warehouses/:warehouseId/edit",
-        element: (
-          <PrivateRoute requiredPermissions={["allow_warehouse_submit"]}>
-            <ManageWareHousePage />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "warehouses/:warehouseId/products",
-        element: (
-          <PrivateRoute requiredPermissions={["allow_warehouse_submit"]}>
-            <CorporateProductsPage />
-          </PrivateRoute>
-        ),
-      },
-      {
         path: "payment-methods",
         element: (
           <PrivateRoute requiredPermissions={["allow_payment_method_view"]}>
             <PaymentMethodsPage />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "storage-types",
-        element: (
-          <PrivateRoute requiredPermissions={["allow_storage_type_view"]}>
-            <StorageTypesPage />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "storage-types/new",
-        element: (
-          <PrivateRoute requiredPermissions={["allow_storage_type_submit"]}>
-            <ManageStorageTypesPage />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "storage-types/:storageTypeId/edit",
-        element: (
-          <PrivateRoute requiredPermissions={["allow_storage_type_submit"]}>
-            <ManageStorageTypesPage />
           </PrivateRoute>
         ),
       },

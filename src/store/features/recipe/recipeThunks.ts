@@ -74,7 +74,7 @@ export const deleteRecipe = createAsyncThunk<
   { rejectValue: string }
 >("recipes/deleteRecipe", async (id, { rejectWithValue }) => {
   try {
-    await axios.delete(`/marketing/recipes/${id}`);
+    await axios.delete(`/marketing/recipes?id=${id}`);
     return id;
   } catch (err: unknown) {
     const error = err as ApiError;

@@ -83,7 +83,7 @@ export const deleteBanner = createAsyncThunk<
   { rejectValue: string }
 >("banners/deleteBanner", async (bannerId, { rejectWithValue }) => {
   try {
-    const response = await axios.delete(`/marketing/banners/${bannerId}`);
+    const response = await axios.delete(`/marketing/banners?id=${bannerId}`);
     return response.data.message;
   } catch (err: unknown) {
     const error = err as ApiError;

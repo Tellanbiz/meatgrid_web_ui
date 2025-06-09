@@ -54,7 +54,7 @@ export const deleteTag = createAsyncThunk<
   { rejectValue: string }
 >("tags/deleteTag", async (tagId, { rejectWithValue }) => {
   try {
-    const response = await axios.delete(`/marketing/tags/${tagId}`);
+    const response = await axios.delete(`/marketing/tags?id=${tagId}`);
     return response.data.message || "Tag deleted successfully";
   } catch (err: unknown) {
     const error = err as ApiError;
