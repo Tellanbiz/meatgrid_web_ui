@@ -76,6 +76,7 @@ const TransferStockPage = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] =
     useState<ProductToTransfer | null>(null);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     dispatch(fetchStorageTypes());
@@ -303,49 +304,80 @@ const TransferStockPage = () => {
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="product">Product</Label>
-                    <Select
-                      value={selectedProductId}
-                      onValueChange={(value) => {
-                        const product = products.find((p) => p.id === value);
-                        if (product) {
-                          handleSelectProduct(product);
-                        }
-                      }}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a product" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {products
-                          .filter((p) => p.stock_info?.total_instock > 0)
-                          .map((product) => (
-                            <SelectItem key={product.id} value={product.id}>
-                              {product.name} - Available:{" "}
-                              {product.stock_info?.total_instock}{" "}
-                              {product.unit_type}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="quantity">
-                      Quantity{" "}
-                      {selectedProduct ? `(${selectedProduct.unit_type})` : ""}
-                    </Label>
-                    <Input
-                      id="quantity"
-                      type="number"
-                      step="any"
-                      value={productQuantity}
-                      onChange={handleQuantityChange}
-                      className="w-full"
-                      min="0"
-                    />
-                  </div>
+                  {!selectedProduct ? (
+                    <div className="space-y-2">
+                      <Label htmlFor="product">Search Product</Label>
+                      <Input
+                        type="text"
+                        placeholder="Type to search products..."
+                        className="mb-2"
+                        onChange={(e) => {
+                          const searchTerm = e.target.value.toLowerCase();
+                          const filteredProducts = products
+                            .filter((p) => p.stock_info?.total_instock > 0)
+                            .filter((product) =>
+                              product.name.toLowerCase().includes(searchTerm)
+                            );
+                          setFilteredProducts(filteredProducts);
+                        }}
+                      />
+                      <div className="max-h-[200px] overflow-y-auto border rounded-md">
+                        {(filteredProducts || products.filter(p => p.stock_info?.total_instock > 0)).map((product) => (
+                          <div
+                            key={product.id}
+                            className="p-2 hover:bg-gray-100 cursor-pointer"
+                            onClick={() => handleSelectProduct(product)}
+                          >
+                            <div className="font-medium">{product.name}</div>
+                            <div className="text-sm text-gray-500">
+                              Available: {product.stock_info?.total_instock} {product.unit_type}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium">Selected Product</h4>
+                          <p className="text-sm text-gray-500">
+                            {selectedProduct.name} - Available: {selectedProduct.stock_info?.total_instock} {selectedProduct.unit_type}
+                          </p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedProduct(null);
+                            setSelectedProductId("");
+                          }}
+                        >
+                          Change
+                        </Button>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="quantity">
+                          Quantity ({selectedProduct.unit_type})
+                        </Label>
+                        <Input
+                          id="quantity"
+                          type="number"
+                          step="any"
+                          value={productQuantity}
+                          onChange={handleQuantityChange}
+                          className="w-full"
+                          min="0"
+                          max={selectedProduct.stock_info?.total_instock}
+                        />
+                        {selectedProduct.stock_info?.total_instock && (
+                          <p className="text-sm text-gray-500">
+                            Maximum available: {selectedProduct.stock_info.total_instock} {selectedProduct.unit_type}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <DialogFooter>
