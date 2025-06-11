@@ -97,7 +97,6 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
     const totalIn = stockInfo.total_instock + stockInfo.total_reclaim;
 
     const totalOut =
-      stockInfo.total_correction +
       stockInfo.total_damaged +
       stockInfo.total_migrated +
       stockInfo.total_processed +
@@ -108,7 +107,6 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
   const getTotalConsumed = (product: Product) => {
     const stockInfo = product.stock_info;
     const totalOut =
-      stockInfo.total_correction +
       stockInfo.total_damaged +
       stockInfo.total_migrated +
       stockInfo.total_processed +
