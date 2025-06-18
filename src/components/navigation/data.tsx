@@ -7,7 +7,7 @@ export const sidebarData = {
     {
       title: "General",
       url: "#",
-      icon: "solar:home-smile-bold-duotone",
+      icon: "solar:home-smile-linear",
       isActive: true,
       requiredPermissions: ["allow_product_view", "allow_category_view"],
       requireAll: false,
@@ -15,7 +15,7 @@ export const sidebarData = {
         {
           title: "Dashboard",
           url: "/",
-          icon: "solar:home-2-bold-duotone",
+          icon: "solar:home-2-linear",
           isActive: true,
         },
       ],
@@ -23,7 +23,7 @@ export const sidebarData = {
     {
       title: "Product Management",
       url: "#",
-      icon: "solar:box-bold-duotone",
+      icon: "solar:box-linear",
       isActive: true,
       requiredPermissions: ["allow_product_view", "allow_category_view"],
       requireAll: false,
@@ -31,13 +31,13 @@ export const sidebarData = {
         {
           title: "Products",
           url: "/products",
-          icon: "solar:tag-price-bold-duotone",
+          icon: "solar:tag-price-linear",
           requiredPermissions: ["allow_product_view"],
         },
         {
           title: "Categories",
           url: "/categories",
-          icon: "solar:folder-with-files-bold-duotone",
+          icon: "solar:folder-with-files-linear",
           requiredPermissions: ["allow_category_view"],
         },
       ],
@@ -45,7 +45,7 @@ export const sidebarData = {
     {
       title: "Order Management",
       url: "#",
-      icon: "solar:cart-large-bold-duotone",
+      icon: "solar:cart-large-linear",
       isActive: true,
       requiredPermissions: ["allow_orders_view", "allow_payment_method_view"],
       requireAll: false,
@@ -53,21 +53,38 @@ export const sidebarData = {
         {
           title: "Orders",
           url: "/orders",
-          icon: "solar:cart-3-bold-duotone",
+          icon: "solar:cart-3-linear",
           requiredPermissions: ["allow_orders_view"],
         },
         {
           title: "Payment Methods",
           url: "/payment-methods",
-          icon: "solar:card-2-bold-duotone",
+          icon: "solar:card-2-linear",
           requiredPermissions: ["allow_payment_method_view"],
+        },
+      ],
+    },
+    {
+      title: "Purchasables",
+      url: "#",
+      icon: "solar:cart-large-2-linear",
+      items: [
+        {
+          title: "Purchasables",
+          url: "/purchasables",
+          icon: "solar:box-minimalistic-linear",
+        },
+        {
+          title: "Purchasable Orders",
+          url: "/purchasable-orders",
+          icon: "solar:bill-list-linear",
         },
       ],
     },
     {
       title: "Inventory Management",
       url: "#",
-      icon: "solar:shop-bold-duotone",
+      icon: "solar:shop-linear",
       isActive: true,
       requiredPermissions: [
         "allow_stock_view",
@@ -80,31 +97,31 @@ export const sidebarData = {
         {
           title: "Stock",
           url: "/stock",
-          icon: "solar:box-minimalistic-bold-duotone",
+          icon: "solar:box-minimalistic-linear",
           requiredPermissions: ["allow_stock_view"],
         },
         {
           title: "Batches",
           url: "/batches",
-          icon: "solar:box-bold-duotone",
+          icon: "solar:box-linear",
           requiredPermissions: ["allow_product_view"],
         },
         {
           title: "Suppliers",
           url: "/suppliers",
-          icon: "solar:users-group-two-rounded-bold-duotone",
+          icon: "solar:users-group-two-rounded-linear",
           requiredPermissions: ["allow_suppliers_view"],
         },
         {
           title: "Warehouses",
           url: "/warehouses",
-          icon: "solar:buildings-3-bold-duotone",
+          icon: "solar:buildings-3-linear",
           requiredPermissions: ["allow_warehouse_view"],
         },
         {
           title: "Storage Types",
           url: "/storage-types",
-          icon: "solar:archive-up-bold-duotone",
+          icon: "solar:archive-up-linear",
           requiredPermissions: ["allow_storage_type_view"],
         },
       ],
@@ -112,7 +129,7 @@ export const sidebarData = {
     {
       title: "Marketing",
       url: "#",
-      icon: "solar:megaphone-bold-duotone",
+      icon: "solar:megaphone-linear",
       isActive: true,
       requiredPermissions: ["allow_banners_view", "allow_promotional_tag_view"],
       requireAll: false,
@@ -120,23 +137,23 @@ export const sidebarData = {
         {
           title: "Recipes",
           url: "/recipes",
-          icon: "solar:notebook-bold-duotone",
+          icon: "solar:notebook-linear",
         },
         {
           title: "Coupons",
           url: "/coupons",
-          icon: "solar:ticket-bold-duotone",
+          icon: "solar:ticket-linear",
         },
         {
           title: "Banners",
           url: "/banners",
-          icon: "solar:bill-list-bold-duotone",
+          icon: "solar:bill-list-linear",
           requiredPermissions: ["allow_banners_view"],
         },
         {
           title: "Promotion Tags",
           url: "/tags",
-          icon: "solar:tag-price-bold-duotone",
+          icon: "solar:tag-price-linear",
           requiredPermissions: ["allow_promotional_tag_view"],
         },
       ],
@@ -144,7 +161,7 @@ export const sidebarData = {
     {
       title: "User Management",
       url: "#",
-      icon: "solar:users-group-rounded-bold-duotone",
+      icon: "solar:users-group-rounded-linear",
       requiredPermissions: [
         "allow_accounts_view",
         "allow_staff_view",
@@ -155,31 +172,31 @@ export const sidebarData = {
         {
           title: "Accounts",
           url: "/accounts",
-          icon: "solar:user-id-bold-duotone",
+          icon: "solar:user-id-linear",
           requiredPermissions: ["allow_accounts_view"],
         },
         {
           title: "Administrators",
           url: "/administrators",
-          icon: "solar:user-rounded-bold-duotone",
+          icon: "solar:user-rounded-linear",
           requiredPermissions: ["allow_adminstrators_view"],
         },
         {
           title: "Staff Members",
           url: "/staffs",
-          icon: "solar:users-group-two-rounded-bold-duotone",
+          icon: "solar:users-group-two-rounded-linear",
           requiredPermissions: ["allow_staff_view"],
         },
         {
           title: "Organizations",
           url: "/organizations",
-          icon: "solar:buildings-3-bold-duotone",
+          icon: "solar:buildings-3-linear",
           requiredPermissions: ["allow_accounts_view"],
         },
         {
           title: "Riders",
           url: "/riders",
-          icon: "solar:delivery-bold-duotone",
+          icon: "solar:delivery-linear",
           requiredPermissions: ["allow_riders_view"],
         },
       ],
@@ -187,12 +204,12 @@ export const sidebarData = {
     {
       title: "Settings",
       url: "#",
-      icon: "solar:settings-bold-duotone",
+      icon: "solar:settings-linear",
       items: [
         {
           title: "Delivery Schedules",
           url: "/delivery-schedules",
-          icon: "solar:calendar-mark-bold-duotone",
+          icon: "solar:calendar-mark-linear",
           requiredPermissions: ["allow_configuration_view"],
         },
       ],

@@ -42,6 +42,8 @@ import CorporateProductsPage from "@/pages/products/CorporateProductsPage.js";
 import OrganizationsPage from "@/pages/organizations/OrganizationsPage.js";
 import BatchesPage from "@/routes/manufacturing/batches/pages/BatchesPage";
 import SchedulesPage from "@/pages/schedules/SchedulesPage.js";
+import PurchasablePage from "@/routes/purchasables/pages/purchasable-page";
+import PurchasableOrderPage from "@/routes/purchasables/pages/purchasable-order-page";
 
 const routes: RouteObject[] = [
   {
@@ -435,6 +437,22 @@ const routes: RouteObject[] = [
         element: (
           <PrivateRoute requiredPermissions={["allow_configuration_view"]}>
             <SchedulesPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "purchasables",
+        element: (
+          <PrivateRoute>
+            <PurchasablePage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "purchasable-orders",
+        element: (
+          <PrivateRoute>
+            <PurchasableOrderPage />
           </PrivateRoute>
         ),
       },
