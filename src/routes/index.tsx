@@ -30,12 +30,11 @@ import TransferStockPage from "@/routes/manufacturing/stocks/pages/TransferStock
 import RestockPage from "@/routes/manufacturing/stocks/pages/RestockPage.js";
 import ProcessProductsPage from "@/routes/manufacturing/stocks/pages/ProcessProductsPage.js";
 import SelectProductsPage from "@/routes/manufacturing/stocks/pages/SelectProductsPage.js";
-import AccountsPage from "@/pages/accounts/AccountsPage.js";
-import StaffsPage from "@/pages/staff/StaffsPage.js";
-import RidersPage from "@/pages/riders/RidersPage.js";
 import EditCouponPage from "@/pages/coupons/EditCouponPage.js";
 import AddCouponPage from "@/pages/coupons/AddCouponPage.js";
 import OrdersPage from "@/pages/orders/OrdersPage.js";
+import StaffsPage from "@/pages/staff/StaffsPage.js";
+import RidersPage from "@/pages/riders/RidersPage.js";
 import AdministratorsPage from "@/pages/administrators/AdministratorsPage";
 import UpdateAdminPermissionsPage from "@/pages/administrators/UpdateAdminPermissionsPage";
 import CorporateProductsPage from "@/pages/products/CorporateProductsPage.js";
@@ -44,6 +43,9 @@ import BatchesPage from "@/routes/manufacturing/batches/pages/BatchesPage";
 import SchedulesPage from "@/pages/schedules/SchedulesPage.js";
 import PurchasablePage from "@/routes/purchasables/pages/purchasable-page";
 import PurchasableOrderPage from "@/routes/purchasables/pages/purchasable-order-page";
+
+// New Zustand-based accounts page
+import AccountsPage from "@/routes/accounts/pages/accounts-page";
 
 const routes: RouteObject[] = [
   {

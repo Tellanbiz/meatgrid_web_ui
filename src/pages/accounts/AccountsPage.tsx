@@ -42,7 +42,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const AccountsPage = () => {
+const AcxcountsPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const accounts = useAppSelector(selectAccounts);
@@ -288,4 +288,4 @@ const AccountsPage = () => {
   );
 };
 
-export default AccountsPage;
+export default AcxcountsPage;

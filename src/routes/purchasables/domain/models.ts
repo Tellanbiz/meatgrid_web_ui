@@ -29,3 +29,19 @@ export interface PurchasableOrder {
     unit_of_issue: number;
   }[];
 }
+
+export interface CreatePurchaseParams {
+    id?: number
+    name: string, 
+    description: string, 
+    unit_type: 'grams'| 'kilograms'|'liters'| 'pieces'
+}
+
+export interface CreateOrderPurchaseParams {
+    supplier_id: string;
+    items: {
+      product_id: number;
+      unit_of_issue: number;
+      unit_cost: number;
+    }[];
+}

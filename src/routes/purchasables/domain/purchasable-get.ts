@@ -6,8 +6,9 @@ export async function getPurchasables(): Promise<Purchasable[]> {
     return response.data as Purchasable[];
 }
 
-export async function getPurchasableOrders(): Promise<PurchasableOrder[]> {
-    const response = await axios.get("/purchasables");
+/** so the date should be as dd-mm-yyyy */
+export async function getPurchasableOrders(startDate: string, endDate: string): Promise<PurchasableOrder[]> {
+    const response = await axios.get(`/purchasables/orders?start_date=${startDate}&end_date=${endDate}`);
     return response.data as PurchasableOrder[];
 }
 

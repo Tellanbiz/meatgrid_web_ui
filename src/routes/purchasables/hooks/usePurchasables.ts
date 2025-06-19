@@ -8,7 +8,7 @@ interface PurchasablesState {
     loading: boolean;
     error: string | null;
     fetchPurchasables: () => Promise<void>;
-    fetchPurchasableOrders: () => Promise<void>;
+    fetchPurchasableOrders: (startDate?: string, endDate?: string) => Promise<void>;
 }
 
 export const usePurchasables = create<PurchasablesState>((set) => ({
@@ -25,10 +25,17 @@ export const usePurchasables = create<PurchasablesState>((set) => ({
             set({ error: e instanceof Error ? e.message : "Failed to fetch purchasables", loading: false });
         }
     },
-    fetchPurchasableOrders: async () => {
+    fetchPurchasableOrders: async (startDate?: string, endDate?: string) => {
         set({ loading: true, error: null });
         try {
-            const data = await getPurchasableOrders();
+            // Default to 30 days if no dates provided
+            const today = new Date();
+            const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+            const defaultEndDate = endDate || today.toLocaleDateString('en-GB').split('/').reverse().join('-');
+            const defaultStartDate = startDate || thirtyDaysAgo.toLocaleDateString('en-GB').split('/').reverse().join('-');
+
+            const data = await getPurchasableOrders(defaultStartDate, defaultEndDate);
             set({ purchasableOrders: data, loading: false });
         } catch (e: unknown) {
             set({ error: e instanceof Error ? e.message : "Failed to fetch purchasable orders", loading: false });
