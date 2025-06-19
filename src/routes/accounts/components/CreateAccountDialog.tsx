@@ -212,14 +212,14 @@ export default function CreateAccountDialog({
               <div className="relative">
                 <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2 text-gray-500">
                   <span className="text-lg">🇰🇪</span>
-                  <span className="text-sm font-medium">+254</span>
+                  <span className="text-sm font-medium">254 </span>
                 </div>
                 <Input
                   id="phone_number"
-                  value={formData.phone_number.replace(/^\+254/, "")}
+                  value={formData.phone_number.replace(/^254/, "")}
                   onChange={(e) => {
                     const value = e.target.value.replace(/\D/g, ""); // Remove non-digits
-                    const phoneWithCode = value ? `+254${value}` : "";
+                    const phoneWithCode = value ? `254${value}` : "";
                     handleInputChange("phone_number", phoneWithCode);
                   }}
                   placeholder="712345678"
@@ -282,7 +282,7 @@ export default function CreateAccountDialog({
                   id="latitude"
                   type="number"
                   step="any"
-                  value={formData.address.points[0]}
+                  value={formData.address.points[0] || ""}
                   onChange={(e) => handleLatitudeChange(e.target.value)}
                   placeholder="Enter latitude (e.g., 40.7128)"
                 />
@@ -294,7 +294,7 @@ export default function CreateAccountDialog({
                   id="longitude"
                   type="number"
                   step="any"
-                  value={formData.address.points[1]}
+                  value={formData.address.points[1] || ""}
                   onChange={(e) => handleLongitudeChange(e.target.value)}
                   placeholder="Enter longitude (e.g., -74.0060)"
                 />
