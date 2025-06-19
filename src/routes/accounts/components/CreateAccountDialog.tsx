@@ -219,7 +219,7 @@ export default function CreateAccountDialog({
                   value={formData.phone_number.replace(/^\+254/, "")}
                   onChange={(e) => {
                     const value = e.target.value.replace(/\D/g, ""); // Remove non-digits
-                    const phoneWithCode = value ? `254${value}` : "";
+                    const phoneWithCode = value ? `+254${value}` : "";
                     handleInputChange("phone_number", phoneWithCode);
                   }}
                   placeholder="712345678"
