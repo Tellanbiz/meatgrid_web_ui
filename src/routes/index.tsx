@@ -39,7 +39,8 @@ import AdministratorsPage from "@/pages/administrators/AdministratorsPage";
 import UpdateAdminPermissionsPage from "@/pages/administrators/UpdateAdminPermissionsPage";
 import CorporateProductsPage from "@/pages/products/CorporateProductsPage.js";
 import OrganizationsPage from "@/pages/organizations/OrganizationsPage.js";
-import BatchesPage from "@/routes/manufacturing/batches/pages/BatchesPage";
+import BatchesPage from "@/routes/processing-module/pages/BatchesPage";
+import ProcessingFormPage from "@/routes/processing-module/pages/ProcessingFormPage";
 import SchedulesPage from "@/pages/schedules/SchedulesPage.js";
 import PurchasablePage from "@/routes/purchasables/pages/purchasable-page";
 import PurchasableOrderPage from "@/routes/purchasables/pages/purchasable-order-page";
@@ -177,6 +178,14 @@ const routes: RouteObject[] = [
             element: (
               <PrivateRoute requiredPermissions={["allow_product_view"]}>
                 <BatchesPage />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: "processing/create",
+            element: (
+              <PrivateRoute requiredPermissions={["allow_product_submit"]}>
+                <ProcessingFormPage />
               </PrivateRoute>
             ),
           },

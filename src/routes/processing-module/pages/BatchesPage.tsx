@@ -1,27 +1,30 @@
 import { useState } from "react";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectIsFetchingBatches } from "@/store/features/batches/batchSelectors";
-import { fetchBatches } from "@/store/features/batches/batchThunks";
-import { RefreshCw, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { RefreshCw, Search, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import BatchesTable from "../components/BatchesTable";
+import { useBatchesStore } from "../hooks/batches-store";
 
 const BatchesPage = () => {
-  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const [searchString, setSearchString] = useState<string>("");
-  const isFetchingBatches = useAppSelector(selectIsFetchingBatches);
+  const { loading, fetchBatches } = useBatchesStore();
 
   const handleRefresh = () => {
-    dispatch(fetchBatches());
+    fetchBatches();
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchString(e.target.value);
   };
 
+  const handleCreateBatch = () => {
+    navigate("/processing/create");
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-6">
       <div className="flex flex-col bg-background border-b border-gray-100">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
@@ -40,20 +43,28 @@ const BatchesPage = () => {
             <Button
               variant="outline"
               onClick={handleRefresh}
-              disabled={isFetchingBatches}
+              disabled={loading}
               size="sm"
               className="px-2"
             >
               <RefreshCw
-                className={`h-4 w-4 ${isFetchingBatches ? "animate-spin" : ""}`}
+                className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
               />
               <span className="ml-2">Refresh</span>
+            </Button>
+            <Button
+              onClick={handleCreateBatch}
+              size="sm"
+              className="px-2"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create Batch
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="h-table rounded-md shadow-sm border border-gray-100 overflow-hidden bg-white">
+      <div className="h-table">
         <BatchesTable searchString={searchString} />
       </div>
     </div>

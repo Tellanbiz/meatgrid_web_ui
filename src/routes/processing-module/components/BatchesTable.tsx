@@ -1,18 +1,8 @@
 import { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchBatches } from "@/store/features/batches/batchThunks";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { QrCode, Barcode } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { selectBatches } from "@/store/features/batches/batchSelectors";
-import { AvatarStack } from "@/components/common/avatar-stack";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import CodeImageDialog from "./CodeImageDialog";
 import {
   Table,
@@ -30,15 +20,14 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useBatchesStore } from "../hooks/batches-store";
 
 interface BatchesTableProps {
   searchString: string;
 }
 
 const BatchesTable: React.FC<BatchesTableProps> = ({ searchString }) => {
-  const dispatch = useAppDispatch();
-  const { status, error } = useAppSelector((state) => state.batches);
-  const batches = useAppSelector(selectBatches);
+  const { batches, loading, error, fetchBatches } = useBatchesStore();
   const [selectedImage, setSelectedImage] = useState<{
     url: string;
     title: string;
@@ -48,14 +37,14 @@ const BatchesTable: React.FC<BatchesTableProps> = ({ searchString }) => {
   const itemsPerPage = 15;
 
   useEffect(() => {
-    dispatch(fetchBatches());
-  }, [dispatch]);
+    fetchBatches();
+  }, [fetchBatches]);
 
   useEffect(() => {
-    if (status === "failed" && error) {
+    if (error) {
       toast.error(error);
     }
-  }, [status, error]);
+  }, [error]);
 
   const filteredBatches = batches.filter((batch) =>
     batch.batch_number.toLowerCase().includes(searchString.toLowerCase())
@@ -66,6 +55,29 @@ const BatchesTable: React.FC<BatchesTableProps> = ({ searchString }) => {
   const endIndex = startIndex + itemsPerPage;
   const currentItems = filteredBatches.slice(startIndex, endIndex);
 
+  const formatQuantity = (quantity: number, unitType: string) => {
+    if (unitType.toLowerCase() === "kilograms") {
+      const convertedQuantity = quantity / 1000;
+      // Format to 2 decimal places if needed, but remove trailing zeros
+      const formattedQuantity = convertedQuantity % 1 === 0 
+        ? convertedQuantity.toFixed(0) 
+        : convertedQuantity.toFixed(2).replace(/\.?0+$/, '');
+      return `${formattedQuantity} ${unitType}`;
+    }
+    return `${quantity} ${unitType}`;
+  };
+
+  if (loading && batches.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading batches...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-full">
       <div className="rounded-md border bg-white">
@@ -73,11 +85,11 @@ const BatchesTable: React.FC<BatchesTableProps> = ({ searchString }) => {
           <TableHeader>
             <TableRow>
               <TableHead>Batch Number</TableHead>
-              <TableHead>Product</TableHead>
+              <TableHead>Products</TableHead>
+              <TableHead>Total Quantity</TableHead>
               <TableHead>Storage Type</TableHead>
               <TableHead>Store</TableHead>
               <TableHead>Expiry Date</TableHead>
-              <TableHead>Suppliers</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -102,36 +114,27 @@ const BatchesTable: React.FC<BatchesTableProps> = ({ searchString }) => {
                     </Button>
                   </div>
                 </TableCell>
-                <TableCell className="font-bold">{batch.product}</TableCell>
+                <TableCell>
+                  <div className="space-y-1">
+                    {batch.products.map((product, index) => (
+                      <div key={index} className="text-sm">
+                        <span className="font-medium">{product.product_name}</span>
+                        <span className="text-muted-foreground ml-2">
+                          ({formatQuantity(batch.total_quantity, product.unit_type)})
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </TableCell>
+                <TableCell className="font-bold">
+                  {batch.products.length > 0 && 
+                    formatQuantity(batch.total_quantity, batch.products[0].unit_type)
+                  }
+                </TableCell>
                 <TableCell>{batch.storage_type}</TableCell>
                 <TableCell>{batch.store}</TableCell>
                 <TableCell>
                   {format(new Date(batch.expiry_at), "MMM d, yyyy")}
-                </TableCell>
-                <TableCell>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="flex items-center cursor-help">
-                          <AvatarStack items={batch.suppliers} limit={3} />
-                          <span className="ml-3 text-sm text-muted-foreground">
-                            {batch.suppliers.length} supplier
-                            {batch.suppliers.length !== 1 ? "s" : ""}
-                          </span>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-[300px]">
-                        <div className="space-y-1">
-                          <p className="font-semibold text-sm">Suppliers</p>
-                          <ul className="text-sm list-disc pl-4">
-                            {batch.suppliers.map((supplier, index) => (
-                              <li key={index}>{supplier}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
@@ -200,7 +203,7 @@ const BatchesTable: React.FC<BatchesTableProps> = ({ searchString }) => {
 
       {selectedImage && (
         <CodeImageDialog
-          isOpen={true}
+          isOpen={!!selectedImage}
           onClose={() => setSelectedImage(null)}
           imageUrl={selectedImage.url}
           title={selectedImage.title}
