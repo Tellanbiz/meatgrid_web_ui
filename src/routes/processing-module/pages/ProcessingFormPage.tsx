@@ -49,18 +49,18 @@ const ProcessingFormPage: React.FC<ProcessingFormPageProps> = ({
   storageTypeId,
 }) => {
   const navigate = useNavigate();
-  const { purchasables, loading: purchasablesLoading, fetchPurchasables } = usePurchasables();
+  const { purchasables, fetchPurchasables } = usePurchasables();
   const [availableProducts, setAvailableProducts] = useState<AvailableProductItem[]>([]);
   const [storageTypes, setStorageTypes] = useState<StorageType[]>([]);
   const [warehouses, setWarehouses] = useState<Store[]>([]);
-  const [availableProductsLoading, setAvailableProductsLoading] = useState(false);
-  const [storageTypesLoading, setStorageTypesLoading] = useState(false);
-  const [warehousesLoading, setWarehousesLoading] = useState(false);
+  const [ setAvailableProductsLoading] = useState(false);
+  const [ setStorageTypesLoading] = useState(false);
+  const [ setWarehousesLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   
   // Dialog states
-  const [warehouseDialogOpen, setWarehouseDialogOpen] = useState(false);
-  const [storageTypeDialogOpen, setStorageTypeDialogOpen] = useState(false);
+  const [ setWarehouseDialogOpen] = useState(false);
+  const [ setStorageTypeDialogOpen] = useState(false);
   const [purchasedProductDialogOpen, setPurchasedProductDialogOpen] = useState(false);
   const [processedProductDialogOpen, setProcessedProductDialogOpen] = useState(false);
   
