@@ -56,14 +56,19 @@ const BatchesTable: React.FC<BatchesTableProps> = ({ searchString }) => {
   const currentItems = filteredBatches.slice(startIndex, endIndex);
 
   const formatQuantity = (quantity: number, unitType: string) => {
-    if (unitType.toLowerCase() === "kilograms") {
+    if (
+      unitType.toLowerCase() === "kilograms" ||
+      (unitType.toLowerCase() === "grams" && quantity > 1000)
+    ) {
       const convertedQuantity = quantity / 1000;
       // Format to 2 decimal places if needed, but remove trailing zeros
-      const formattedQuantity = convertedQuantity % 1 === 0 
-        ? convertedQuantity.toFixed(0) 
-        : convertedQuantity.toFixed(2).replace(/\.?0+$/, '');
-      return `${formattedQuantity} ${unitType}`;
+      const formattedQuantity =
+        convertedQuantity % 1 === 0
+          ? convertedQuantity.toFixed(0)
+          : convertedQuantity.toFixed(2).replace(/\.?0+$/, "");
+      return `${formattedQuantity} kilograms`;
     }
+
     return `${quantity} ${unitType}`;
   };
 
@@ -118,18 +123,27 @@ const BatchesTable: React.FC<BatchesTableProps> = ({ searchString }) => {
                   <div className="space-y-1">
                     {batch.products.map((product, index) => (
                       <div key={index} className="text-sm">
-                        <span className="font-medium">{product.product_name}</span>
+                        <span className="font-medium">
+                          {product.product_name}
+                        </span>
                         <span className="text-muted-foreground ml-2">
-                          ({formatQuantity(batch.total_quantity, product.unit_type)})
+                          (
+                          {formatQuantity(
+                            batch.total_quantity,
+                            product.unit_type
+                          )}
+                          )
                         </span>
                       </div>
                     ))}
                   </div>
                 </TableCell>
                 <TableCell className="font-bold">
-                  {batch.products.length > 0 && 
-                    formatQuantity(batch.total_quantity, batch.products[0].unit_type)
-                  }
+                  {batch.products.length > 0 &&
+                    formatQuantity(
+                      batch.total_quantity,
+                      batch.products[0].unit_type
+                    )}
                 </TableCell>
                 <TableCell>{batch.storage_type}</TableCell>
                 <TableCell>{batch.store}</TableCell>

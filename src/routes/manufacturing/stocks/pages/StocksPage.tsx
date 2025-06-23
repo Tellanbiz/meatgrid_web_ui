@@ -2,7 +2,6 @@ import {
   Forward,
   RedoDot,
   RefreshCcw,
-  WandSparkles,
   FileDown,
   FileSpreadsheet,
 } from "lucide-react";
@@ -35,9 +34,6 @@ const StocksPage = () => {
     navigate("/stock/restock");
   };
 
-  const handleProcessProducts = () => {
-    navigate("/stock/process");
-  };
 
   const handleExportExcel = () => {
     const data = stocks.map((stock) => ({
@@ -93,10 +89,7 @@ const StocksPage = () => {
             <span className="ml-2">Transfer Stock</span>
           </Button>
 
-          <Button variant="outline" size="sm" onClick={handleProcessProducts}>
-            <WandSparkles className="h-4 w-4" />
-            <span className="ml-2">Process Products</span>
-          </Button>
+  
 
           <Button variant="default" size="sm" onClick={handleRestock}>
             <RedoDot className="h-4 w-4" />
