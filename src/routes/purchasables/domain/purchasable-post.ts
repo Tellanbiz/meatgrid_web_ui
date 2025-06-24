@@ -13,6 +13,6 @@ export async function updatePurchasable(params: CreatePurchaseParams): Promise<s
 }
 
 export async function createPurchaseOrder(params: CreateOrderPurchaseParams) {
-    const response = await axios.post("/purchasables/order", params);
+    const response = await axios.post("/purchasables/order/new", params);
     return response.data.error
 }

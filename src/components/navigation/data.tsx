@@ -5,7 +5,7 @@ export const sidebarData = {
   },
   navMain: [
     {
-      title: "General",
+      title: "Overview",
       url: "#",
       icon: "solar:home-smile-linear",
       isActive: true,
@@ -21,7 +21,7 @@ export const sidebarData = {
       ],
     },
     {
-      title: "Product Management",
+      title: "Products & Categories",
       url: "#",
       icon: "solar:box-linear",
       isActive: true,
@@ -43,7 +43,7 @@ export const sidebarData = {
       ],
     },
     {
-      title: "Order Management",
+      title: "Sales & Orders",
       url: "#",
       icon: "solar:cart-large-linear",
       isActive: true,
@@ -65,7 +65,7 @@ export const sidebarData = {
       ],
     },
     {
-      title: "Purchasables",
+      title: "Purchasing",
       url: "#",
       icon: "solar:cart-large-2-linear",
       items: [
@@ -75,14 +75,14 @@ export const sidebarData = {
           icon: "solar:box-minimalistic-linear",
         },
         {
-          title: "Purchasable Orders",
+          title: "Purchase Orders",
           url: "/purchasable-orders",
           icon: "solar:bill-list-linear",
         },
       ],
     },
     {
-      title: "Inventory Management",
+      title: "Inventory & Supply",
       url: "#",
       icon: "solar:shop-linear",
       isActive: true,
@@ -127,7 +127,7 @@ export const sidebarData = {
       ],
     },
     {
-      title: "Marketing",
+      title: "Marketing & Promotions",
       url: "#",
       icon: "solar:megaphone-linear",
       isActive: true,
@@ -159,7 +159,7 @@ export const sidebarData = {
       ],
     },
     {
-      title: "User Management",
+      title: "Team & Users",
       url: "#",
       icon: "solar:users-group-rounded-linear",
       requiredPermissions: [
@@ -202,7 +202,7 @@ export const sidebarData = {
       ],
     },
     {
-      title: "Settings",
+      title: "System Settings",
       url: "#",
       icon: "solar:settings-linear",
       items: [

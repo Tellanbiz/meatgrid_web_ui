@@ -44,6 +44,7 @@ import ProcessingFormPage from "@/routes/processing-module/pages/ProcessingFormP
 import SchedulesPage from "@/pages/schedules/SchedulesPage.js";
 import PurchasablePage from "@/routes/purchasables/pages/purchasable-page";
 import PurchasableOrderPage from "@/routes/purchasables/pages/purchasable-order-page";
+import PurchasableCreateOrderPage from "@/routes/purchasables/pages/purchasable-create-order-page";
 
 // New Zustand-based accounts page
 import AccountsPage from "@/routes/accounts/pages/accounts-page";
@@ -464,6 +465,14 @@ const routes: RouteObject[] = [
         element: (
           <PrivateRoute>
             <PurchasableOrderPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "purchasable-create-orders",
+        element: (
+          <PrivateRoute>
+            <PurchasableCreateOrderPage />
           </PrivateRoute>
         ),
       },
