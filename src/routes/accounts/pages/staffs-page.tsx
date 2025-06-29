@@ -1,15 +1,15 @@
 import { RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { useEffect, useState } from "react";
-import { fetchStaffs } from "../../store/features/staff/staffThunks";
-import { Staff } from "../../store/features/staff/staffTypes";
-import StaffsTable from "./components/StaffsTable";
-import UpdateStaffPermissionsDialog from "../accounts/components/UpdateStaffPermissionsDialog";
-import { selectIsFetchingStaffs } from "../../store/features/staff/staffSelectors";
-import { selectStores } from "../../store/features/stores/storeSelectors";
-import { useModal } from "../../shared/hooks/use-modal";
-import { fetchStores } from "../../store/features/stores/storeThunks";
+import { fetchStaffs } from "../../../store/features/staff/staffThunks";
+import { Staff } from "../../../store/features/staff/staffTypes";
+import StaffsTable from "../components/StaffsTable";
+import { selectIsFetchingStaffs } from "../../../store/features/staff/staffSelectors";
+import { selectStores } from "../../../store/features/stores/storeSelectors";
+import { useModal } from "../../../shared/hooks/use-modal";
+import { fetchStores } from "../../../store/features/stores/storeThunks";
+import UpdateStaffPermissionsDialog from "../components/UpdateStaffPermissionsDialog";
 
 const StaffsPage = () => {
   const dispatch = useAppDispatch();

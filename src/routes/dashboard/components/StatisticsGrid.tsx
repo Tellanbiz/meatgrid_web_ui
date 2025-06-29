@@ -12,6 +12,11 @@ interface StatisticCardProps {
   additionalInfo: string;
 }
 
+interface StatisticsGridProps {
+  startDate: Date | null;
+  endDate: Date | null;
+}
+
 const StatisticCard: FC<StatisticCardProps> = ({
   title,
   value,
@@ -43,13 +48,7 @@ const StatisticCard: FC<StatisticCardProps> = ({
   );
 };
 
-function getGrowth(latest: number, prev: number): string {
-  if (prev === 0) return '+0.00%';
-  const growth = ((latest - prev) / Math.abs(prev)) * 100;
-  return `${growth >= 0 ? '+' : ''}${growth.toFixed(2)}%`;
-}
-
-const StatisticsGrid = () => {
+const StatisticsGrid: FC<StatisticsGridProps> = ({ startDate: _startDate, endDate: _endDate }) => {
   const { dashboardStatistics, loading } = useDashboard();
   const isLoading = loading.dashboardStatistics;
 
@@ -67,17 +66,10 @@ const StatisticsGrid = () => {
     );
   }
 
-  // Growth calculations: only last two months
-  function lastTwoGrowth(arr: { [k: string]: any }[] | null | undefined, key: string): string {
-    if (!arr || arr.length < 2) return '+0.00%';
-    const prev = arr[arr.length - 2]?.[key] ?? 0;
-    const latest = arr[arr.length - 1]?.[key] ?? 0;
-    return getGrowth(latest, prev);
-  }
-
-  const revenueGrowth = lastTwoGrowth(dashboardStatistics?.revenue_growth_by_month || [], 'revenue_growth_perc');
-  const orderGrowth = lastTwoGrowth(dashboardStatistics?.order_growth_by_month || [], 'order_growth_perc');
-  const userGrowth = lastTwoGrowth(dashboardStatistics?.user_growth_by_month || [], 'user_growth_perc');
+  // Use direct growth percentages from API
+  const revenueGrowth = dashboardStatistics?.total_revenue_growth_percentage ?? 0;
+  const orderGrowth = dashboardStatistics?.total_order_growth_percentage ?? 0;
+  const userGrowth = dashboardStatistics?.total_user_growth_percentage ?? 0;
 
   // Calculate total orders from order status counts
   const totalOrders = dashboardStatistics?.order_status_counts 
@@ -88,10 +80,10 @@ const StatisticsGrid = () => {
     {
       title: "Total Revenue",
       value: dashboardStatistics ? `KES ${dashboardStatistics.total_revenue.toLocaleString()}` : "KES 0",
-      trend: revenueGrowth,
-      trendColor: revenueGrowth.startsWith('+') ? 'text-green-600' : 'text-red-600',
+      trend: `${revenueGrowth >= 0 ? '+' : ''}${revenueGrowth.toFixed(2)}%`,
+      trendColor: revenueGrowth >= 0 ? 'text-green-600' : 'text-red-600',
       icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" /></svg>,
-      additionalInfo: "Total revenue this period",
+      additionalInfo: "Growth from previous period",
     },
     {
       title: "Total Products",
@@ -104,18 +96,18 @@ const StatisticsGrid = () => {
     {
       title: "Total Orders",
       value: totalOrders.toLocaleString(),
-      trend: orderGrowth,
-      trendColor: orderGrowth.startsWith('+') ? 'text-green-600' : 'text-red-600',
+      trend: `${orderGrowth >= 0 ? '+' : ''}${orderGrowth.toFixed(2)}%`,
+      trendColor: orderGrowth >= 0 ? 'text-green-600' : 'text-red-600',
       icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>,
-      additionalInfo: "Total orders across all statuses",
+      additionalInfo: "Growth from previous period",
     },
     {
       title: "Total Users",
       value: dashboardStatistics ? dashboardStatistics.total_users.toLocaleString() : "0",
-      trend: userGrowth,
-      trendColor: userGrowth.startsWith('+') ? 'text-green-600' : 'text-red-600',
+      trend: `${userGrowth >= 0 ? '+' : ''}${userGrowth.toFixed(2)}%`,
+      trendColor: userGrowth >= 0 ? 'text-green-600' : 'text-red-600',
       icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>,
-      additionalInfo: "Total registered users",
+      additionalInfo: "Growth from previous period",
     },
   ];
 

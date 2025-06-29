@@ -1,3 +1,5 @@
+import { Order } from "@/store/features/orders/orderTypes";
+
 export interface ProductReport {
   product_id: string;
   images: string;
@@ -85,22 +87,23 @@ export interface FetchDashboardStatisticsRequest {
   end_date: string; // yyyy-mm-dd format
 }
 
+export interface OrderStatusCounts {
+  dispatch: number;
+  delivered: number;
+  preparing: number;
+}
+
 export interface DashboardStatistics {
   total_users: number;
   total_products: number;
   total_revenue: number;
-  order_status_counts: Record<string, number>;
-  user_growth_by_month: {
-    month: string;
-    user_growth_perc: number;
-  }[] | null;
-  order_growth_by_month: {
-    month: string;
-    order_growth_perc: number;
-  }[];
-  revenue_growth_by_month: {
-    month: string;
-    revenue_growth_perc: number;
-  }[];
+  order_status_counts: OrderStatusCounts;
+  total_order_growth_percentage: number;
+  total_user_growth_percentage: number | null;
+  total_revenue_growth_percentage: number;
 }
 
+
+export interface LatestOrderData extends Order {
+  // Extends the existing Order type from orders module
+} 

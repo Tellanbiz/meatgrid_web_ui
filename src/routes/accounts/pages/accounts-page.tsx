@@ -29,12 +29,12 @@ import { useAccounts } from "../hooks/useAccounts";
 import { UserAccount, UserRole, FetchAccountsRequest } from "../domain/models";
 import { formatDate } from "@/utils/dateUtils";
 import { UpdateUserRoleDialog } from "../components/UpdateUserRoleDialog";
-import UpdateStaffPermissionsDialog from "@/pages/accounts/components/UpdateStaffPermissionsDialog";
 import CreateAccountDialog from "../components/CreateAccountDialog";
 import UpdateRiderStatusDialog from "../components/UpdateRiderStatusDialog";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectStores } from "@/store/features/stores/storeSelectors";
 import { fetchStores } from "@/store/features/stores/storeThunks";
+import UpdateStaffPermissionsDialog from "../components/UpdateStaffPermissionsDialog";
 
 export default function AccountsPage() {
   const navigate = useNavigate();
@@ -204,7 +204,7 @@ export default function AccountsPage() {
   };
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6 p-6 bg-white h-full">
       {/* Header with search and filters */}
       <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
         <div className="relative w-full lg:w-[350px]">

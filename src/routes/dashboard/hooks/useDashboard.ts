@@ -204,16 +204,17 @@ export function useDashboard() {
   }, [setLoading, setError, setLatestOrders]);
 
   // Fetch all dashboard data
-  const fetchAllDashboardData = useCallback(async () => {
+  const fetchAllDashboardData = useCallback(async (dateRange?: { start_date: string; end_date: string }) => {
     const defaultDates = getDefaultDateRange();
     const currentYear = new Date().getFullYear();
+    const requestDates = dateRange || defaultDates;
     
     // Fetch all data in parallel
     await Promise.all([
-      fetchDashboardStatisticsData(defaultDates),
-      fetchTopProductsData({ ...defaultDates, limit: 10 }),
-      fetchTopStoresData({ ...defaultDates, limit: 10 }),
-      fetchLatestOrdersData({ ...defaultDates, limit: 10 }),
+      fetchDashboardStatisticsData(requestDates),
+      fetchTopProductsData({ ...requestDates, limit: 10 }),
+      fetchTopStoresData({ ...requestDates, limit: 10 }),
+      fetchLatestOrdersData({ ...requestDates, limit: 10 }),
       fetchYearlyReportsData({ year: currentYear }), // Use current year for combined stats
     ]);
   }, [

@@ -20,7 +20,12 @@ import {
 import { useDashboard } from "../hooks/useDashboard";
 import { Card } from "@/components/ui/card";
 
-const RevenueStatistics: FC = () => {
+interface RevenueStatisticsProps {
+  startDate: Date | null;
+  endDate: Date | null;
+}
+
+const RevenueStatistics: FC<RevenueStatisticsProps> = ({ startDate: _startDate, endDate: _endDate }) => {
   const { yearlyReports, loading, fetchYearlyReportsData } = useDashboard();
   const [selectedYear, setSelectedYear] = useState("2025");
   const isLoading = loading.yearlyReports;

@@ -1,12 +1,16 @@
 import { useDashboard } from "../hooks/useDashboard";
-import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-const TopStores = () => {
+interface TopStoresProps {
+  startDate: Date | null;
+  endDate: Date | null;
+}
+
+const TopStores = ({ startDate: _startDate, endDate: _endDate }: TopStoresProps) => {
   const { topStores, loading } = useDashboard();
 
   return (
-    <Card className="bg-white border border-gray-200 p-0 h-full flex flex-col shadow-sm">
+    <div className="bg-white border border-gray-200 p-0 h-full flex flex-col shadow-sm  rounded-md">
       <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
         <div>
           <h3 className="dashboard-card-title">Top Stores</h3>
@@ -36,7 +40,7 @@ const TopStores = () => {
                 <TableCell colSpan={3} className="text-center py-12 text-muted-foreground">
                   <div className="text-4xl mb-3">🏬</div>
                   <div className="dashboard-subtitle">No stores found</div>
-                  <div className="dashboard-label mt-1">No top stores in the last 30 days.</div>
+                  <div className="dashboard-label mt-1">No top stores in the selected period.</div>
                 </TableCell>
               </TableRow>
             ) : (
@@ -62,7 +66,7 @@ const TopStores = () => {
           </TableBody>
         </Table>
       </div>
-    </Card>
+    </div>
   );
 };
 

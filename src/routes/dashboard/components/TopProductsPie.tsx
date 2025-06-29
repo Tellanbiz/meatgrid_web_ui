@@ -7,7 +7,12 @@ const COLORS = [
   "#6366f1", "#22d3ee", "#f59e42", "#10b981", "#f43f5e", "#a21caf", "#fbbf24", "#14b8a6", "#3b82f6", "#eab308"
 ];
 
-const TopProductsPie = () => {
+interface TopProductsPieProps {
+  startDate: Date | null;
+  endDate: Date | null;
+}
+
+const TopProductsPie = ({ startDate: _startDate, endDate: _endDate }: TopProductsPieProps) => {
   const { topProducts } = useDashboard();
 
   // Group by product name since category is not available in ProductReport
@@ -36,7 +41,7 @@ const TopProductsPie = () => {
           <p className="dashboard-card-subtitle mt-1">Top selling products distribution</p>
         </div>
       </div>
-      <div className="flex flex-col md:flex-row items-center gap-4 flex-1 p-6">
+      <div className="flex flex-col md:flex-row items-center flex-1 pr-6">
         <div className="w-full md:w-1/2 h-64">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>

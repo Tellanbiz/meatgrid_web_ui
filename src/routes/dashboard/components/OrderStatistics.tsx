@@ -4,7 +4,12 @@ import { Card } from "@/components/ui/card";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-const OrderStatistics: FC = () => {
+interface OrderStatisticsProps {
+  startDate: Date | null;
+  endDate: Date | null;
+}
+
+const OrderStatistics: FC<OrderStatisticsProps> = ({ startDate: _startDate, endDate: _endDate }) => {
   const { yearlyReports, loading, fetchYearlyReportsData } = useDashboard();
   const [selectedYear, setSelectedYear] = useState<string>("2025");
   const isLoading = loading.yearlyReports;

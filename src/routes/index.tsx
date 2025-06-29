@@ -32,7 +32,7 @@ import SelectProductsPage from "@/routes/manufacturing/stocks/pages/SelectProduc
 import EditCouponPage from "@/pages/coupons/EditCouponPage.js";
 import AddCouponPage from "@/pages/coupons/AddCouponPage.js";
 import OrdersPage from "@/pages/orders/OrdersPage.js";
-import StaffsPage from "@/pages/staff/StaffsPage.js";
+import StaffsPage from "@/routes/accounts/pages/staffs-page.js";
 import RidersPage from "@/pages/riders/RidersPage.js";
 import AdministratorsPage from "@/pages/administrators/AdministratorsPage";
 import UpdateAdminPermissionsPage from "@/pages/administrators/UpdateAdminPermissionsPage";

@@ -9,48 +9,40 @@ import { useNavigate } from "react-router-dom";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
 
 interface LatestOnlineOrdersProps {
   pageSize?: number;
+  startDate: Date | null;
+  endDate: Date | null;
 }
 
-const LatestOnlineOrders = ({ pageSize = 10 }: LatestOnlineOrdersProps) => {
+const LatestOnlineOrders = ({ pageSize = 10, startDate, endDate }: LatestOnlineOrdersProps) => {
   const { latestOrders, loading, fetchLatestOrdersData } = useDashboard();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    const defaultDates = getDefaultDateRange();
-    fetchLatestOrdersData({ 
-      start_date: defaultDates.start_date,
-      end_date: defaultDates.end_date,
-      limit: pageSize,
-    });
-  }, [fetchLatestOrdersData, page, pageSize]);
+    if (startDate && endDate) {
+      fetchLatestOrdersData({ 
+        start_date: startDate.toISOString().split('T')[0],
+        end_date: endDate.toISOString().split('T')[0],
+        limit: pageSize,
+      });
+    }
+  }, [fetchLatestOrdersData, page, pageSize, startDate, endDate]);
 
   const handleViewOrder = (orderId: number) => {
     navigate(`/orders/${orderId}`);
   };
 
   const handleRefresh = () => {
-    const defaultDates = getDefaultDateRange();
-    fetchLatestOrdersData({ 
-      start_date: defaultDates.start_date,
-      end_date: defaultDates.end_date,
-      limit: pageSize,
-    });
-  };
-
-  // Helper function to get default date range (30 days)
-  const getDefaultDateRange = (): { start_date: string; end_date: string } => {
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - 30);
-    return {
-      start_date: startDate.toISOString().split('T')[0],
-      end_date: endDate.toISOString().split('T')[0],
-    };
+    if (startDate && endDate) {
+      fetchLatestOrdersData({ 
+        start_date: startDate.toISOString().split('T')[0],
+        end_date: endDate.toISOString().split('T')[0],
+        limit: pageSize,
+      });
+    }
   };
 
   const formatStatusName = (status: string) => status.charAt(0).toUpperCase() + status.slice(1);
@@ -60,11 +52,11 @@ const LatestOnlineOrders = ({ pageSize = 10 }: LatestOnlineOrdersProps) => {
   const totalPages = 10;
 
   return (
-    <Card className="bg-white border border-gray-200 p-0 h-[500px] flex flex-col shadow-sm">
+    <div className="bg-white border border-gray-200 p-0 h-fit flex flex-col shadow-sm">
       <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
         <div>
           <h3 className="dashboard-card-title">Latest Online Orders</h3>
-          <p className="dashboard-card-subtitle mt-1">Recent orders from the last 30 days</p>
+          <p className="dashboard-card-subtitle mt-1">Recent orders from the selected period</p>
         </div>
         <Button
           variant="outline"
@@ -104,7 +96,7 @@ const LatestOnlineOrders = ({ pageSize = 10 }: LatestOnlineOrdersProps) => {
                 <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
                   <div className="text-4xl mb-3">📦</div>
                   <div className="dashboard-subtitle">No orders found</div>
-                  <div className="dashboard-label mt-1">No orders have been placed in the last 30 days.</div>
+                  <div className="dashboard-label mt-1">No orders have been placed in the selected period.</div>
                 </TableCell>
               </TableRow>
             ) : (
@@ -170,7 +162,7 @@ const LatestOnlineOrders = ({ pageSize = 10 }: LatestOnlineOrdersProps) => {
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
-    </Card>
+    </div>
   );
 };
 

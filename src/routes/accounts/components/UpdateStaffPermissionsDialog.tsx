@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from "react";
 import {
   Dialog,
@@ -23,7 +24,7 @@ import {
   fetchStaff,
 } from "../../../store/features/staff/staffThunks";
 import { clearStaffMessages } from "../../../store/features/staff/staffSlice";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import {
   Select,
@@ -32,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { resetStaffCode, deleteStaff } from "../domain/staff-api";
 
 interface Store {
   id: string;
@@ -69,6 +71,8 @@ const UpdateStaffPermissionsDialog = ({
   const [canClaim, setCanClaim] = useState<boolean>(false);
   const [canDispatch, setCanDispatch] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   // Fetch staff info when dialog opens with a user
   useEffect(() => {
@@ -133,11 +137,59 @@ const UpdateStaffPermissionsDialog = ({
     );
   };
 
+  const handleDeleteStaff = async () => {
+    if (!account) return;
+
+    if (!confirm(`Are you sure you want to delete ${account.full_name}?`)) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const error = await deleteStaff(account.id);
+      if (error) {
+        toast.error(error);
+      } else {
+        toast.success("Staff deleted successfully");
+        onOpenChange(false);
+        if (onUpdateSuccess) {
+          onUpdateSuccess();
+        }
+      }
+    } catch (err) {
+      toast.error("Failed to delete staff");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleResetStaffCode = async () => {
+    if (!account || !selectedStoreId) return;
+
+    if (!confirm(`Are you sure you want to reset the code for ${account.full_name}?`)) {
+      return;
+    }
+
+    setIsResetting(true);
+    try {
+      const error = await resetStaffCode(account.id, selectedStoreId);
+      if (error) {
+        toast.error(error);
+      } else {
+        toast.success("Staff code reset successfully");
+      }
+    } catch (err) {
+      toast.error("Failed to reset staff code");
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   return (
     <Dialog
       open={open}
       onOpenChange={(isOpen) => {
-        if (!isUpdating) {
+        if (!isUpdating && !isDeleting && !isResetting) {
           onOpenChange(isOpen);
         }
       }}
@@ -165,7 +217,7 @@ const UpdateStaffPermissionsDialog = ({
                 <Select
                   value={selectedStoreId}
                   onValueChange={setSelectedStoreId}
-                  disabled={isUpdating}
+                  disabled={isUpdating || isDeleting || isResetting}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a store" />
@@ -190,7 +242,7 @@ const UpdateStaffPermissionsDialog = ({
                       onCheckedChange={(checked) =>
                         setCanClaim(checked === true)
                       }
-                      disabled={isUpdating}
+                      disabled={isUpdating || isDeleting || isResetting}
                     />
                     <Label htmlFor="can_claim" className="text-sm">
                       Can claim orders
@@ -203,12 +255,57 @@ const UpdateStaffPermissionsDialog = ({
                       onCheckedChange={(checked) =>
                         setCanDispatch(checked === true)
                       }
-                      disabled={isUpdating}
+                      disabled={isUpdating || isDeleting || isResetting}
                     />
                     <Label htmlFor="can_dispatch" className="text-sm">
                       Can dispatch orders
                     </Label>
                   </div>
+                </div>
+              </div>
+
+              {/* Additional Actions */}
+              <div className="space-y-2 pt-4 border-t">
+                <Label className="text-sm">Additional Actions</Label>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleResetStaffCode}
+                    disabled={isUpdating || isDeleting || isResetting || !selectedStoreId}
+                    className="flex-1"
+                  >
+                    {isResetting ? (
+                      <>
+                        <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                        Resetting...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="mr-2 h-3 w-3" />
+                        Reset Code
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleDeleteStaff}
+                    disabled={isUpdating || isDeleting || isResetting}
+                    className="flex-1"
+                  >
+                    {isDeleting ? (
+                      <>
+                        <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                        Deleting...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="mr-2 h-3 w-3" />
+                        Delete Staff
+                      </>
+                    )}
+                  </Button>
                 </div>
               </div>
             </div>
@@ -219,13 +316,13 @@ const UpdateStaffPermissionsDialog = ({
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
-            disabled={isUpdating || isFetchingStaffInfo}
+            disabled={isUpdating || isFetchingStaffInfo || isDeleting || isResetting}
           >
             Cancel
           </Button>
           <Button
             onClick={handleUpdatePermissions}
-            disabled={isUpdating || isFetchingStaffInfo || !selectedStoreId}
+            disabled={isUpdating || isFetchingStaffInfo || !selectedStoreId || isDeleting || isResetting}
           >
             {isUpdating ? (
               <>
