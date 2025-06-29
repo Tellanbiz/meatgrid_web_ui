@@ -141,16 +141,7 @@ export function TopNavigation({ items }: Props) {
         )}
       </div>
 
-      <div className="flex items-center space-x-5">
-        <div className="relative">
-          <Icon icon="solar:bell-bold-duotone" width="22" height="22" className="text-gray-600" />
-          <span className="absolute -top-1 -right-1 size-4 bg-accent rounded-full flex items-center justify-center text-[10px] text-white">4</span>
-        </div>
-        <div className="relative">
-          <Icon icon="solar:chat-dots-bold-duotone" width="22" height="22" className="text-gray-600" />
-          <span className="absolute -top-1 -right-1 size-4 bg-accent rounded-full flex items-center justify-center text-[10px] text-white">7</span>
-        </div>
-      </div>
+     
     </div>
   );
 } 

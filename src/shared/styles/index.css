@@ -1,18 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,opsz,wght@0,14..32,300..900;1,14..32,300..900&display=swap');
 
 @import "tailwindcss";
 @import "tw-animate-css";
 
 * {
-  font-family: "Nunito Sans";
+  font-family: "Albert Sans";
 }
 
-@custom-variant dark (&:is(.dark *));
 
-@tailwind utilities;
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -197,6 +194,26 @@
   }
   .h-table {
     @apply h-[calc(100vh-9.5rem)];
+  }
+  
+  /* Dashboard Typography */
+  .dashboard-title {
+    @apply font-semibold text-gray-900 tracking-tight;
+  }
+  .dashboard-subtitle {
+    @apply font-medium text-gray-700 tracking-tight;
+  }
+  .dashboard-stat {
+    @apply font-bold text-gray-900 tracking-tight;
+  }
+  .dashboard-label {
+    @apply font-medium text-gray-600 text-sm tracking-tight;
+  }
+  .dashboard-card-title {
+    @apply font-semibold text-gray-900 text-lg tracking-tight;
+  }
+  .dashboard-card-subtitle {
+    @apply font-medium text-gray-600 text-sm tracking-tight;
   }
 }
 

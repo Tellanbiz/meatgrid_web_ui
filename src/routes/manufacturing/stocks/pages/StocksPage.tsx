@@ -15,12 +15,29 @@ import {
 } from "@/store/features/stock/stockSelectors";
 import { useNavigate } from "react-router-dom";
 import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
+import { Input } from "@/components/ui/input";
+import StockDateRangePicker from "../components/StockDateRangePicker";
+import { useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { StockStatus } from "@/store/features/stock/stockTypes";
 
 const StocksPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const isFetchingStocks = useAppSelector(selectIsFetchingStocks);
   const stocks = useAppSelector(selectStocks);
+
+  // Search and date range state
+  const [searchTerm, setSearchTerm] = useState("");
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string>("all");
 
   const handleRefresh = () => {
     dispatch(fetchStocks());
@@ -34,72 +51,167 @@ const StocksPage = () => {
     navigate("/stock/restock");
   };
 
+  const handleDateRangeChange = (start: Date | null, end: Date | null) => {
+    setStartDate(start);
+    setEndDate(end);
+  };
+
+  const getFilteredStocks = () => {
+    let filtered = stocks;
+
+    // Filter by search term
+    if (searchTerm) {
+      filtered = filtered.filter((stock) =>
+        stock.product.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filter by date range
+    if (startDate || endDate) {
+      filtered = filtered.filter((stock) => {
+        const stockDate = new Date(stock.created_at);
+        
+        if (startDate && endDate) {
+          return stockDate >= startDate && stockDate <= endDate;
+        } else if (startDate) {
+          return stockDate >= startDate;
+        } else if (endDate) {
+          return stockDate <= endDate;
+        }
+        
+        return true;
+      });
+    }
+
+    // Filter by status
+    if (selectedStatus !== "all") {
+      filtered = filtered.filter((stock) => stock.status === selectedStatus);
+    }
+
+    return filtered;
+  };
+
+  const aggregateStocks = () => {
+    const filteredStocks = getFilteredStocks();
+    const productMap = new Map();
+    
+    for (const stock of filteredStocks) {
+      const key = stock.product.id;
+      if (!productMap.has(key)) {
+        productMap.set(key, {
+          Product: stock.product.name,
+          Quantity: 0,
+          Unit: stock.product.unit_type,
+          Status: stock.status,
+          "Created At": new Date(stock.created_at).toLocaleDateString(),
+        });
+      }
+      const entry = productMap.get(key);
+      entry.Quantity += stock.quantity;
+    }
+    
+    // Convert grams to kilograms if needed
+    for (const entry of productMap.values()) {
+      if (
+        (entry.Unit === "gram" || entry.Unit === "grams") &&
+        entry.Quantity >= 1000
+      ) {
+        entry.Quantity = (entry.Quantity / 1000).toLocaleString(undefined, { maximumFractionDigits: 2 });
+        entry.Unit = "kilograms";
+      } else {
+        entry.Quantity = entry.Quantity.toLocaleString();
+      }
+    }
+    
+    return Array.from(productMap.values()).map((entry) => ({
+      Product: entry.Product,
+      Quantity: `${entry.Quantity} ${entry.Unit}`,
+      Status: entry.Status,
+      "Created At": entry["Created At"],
+    }));
+  };
 
   const handleExportExcel = () => {
-    const data = stocks.map((stock) => ({
-      Product: stock.product.name,
-      Store: stock.store?.name ?? "N/A",
-      Quantity: `${stock.quantity.toLocaleString()} ${stock.product.unit_type}`,
-      Status: stock.status,
-      "Created At": new Date(stock.created_at).toLocaleDateString(),
-    }));
+    const data = aggregateStocks();
     exportToExcel(data, "stocks-report");
   };
 
   const handleExportPDF = () => {
-    const data = stocks.map((stock) => ({
-      Product: stock.product.name,
-      Store: stock.store?.name ?? "N/A",
-      Quantity: `${stock.quantity.toLocaleString()} ${stock.product.unit_type}`,
-      Status: stock.status,
-      "Created At": new Date(stock.created_at).toLocaleDateString(),
-    }));
+    const data = aggregateStocks();
     exportToPDF(data, "stocks-report");
   };
 
   return (
-    <div className="h-full p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">Stock</h1>
-        <div className="flex gap-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={isFetchingStocks}
-          >
-            <RefreshCcw
-              className={`h-4 w-4 ${isFetchingStocks ? "animate-spin" : ""}`}
+    <div className="h-full p-6 bg-white">
+      <div className="flex flex-col gap-2 mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-3">
+            <Input
+              placeholder="Search by product name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-64"
             />
-            <span className="ml-2">Refresh</span>
-          </Button>
+            <StockDateRangePicker
+              startDate={startDate}
+              endDate={endDate}
+              onChange={handleDateRangeChange}
+            />
+            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value={StockStatus.InStock}>In Stock</SelectItem>
+                <SelectItem value={StockStatus.Sold}>Sold</SelectItem>
+                <SelectItem value={StockStatus.Migrated}>Migrated</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex gap-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isFetchingStocks}
+            >
+              <RefreshCcw
+                className={`h-4 w-4 ${isFetchingStocks ? "animate-spin" : ""}`}
+              />
+              <span className="ml-2">Refresh</span>
+            </Button>
 
-          <Button variant="outline" size="sm" onClick={handleExportExcel}>
-            <FileSpreadsheet className="h-4 w-4" />
-            <span className="ml-2">Export Excel</span>
-          </Button>
+            <Button variant="outline" size="sm" onClick={handleExportExcel}>
+              <FileSpreadsheet className="h-4 w-4" />
+              <span className="ml-2">Export Excel</span>
+            </Button>
 
-          <Button variant="outline" size="sm" onClick={handleExportPDF}>
-            <FileDown className="h-4 w-4" />
-            <span className="ml-2">Export PDF</span>
-          </Button>
+            <Button variant="outline" size="sm" onClick={handleExportPDF}>
+              <FileDown className="h-4 w-4" />
+              <span className="ml-2">Export PDF</span>
+            </Button>
 
-          <Button variant="outline" size="sm" onClick={handleTransferStock}>
-            <Forward className="h-4 w-4" />
-            <span className="ml-2">Transfer Stock</span>
-          </Button>
+            <Button variant="outline" size="sm" onClick={handleTransferStock}>
+              <Forward className="h-4 w-4" />
+              <span className="ml-2">Transfer Stock</span>
+            </Button>
 
-  
-
-          <Button variant="default" size="sm" onClick={handleRestock}>
-            <RedoDot className="h-4 w-4" />
-            <span className="ml-2">Restock</span>
-          </Button>
+            <Button variant="default" size="sm" onClick={handleRestock}>
+              <RedoDot className="h-4 w-4" />
+              <span className="ml-2">Restock</span>
+            </Button>
+          </div>
         </div>
       </div>
 
       <div className="h-table">
-        <StocksTable />
+        <StocksTable 
+          searchTerm={searchTerm} 
+          startDate={startDate} 
+          endDate={endDate} 
+          selectedStatus={selectedStatus}
+        />
       </div>
     </div>
   );

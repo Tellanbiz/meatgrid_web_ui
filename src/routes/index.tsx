@@ -2,7 +2,6 @@ import Settings from "@/pages/Settings";
 import NotFound from "@/pages/NotFound";
 import { RouteObject } from "react-router-dom";
 import MainLayout from "@/components/layouts/MainLayout.js";
-import Dashboard from "@/pages/dashboard/Dashboard";
 import ProductsPage from "@/pages/products/ProductsPage.js";
 import LoginPage from "@/pages/login/LoginPage.js";
 import RegisterPage from "@/pages/register/RegisterPage.js";
@@ -48,6 +47,7 @@ import PurchasableCreateOrderPage from "@/routes/purchasables/pages/purchasable-
 
 // New Zustand-based accounts page
 import AccountsPage from "@/routes/accounts/pages/accounts-page";
+import DashboardPage from "@/routes/dashboard/pages/dashboard-page.tsx";
 
 const routes: RouteObject[] = [
   {
@@ -72,7 +72,7 @@ const routes: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <Dashboard />,
+        element: <DashboardPage />,
       },
       // Manufacturing Routes
       {

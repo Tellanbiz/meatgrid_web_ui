@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 interface ExportData {
     [key: string]: string | number;
@@ -34,31 +34,47 @@ export const exportToExcel = (data: ExportData[], fileName: string) => {
 };
 
 export const exportToPDF = (data: ExportData[], fileName: string) => {
-    const doc = new jsPDF() as JsPDFWithAutoTable;
+    const doc = new jsPDF();
+    const primaryColor = [255, 90, 95]; // #ff5a5f
 
     // Add title
-    doc.setFontSize(16);
-    doc.text('Stocks Report', 14, 15);
+    doc.setFontSize(18);
+    doc.setTextColor(...primaryColor);
+    doc.setFont('helvetica', 'bold');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const title = 'Stocks Report';
+    const titleWidth = doc.getTextWidth(title);
+    doc.text(title, (pageWidth - titleWidth) / 2, 18);
 
     // Add date
     doc.setFontSize(10);
-    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 22);
+    doc.setTextColor(60, 60, 60);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 26);
 
     // Add table
-    doc.autoTable({
+    autoTable(doc, {
         head: [Object.keys(data[0])],
         body: data.map(item => Object.values(item)),
-        startY: 30,
+        startY: 34,
         styles: {
-            fontSize: 8,
-            cellPadding: 2,
+            fontSize: 9,
+            cellPadding: 3,
+            lineColor: [220, 53, 69], // subtle red border
+            lineWidth: 0.2,
         },
         headStyles: {
-            fillColor: [41, 128, 185],
+            fillColor: primaryColor,
             textColor: 255,
-            fontSize: 10,
+            fontSize: 11,
             fontStyle: 'bold',
         },
+        alternateRowStyles: {
+            fillColor: [255, 245, 245], // very light red
+        },
+        tableLineColor: [220, 53, 69],
+        tableLineWidth: 0.2,
+        margin: { left: 10, right: 10 },
     });
 
     doc.save(`${fileName}.pdf`);

@@ -48,35 +48,42 @@ export function SideBar() {
   };
 
   return (
-    <aside className="h-screen w-[260px] bg-[#18192a] shadow-lg flex flex-col overflow-hidden font-lato transition-all duration-300">
-      {/* Company Header */}
-      <div className="flex items-center gap-3 px-6 py-6 bg-[#20223a] shadow-sm">
-        <img
-          src={sidebarData.company.logo}
-          alt="logo"
-          className="w-11 h-11 rounded-xl bg-cover shadow-md"
-        />
+    <aside className="h-screen w-56 bg-[#1A1A1D] border-r border-gray-700 flex flex-col font-inter">
+      {/* Logo Section - Simplified */}
+      <div className="flex items-center gap-3 px-4 py-4 border-b border-gray-700">
+        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+          <img
+            src={sidebarData.company.logo}
+            alt="logo"
+            className="w-8 h-8"
+          />
+        </div>
         <div>
-          <div className="font-bold text-lg text-white leading-tight tracking-wide">
+          <div className="font-semibold text-white text-sm">
             {sidebarData.company.name}
           </div>
-          <div className="text-xs text-gray-400 leading-tight font-medium">
-            Admin Panel
+          <div className="text-xs text-gray-400">
+            Admin
           </div>
         </div>
       </div>
-      {/* Nav Sections */}
-      <nav className="flex-1 overflow-y-auto px-0 pt-4 pb-6 custom-scrollbar">
+
+      {/* Navigation - Compact */}
+      <nav className="flex-1 overflow-y-auto py-2 custom-scrollbar">
         {filteredNav.map((section) => (
-          <div key={section.title} className="mb-4">
+          <div key={section.title} className="mb-1">
+            {/* Section Header */}
             {section.url === "#" && (
-              <div className="px-6 pt-2 pb-1 text-[11px] font-bold text-gray-500 tracking-widest uppercase letter-spacing-wider">
-                {section.title}
+              <div className="px-4 py-2">
+                <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                  {section.title}
+                </div>
               </div>
             )}
+            
             {/* Section Items */}
             {section.items ? (
-              <ul className="space-y-1 mt-1">
+              <div className="space-y-0.5">
                 {section.items.map((item) => {
                   const isActive =
                     item.url === "/"
@@ -84,163 +91,157 @@ export function SideBar() {
                       : location.pathname.startsWith(item.url);
 
                   return (
-                    <li key={item.title} className="flex flex-row space-x-2">
-                      <div
+                    <NavLink
+                      key={item.title}
+                      to={item.url}
+                      className={`flex items-center gap-3 px-4 py-2 text-sm transition-colors relative group
+                        ${
+                          isActive
+                            ? "bg-[#ff5a5f]/10 text-[#ff5a5f] font-medium"
+                            : "text-gray-300 hover:bg-white/5 hover:text-white"
+                        }`}
+                    >
+                      {/* Active indicator */}
+                      {isActive && (
+                        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#ff5a5f]"></div>
+                      )}
+                      
+                      <Icon
+                        icon={item.icon}
+                        width={16}
                         className={`${
-                          isActive ? "bg-accent" : ""
-                        } w-1 h-[32px] rounded-tr-md py-1 transition-all`}
-                      ></div>
-                      <NavLink
-                        to={item.url}
-                        className={() =>
-                          `flex flex-grow items-center gap-3 py-2 pl-3 pr-4 rounded-lg text-[15px] font-semibold transition-all duration-200
-                          ${
-                            isActive
-                              ? "bg-[#23243a] text-accent shadow-md"
-                              : "text-gray-300 hover:bg-[#23243a]/60 hover:text-white"
-                          }
-                          ${isActive ? "pl-0" : ""}`
-                        }
-                        style={{ marginLeft: 0 }}
-                      >
-                        <Icon
-                          icon={item.icon}
-                          width={22}
-                          className={isActive ? "text-accent" : "text-gray-400"}
-                        />
-                        <span
-                          className={isActive ? "text-accent" : "text-gray-200"}
-                        >
-                          {item.title}
-                        </span>
-                      </NavLink>
-                    </li>
+                          isActive ? "text-[#ff5a5f]" : "text-gray-400 group-hover:text-gray-300"
+                        } flex-shrink-0`}
+                      />
+                      <span className="truncate  font-medium">
+                        {item.title}
+                      </span>
+                    </NavLink>
                   );
                 })}
-              </ul>
+              </div>
             ) : (
-              <ul className="space-y-1 mt-1">
-                <li>
-                  <NavLink
-                    to={section.url}
-                    className={({ isActive }) =>
-                      `flex items-center gap-3 py-2 pl-3 pr-4 rounded-lg text-[15px] font-medium transition-all duration-200
-                      ${
-                        isActive
-                          ? "bg-[#23243a] border-l-4 border-accent text-accent shadow-md pl-0"
-                          : "text-gray-300 hover:bg-[#23243a]/60 hover:text-white pl-4"
-                      }`
-                    }
-                    style={{ marginLeft: 0 }}
-                  >
-                    <Icon
-                      icon={section.icon}
-                      width={22}
-                      className={
-                        location.pathname === section.url
-                          ? "text-accent"
-                          : "text-gray-400"
-                      }
-                    />
-                    <span>{section.title}</span>
-                  </NavLink>
-                </li>
-              </ul>
+              <NavLink
+                to={section.url}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-2 text-sm transition-colors relative group
+                  ${
+                    isActive
+                      ? "bg-[#ff5a5f]/10 text-[#ff5a5f]"
+                      : "text-gray-300 hover:bg-white/5 hover:text-white"
+                  }`
+                }
+              >
+                {/* Active indicator */}
+                {location.pathname === section.url && (
+                  <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#ff5a5f]"></div>
+                )}
+                
+                <Icon
+                  icon={section.icon}
+                  width={16}
+                  className={`${
+                    location.pathname === section.url
+                      ? "text-[#ff5a5f]"
+                      : "text-gray-400 group-hover:text-gray-300"
+                  } flex-shrink-0`}
+                />
+                <span className="truncate">
+                  {section.title}
+                </span>
+              </NavLink>
             )}
           </div>
         ))}
       </nav>
-      {/* User Profile */}
-      <div className="mt-auto px-5 py-4 bg-[#20223a] flex items-center gap-3 rounded-t-xl shadow-inner">
-        {user ? (
-          <>
-            {user.picture ? (
-              <img
-                src={user.picture}
-                alt={user.full_name || "User"}
-                className="w-10 h-10 rounded-full border border-gray-700 shadow"
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700 shadow">
+
+      {/* User Profile - Compact */}
+      <div className="border-t border-gray-700 p-3">
+        <div className="flex items-center gap-3">
+          {user ? (
+            <>
+              {user.picture ? (
+                <img
+                  src={user.picture}
+                  alt={user.full_name || "User"}
+                  className="w-8 h-8 rounded-full border border-gray-600 flex-shrink-0"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center border border-gray-600 flex-shrink-0">
+                  <Icon
+                    icon="solar:user-linear"
+                    width={16}
+                    className="text-gray-400"
+                  />
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-white text-sm truncate">
+                  {user.full_name || "User"}
+                </div>
+                <div className="text-xs text-gray-400 truncate">
+                  {user.email || ""}
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center border border-gray-600 flex-shrink-0">
                 <Icon
                   icon="solar:user-linear"
-                  width={22}
+                  width={16}
                   className="text-gray-400"
                 />
               </div>
-            )}
-            <div className="flex-1 min-w-0">
-              <div className="font-semibold text-[15px] text-white truncate">
-                {user.full_name || "User"}
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-white text-sm truncate">
+                  Loading...
+                </div>
               </div>
-              <div className="text-xs text-gray-400 truncate">
-                {user.email || ""}
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700 shadow">
-              <Icon
-                icon="solar:user-linear"
-                width={22}
-                className="text-gray-400"
-              />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="font-semibold text-[15px] text-white truncate">
-                Loading...
-              </div>
-            </div>
-          </>
-        )}
-        <button
-          className="p-2 hover:bg-[#23243a] rounded-full transition-colors"
-          onClick={handleLogoutClick}
-          disabled={isLoggingOut}
-        >
-          {isLoggingOut ? (
-            <Icon
-              icon="solar:spinner-linear"
-              width={22}
-              className="text-gray-400 animate-spin"
-            />
-          ) : (
-            <Icon
-              icon="solar:logout-2-linear"
-              width={22}
-              className="text-gray-400"
-            />
+            </>
           )}
-        </button>
+          
+          <button
+            className="p-1.5 hover:bg-white/5 rounded-md transition-colors flex-shrink-0 group"
+            onClick={handleLogoutClick}
+            disabled={isLoggingOut}
+            title="Logout"
+          >
+            {isLoggingOut ? (
+              <Icon
+                icon="solar:spinner-linear"
+                width={16}
+                className="text-gray-400 animate-spin"
+              />
+            ) : (
+              <Icon
+                icon="solar:logout-2-linear"
+                width={16}
+                className="text-gray-400 group-hover:text-gray-300 transition-colors"
+              />
+            )}
+          </button>
+        </div>
       </div>
-      {/* Custom thin scrollbar styles */}
+
+      {/* Custom scrollbar styles */}
       <style>{`
         .custom-scrollbar::-webkit-scrollbar {
-          width: 5px;
+          width: 3px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #23243a;
-          border-radius: 4px;
+          background: #4b5563;
+          border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
         }
         .custom-scrollbar {
           scrollbar-width: thin;
-          scrollbar-color: #23243a #18192a;
+          scrollbar-color: #4b5563 transparent;
         }
-        .font-lato, .font-lato * {
-          font-family: 'Lato', sans-serif !important;
-        }
-        .letter-spacing-wider {
-          letter-spacing: 0.12em;
-        }
-        .text-accent {
-          color: #ff5a5f !important;
-        }
-        .bg-accent {
-          background: #ff5a5f !important;
-        }
-        .border-accent {
-          border-color: #ff5a5f !important;
+        .font-inter {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
       `}</style>
     </aside>
