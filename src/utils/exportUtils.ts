@@ -6,26 +6,6 @@ interface ExportData {
     [key: string]: string | number;
 }
 
-interface AutoTableOptions {
-    head: string[][];
-    body: (string | number)[][];
-    startY: number;
-    styles: {
-        fontSize: number;
-        cellPadding: number;
-    };
-    headStyles: {
-        fillColor: number[];
-        textColor: number;
-        fontSize: number;
-        fontStyle: string;
-    };
-}
-
-interface JsPDFWithAutoTable extends jsPDF {
-    autoTable: (options: AutoTableOptions) => void;
-}
-
 export const exportToExcel = (data: ExportData[], fileName: string) => {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
@@ -35,11 +15,11 @@ export const exportToExcel = (data: ExportData[], fileName: string) => {
 
 export const exportToPDF = (data: ExportData[], fileName: string) => {
     const doc = new jsPDF();
-    const primaryColor = [255, 90, 95]; // #ff5a5f
+    const primaryColor: [number, number, number] = [255, 90, 95]; // #ff5a5f
 
     // Add title
     doc.setFontSize(18);
-    doc.setTextColor(...primaryColor);
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
     doc.setFont('helvetica', 'bold');
     const pageWidth = doc.internal.pageSize.getWidth();
     const title = 'Stocks Report';
