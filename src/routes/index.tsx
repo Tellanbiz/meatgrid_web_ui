@@ -48,6 +48,7 @@ import PurchasableCreateOrderPage from "@/routes/purchasables/pages/purchasable-
 // New Zustand-based accounts page
 import AccountsPage from "@/routes/accounts/pages/accounts-page";
 import DashboardPage from "@/routes/dashboard/pages/dashboard-page.tsx";
+import ConfigurationPage from "@/routes/configuration/pages/configuration-page";
 
 const routes: RouteObject[] = [
   {
@@ -449,6 +450,14 @@ const routes: RouteObject[] = [
         element: (
           <PrivateRoute requiredPermissions={["allow_configuration_view"]}>
             <SchedulesPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "configuration",
+        element: (
+          <PrivateRoute requiredPermissions={["allow_configuration_view"]}>
+            <ConfigurationPage />
           </PrivateRoute>
         ),
       },

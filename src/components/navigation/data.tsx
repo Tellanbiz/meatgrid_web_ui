@@ -207,6 +207,12 @@ export const sidebarData = {
       icon: "solar:settings-linear",
       items: [
         {
+          title: "Configuration",
+          url: "/configuration",
+          icon: "solar:settings-linear",
+          requiredPermissions: ["allow_configuration_view"],
+        },
+        {
           title: "Delivery Schedules",
           url: "/delivery-schedules",
           icon: "solar:calendar-mark-linear",
