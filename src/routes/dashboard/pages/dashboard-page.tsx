@@ -81,11 +81,11 @@ const DashboardPage = () => {
       <StatisticsGrid startDate={startDate} endDate={endDate} />
 
       {/* Revenue & Order Statistics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="h-96">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[500px]">
+        <div className="h-[500px]">
           <RevenueStatistics startDate={startDate} endDate={endDate} />
         </div>
-        <div className="h-96">
+        <div className="h-[500px]">
           <OrderStatistics startDate={startDate} endDate={endDate} />
         </div>
       </div>
