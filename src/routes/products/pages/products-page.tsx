@@ -1,18 +1,17 @@
-import ProductsTable from "./components/ProductsTable";
 import { useNavigate } from "react-router-dom";
 import { Plus, RefreshCw, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   selectIsFetchingProducts,
   selectProducts,
-} from "../../store/features/products/productSelectors";
-import ExportService from "../../service/ExportService";
-import ReportService from "../../service/ReportService";
-import { fetchProducts } from "../../store/features/products/productThunks";
+} from "@/store/features/products/productSelectors";
+import ExportService from "@/service/ExportService";
+import ReportService from "@/service/ReportService";
+import { fetchProducts } from "@/store/features/products/productThunks";
 
-import { fetchStores } from "../../store/features/stores/storeThunks";
-import { selectStores } from "../../store/features/stores/storeSelectors";
+import { fetchStores } from "@/store/features/stores/storeThunks";
+import { selectStores } from "@/store/features/stores/storeSelectors";
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import {
@@ -23,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import ExportButton from "@/components/buttons/ExportButton";
+import ProductsTable from "../components/ProductsTable";
 
 const ProductsPage = () => {
   const navigate = useNavigate();
@@ -134,7 +134,7 @@ const ProductsPage = () => {
         </div>
       </div>
 
-      <div className=" h-table rounded-md shadow-sm border border-gray-100 overflow-hidden bg-white">
+      <div className="h-table rounded-md border border-gray-200 overflow-hidden bg-white">
         <ProductsTable
           searchString={searchString}
           selectedStore={selectedStore}

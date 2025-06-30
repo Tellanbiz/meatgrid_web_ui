@@ -2,7 +2,6 @@ import Settings from "@/pages/Settings";
 import NotFound from "@/pages/NotFound";
 import { RouteObject } from "react-router-dom";
 import MainLayout from "@/components/layouts/MainLayout.js";
-import ProductsPage from "@/pages/products/ProductsPage.js";
 import LoginPage from "@/pages/login/LoginPage.js";
 import RegisterPage from "@/pages/register/RegisterPage.js";
 import ResetPassword from "@/pages/reset-pasword/ResetPassword";
@@ -49,6 +48,7 @@ import PurchasableCreateOrderPage from "@/routes/purchasables/pages/purchasable-
 import AccountsPage from "@/routes/accounts/pages/accounts-page";
 import DashboardPage from "@/routes/dashboard/pages/dashboard-page.tsx";
 import ConfigurationPage from "@/routes/configuration/pages/configuration-page";
+import ProductsPage from "./products/pages/products-page.js";
 
 const routes: RouteObject[] = [
   {

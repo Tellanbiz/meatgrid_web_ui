@@ -368,10 +368,33 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
           </div>
           <div className="p-6 space-y-8">
             {/* Supplier Selection */}
-            <div>
-              <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                Supplier *
-              </Label>
+            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+              <div className="flex items-center mb-4">
+                <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                  <svg
+                    className="w-4 h-4 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <Label className="text-base font-semibold text-gray-900">
+                    Supplier Selection
+                  </Label>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Choose the supplier for this purchase order
+                  </p>
+                </div>
+              </div>
+
               <Dialog
                 open={supplierDialogOpen}
                 onOpenChange={setSupplierDialogOpen}
@@ -379,32 +402,101 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                 <DialogTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full justify-between h-12"
+                    className="w-full justify-between h-14 text-left bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-red-300 transition-colors duration-200"
                   >
-                    {selectedSupplier
-                      ? selectedSupplier.full_name
-                      : "Select supplier..."}
-                    <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    <div className="flex items-center">
+                      {selectedSupplier ? (
+                        <>
+                          <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                            <span className="text-red-600 font-semibold text-sm">
+                              {selectedSupplier.full_name
+                                .charAt(0)
+                                .toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="text-left">
+                            <div className="font-medium text-gray-900">
+                              {selectedSupplier.full_name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {selectedSupplier.email}
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex items-center">
+                          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                            <svg
+                              className="w-5 h-5 text-gray-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                              />
+                            </svg>
+                          </div>
+                          <div className="text-left">
+                            <div className="font-medium text-gray-500">
+                              Select supplier...
+                            </div>
+                            <div className="text-sm text-gray-400">
+                              Choose a supplier for this order
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <ChevronDownIcon className="ml-2 h-5 w-5 shrink-0 text-gray-400" />
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-lg">
                   <DialogHeader>
-                    <DialogTitle>Select Supplier</DialogTitle>
-                    <DialogDescription>
-                      Choose a supplier for this order
+                    <DialogTitle className="text-xl font-semibold text-gray-900">
+                      Select Supplier
+                    </DialogTitle>
+                    <DialogDescription className="text-gray-600">
+                      Choose a supplier for this order from the list below
                     </DialogDescription>
                   </DialogHeader>
-                  <Command className="bg-gray-50 rounded-lg">
-                    <div className="flex items-center border-b px-3">
-                      <SearchIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                  <Command className="bg-white rounded-lg border border-gray-200">
+                    <div className="flex items-center border-b border-gray-200 px-4 py-3">
+                      <SearchIcon className="mr-3 h-5 w-5 shrink-0 text-gray-400" />
                       <CommandInput
-                        placeholder="Search suppliers..."
+                        placeholder="Search suppliers by name or email..."
                         value={supplierSearch}
                         onValueChange={setSupplierSearch}
+                        className="border-0 focus:ring-0 text-base"
                       />
                     </div>
                     <CommandList className="max-h-80 overflow-y-auto">
-                      <CommandEmpty>No supplier found.</CommandEmpty>
+                      <CommandEmpty className="py-8 text-center">
+                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <svg
+                            className="w-6 h-6 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            />
+                          </svg>
+                        </div>
+                        <p className="text-gray-500 font-medium">
+                          No supplier found
+                        </p>
+                        <p className="text-sm text-gray-400 mt-1">
+                          Try adjusting your search terms
+                        </p>
+                      </CommandEmpty>
                       <CommandGroup>
                         {suppliers
                           .filter((s) =>
@@ -420,12 +512,23 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                                 setSelectedSupplier(supplier);
                                 setSupplierDialogOpen(false);
                               }}
+                              className="px-4 py-3 hover:bg-red-50 cursor-pointer"
                             >
-                              <div className="flex justify-between w-full">
-                                <span>{supplier.full_name}</span>
-                                <span className="text-gray-500 text-sm">
-                                  {supplier.email}
-                                </span>
+                              <div className="flex items-center w-full">
+                                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                                  <span className="text-red-600 font-semibold text-sm">
+                                    {supplier.full_name.charAt(0).toUpperCase()}
+                                  </span>
+                                </div>
+                                <div className="flex-1">
+                                  <div className="font-medium text-gray-900">
+                                    {supplier.full_name}
+                                  </div>
+                                  <div className="text-sm text-gray-500">
+                                    {supplier.email}
+                                  </div>
+                                </div>
+                                <div className="w-2 h-2 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                               </div>
                             </CommandItem>
                           ))}
@@ -501,32 +604,109 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                             <DialogTrigger asChild>
                               <Button
                                 variant="outline"
-                                className="w-full justify-between h-10"
+                                className="w-full justify-between h-12 text-left bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-red-300 transition-colors duration-200"
                               >
-                                {item.product_name ||
-                                  getProductName(item.product_id) ||
-                                  "Select product..."}
-                                <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                <div className="flex items-center">
+                                  {item.product_name ||
+                                  getProductName(item.product_id) ? (
+                                    <>
+                                      <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                                        <span className="text-red-600 font-semibold text-xs">
+                                          {(
+                                            item.product_name ||
+                                            getProductName(item.product_id)
+                                          )
+                                            ?.charAt(0)
+                                            .toUpperCase()}
+                                        </span>
+                                      </div>
+                                      <div className="text-left">
+                                        <div className="font-medium text-gray-900">
+                                          {item.product_name ||
+                                            getProductName(item.product_id)}
+                                        </div>
+                                        <div className="text-sm text-gray-500">
+                                          {purchasables.find(
+                                            (p) => p.id === item.product_id
+                                          )?.unit_type || "Unit type"}
+                                        </div>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <div className="flex items-center">
+                                      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                                        <svg
+                                          className="w-4 h-4 text-gray-400"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                                          />
+                                        </svg>
+                                      </div>
+                                      <div className="text-left">
+                                        <div className="font-medium text-gray-500">
+                                          Select product...
+                                        </div>
+                                        <div className="text-sm text-gray-400">
+                                          Choose a product for this item
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                                <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 text-gray-400" />
                               </Button>
                             </DialogTrigger>
                             <DialogContent className="max-w-lg">
                               <DialogHeader>
-                                <DialogTitle>Select Product</DialogTitle>
-                                <DialogDescription>
-                                  Choose a product for this order item
+                                <DialogTitle className="text-xl font-semibold text-gray-900">
+                                  Select Product
+                                </DialogTitle>
+                                <DialogDescription className="text-gray-600">
+                                  Choose a product for this order item from the
+                                  list below
                                 </DialogDescription>
                               </DialogHeader>
-                              <Command className="bg-gray-50 rounded-lg">
-                                <div className="flex items-center border-b px-3">
-                                  <SearchIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                              <Command className="bg-white rounded-lg border border-gray-200">
+                                <div className="flex items-center border-b border-gray-200 px-4 py-3">
+                                  <SearchIcon className="mr-3 h-5 w-5 shrink-0 text-gray-400" />
                                   <CommandInput
-                                    placeholder="Search products..."
+                                    placeholder="Search products by name..."
                                     value={productSearch}
                                     onValueChange={setProductSearch}
+                                    className="border-0 focus:ring-0 text-base"
                                   />
                                 </div>
                                 <CommandList className="max-h-80 overflow-y-auto">
-                                  <CommandEmpty>No product found.</CommandEmpty>
+                                  <CommandEmpty className="py-8 text-center">
+                                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                      <svg
+                                        className="w-6 h-6 text-gray-400"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                        />
+                                      </svg>
+                                    </div>
+                                    <p className="text-gray-500 font-medium">
+                                      No product found
+                                    </p>
+                                    <p className="text-sm text-gray-400 mt-1">
+                                      Try adjusting your search terms
+                                    </p>
+                                  </CommandEmpty>
                                   <CommandGroup>
                                     {purchasables
                                       .filter((p) =>
@@ -541,12 +721,25 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                                           onSelect={() =>
                                             selectProduct(index, product)
                                           }
+                                          className="px-4 py-3 hover:bg-red-50 cursor-pointer"
                                         >
-                                          <div className="flex justify-between w-full">
-                                            <span>{product.name}</span>
-                                            <span className="text-gray-500 text-sm">
-                                              {product.unit_type}
-                                            </span>
+                                          <div className="flex items-center w-full">
+                                            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                                              <span className="text-red-600 font-semibold text-sm">
+                                                {product.name
+                                                  .charAt(0)
+                                                  .toUpperCase()}
+                                              </span>
+                                            </div>
+                                            <div className="flex-1">
+                                              <div className="font-medium text-gray-900">
+                                                {product.name}
+                                              </div>
+                                              <div className="text-sm text-gray-500">
+                                                {product.unit_type}
+                                              </div>
+                                            </div>
+                                            <div className="w-2 h-2 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                                           </div>
                                         </CommandItem>
                                       ))}

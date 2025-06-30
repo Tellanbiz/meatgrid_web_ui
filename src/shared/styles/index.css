@@ -215,6 +215,61 @@
   .dashboard-card-subtitle {
     @apply font-medium text-gray-600 text-sm tracking-tight;
   }
+  
+  /* Custom Pagination Styles */
+  .p-paginator {
+    @apply bg-gray-50 border-t border-gray-200 px-4 py-3;
+  }
+  
+  .p-paginator .p-paginator-pages .p-paginator-page {
+    @apply bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors duration-150;
+  }
+  
+  .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+    @apply bg-blue-600 border-blue-600 text-white hover:bg-blue-700 hover:border-blue-700;
+  }
+  
+  .p-paginator .p-paginator-first,
+  .p-paginator .p-paginator-prev,
+  .p-paginator .p-paginator-next,
+  .p-paginator .p-paginator-last {
+    @apply bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors duration-150;
+  }
+  
+  .p-paginator .p-paginator-first:disabled,
+  .p-paginator .p-paginator-prev:disabled,
+  .p-paginator .p-paginator-next:disabled,
+  .p-paginator .p-paginator-last:disabled {
+    @apply bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed;
+  }
+  
+  .p-paginator .p-dropdown {
+    @apply bg-white border border-gray-300 text-gray-700;
+  }
+  
+  .p-paginator .p-dropdown:not(.p-disabled):hover {
+    @apply border-gray-400;
+  }
+  
+  .p-paginator .p-dropdown:not(.p-disabled).p-focus {
+    @apply border-blue-500 ring-2 ring-blue-500/20;
+  }
+  
+  .p-paginator .p-dropdown-panel {
+    @apply bg-white border border-gray-200 shadow-lg rounded-md;
+  }
+  
+  .p-paginator .p-dropdown-items .p-dropdown-item {
+    @apply text-gray-700 hover:bg-gray-50;
+  }
+  
+  .p-paginator .p-dropdown-items .p-dropdown-item.p-highlight {
+    @apply bg-blue-50 text-blue-700;
+  }
+  
+  .p-paginator .p-paginator-current {
+    @apply text-gray-600 font-medium;
+  }
 }
 
 @theme {
