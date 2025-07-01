@@ -17,9 +17,13 @@ import {
   RefreshCw,
   Plus,
   Edit,
+  Trash2,
 } from "lucide-react";
 import { PurchasableEditDialog } from "@/components/purchasable-edit-dialog";
 import type { Purchasable } from "../domain/models";
+import { deletePurchasable } from "../domain/purchasable-post";
+import DeleteDialog from "@/components/dialogs/DeleteDialog";
+import { toast } from "sonner";
 
 export default function PurchasablePage() {
   const { purchasables, loading, error, fetchPurchasables } = usePurchasables();
@@ -28,6 +32,10 @@ export default function PurchasablePage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedPurchasable, setSelectedPurchasable] =
     useState<Purchasable | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [purchasableToDelete, setPurchasableToDelete] =
+    useState<Purchasable | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const itemsPerPage = 15;
 
   useEffect(() => {
@@ -76,6 +84,32 @@ export default function PurchasablePage() {
 
   const handleDialogSuccess = () => {
     fetchPurchasables();
+  };
+
+  const handleDelete = (purchasable: Purchasable) => {
+    setPurchasableToDelete(purchasable);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!purchasableToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const error = await deletePurchasable(purchasableToDelete.id.toString());
+      if (error) {
+        toast.error(error);
+      } else {
+        toast.success("Purchasable deleted successfully");
+        fetchPurchasables();
+      }
+    } catch {
+      toast.error("Failed to delete purchasable");
+    } finally {
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
+      setPurchasableToDelete(null);
+    }
   };
 
   return (
@@ -162,6 +196,13 @@ export default function PurchasablePage() {
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(purchasable)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -211,6 +252,36 @@ export default function PurchasablePage() {
         onOpenChange={setIsDialogOpen}
         purchasable={selectedPurchasable}
         onSuccess={handleDialogSuccess}
+      />
+
+      {/* Delete Dialog */}
+      <DeleteDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Purchasable"
+        description={
+          <div>
+            <p>Are you sure you want to delete this purchasable?</p>
+            {purchasableToDelete && (
+              <div className="mt-2 p-3 bg-gray-50 rounded-md">
+                <p className="font-medium text-gray-900">
+                  {purchasableToDelete.name}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {purchasableToDelete.description}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Unit Type: {purchasableToDelete.unit_type}
+                </p>
+              </div>
+            )}
+            <p className="text-sm text-red-600 mt-2">
+              This action cannot be undone.
+            </p>
+          </div>
+        }
+        onConfirm={confirmDelete}
+        isLoading={isDeleting}
       />
     </div>
   );

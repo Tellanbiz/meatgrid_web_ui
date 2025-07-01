@@ -18,22 +18,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { usePurchasables } from "@/routes/purchasables/hooks/usePurchasables";
 import {
   getAvailableProductItems,
@@ -44,8 +29,9 @@ import { createBatch } from "../domain/processing-post";
 import type { ProcessingParams, AvailableProductItem } from "../domain/data";
 import type { StorageType } from "@/store/features/storages/storageTypes";
 import type { Store } from "@/store/features/stores/storeTypes";
-import type { Purchasable } from "@/routes/purchasables/domain/models";
+
 import { ChevronDownIcon, XIcon } from "lucide-react";
+import ProductSelectionDialog from "@/components/dialogs/ProductSelectionDialog";
 
 interface ProcessingFormPageProps {
   storeId?: string;
@@ -76,6 +62,8 @@ const ProcessingFormPage: React.FC<ProcessingFormPageProps> = ({
     store_id: storeId || "",
     storage_type_id: storageTypeId || "",
     expiry_at: "",
+    chilled_at: "",
+    frozen_at: "",
     purchasable_product_items: [],
     processed_products: [],
   });
@@ -86,18 +74,10 @@ const ProcessingFormPage: React.FC<ProcessingFormPageProps> = ({
   );
   const [selectedStorageType, setSelectedStorageType] =
     useState<StorageType | null>(null);
-  const [selectedPurchasedProduct, setSelectedPurchasedProduct] =
-    useState<Purchasable | null>(null);
-  const [selectedProcessedProduct, setSelectedProcessedProduct] =
-    useState<AvailableProductItem | null>(null);
-  const [processedProductQuantity, setProcessedProductQuantity] = useState(0);
-  const [quantityUnit, setQuantityUnit] = useState<string>("base");
 
   // Search states
   const [warehouseSearch, setWarehouseSearch] = useState("");
   const [storageTypeSearch, setStorageTypeSearch] = useState("");
-  const [purchasableSearch, setPurchasableSearch] = useState("");
-  const [processedProductSearch, setProcessedProductSearch] = useState("");
 
   // Helper function to convert ISO date to date input value
   const getDateInputValue = (isoDate: string) => {
@@ -153,20 +133,6 @@ const ProcessingFormPage: React.FC<ProcessingFormPageProps> = ({
     }));
   };
 
-  const addPurchasedProduct = () => {
-    if (selectedPurchasedProduct) {
-      setFormData((prev) => ({
-        ...prev,
-        purchasable_product_items: [
-          ...prev.purchasable_product_items,
-          selectedPurchasedProduct.id,
-        ],
-      }));
-      setSelectedPurchasedProduct(null);
-      setPurchasedProductDialogOpen(false);
-    }
-  };
-
   const removePurchasedProduct = (index: number) => {
     setFormData((prev) => ({
       ...prev,
@@ -174,39 +140,6 @@ const ProcessingFormPage: React.FC<ProcessingFormPageProps> = ({
         (_, i) => i !== index
       ),
     }));
-  };
-
-  const addProcessedProduct = () => {
-    if (selectedProcessedProduct && processedProductQuantity > 0) {
-      // Convert quantity based on unit selection
-      let finalQuantity = processedProductQuantity;
-      if (
-        quantityUnit === "kg" &&
-        selectedProcessedProduct.unit_type.toLowerCase() === "grams"
-      ) {
-        finalQuantity = processedProductQuantity * 1000;
-      } else if (
-        quantityUnit === "kg" &&
-        selectedProcessedProduct.unit_type.toLowerCase() === "kilograms"
-      ) {
-        finalQuantity = processedProductQuantity * 1000;
-      }
-
-      setFormData((prev) => ({
-        ...prev,
-        processed_products: [
-          ...prev.processed_products,
-          {
-            product_id: selectedProcessedProduct.id,
-            quantity: finalQuantity,
-          },
-        ],
-      }));
-      setSelectedProcessedProduct(null);
-      setProcessedProductQuantity(0);
-      setQuantityUnit("base");
-      setProcessedProductDialogOpen(false);
-    }
   };
 
   const removeProcessedProduct = (index: number) => {
@@ -231,10 +164,9 @@ const ProcessingFormPage: React.FC<ProcessingFormPageProps> = ({
   };
 
   const getQuantityDisplayValue = (quantity: number, unitType: string) => {
-    if (
-      unitType.toLowerCase() === "grams" ||
-      unitType.toLowerCase() === "kilograms"
-    ) {
+    if (unitType.toLowerCase() === "kilograms") {
+      return `${quantity} kg`;
+    } else if (unitType.toLowerCase() === "grams") {
       return quantity >= 1000 ? `${quantity / 1000} kg` : `${quantity} g`;
     }
     return `${quantity} ${unitType}`;
@@ -467,6 +399,38 @@ const ProcessingFormPage: React.FC<ProcessingFormPageProps> = ({
                     required
                   />
                 </div>
+
+                <div>
+                  <Label className="text-xs text-gray-700">Chilled At</Label>
+                  <Input
+                    type="date"
+                    className="mt-1 text-xs"
+                    value={getDateInputValue(formData.chilled_at)}
+                    onChange={(e) => {
+                      // Convert date to ISO 8601 format with time
+                      const date = new Date(e.target.value);
+                      const isoString = date.toISOString();
+                      handleInputChange("chilled_at", isoString);
+                    }}
+                    min={new Date().toISOString().split("T")[0]}
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-xs text-gray-700">Frozen At</Label>
+                  <Input
+                    type="date"
+                    className="mt-1 text-xs"
+                    value={getDateInputValue(formData.frozen_at)}
+                    onChange={(e) => {
+                      // Convert date to ISO 8601 format with time
+                      const date = new Date(e.target.value);
+                      const isoString = date.toISOString();
+                      handleInputChange("frozen_at", isoString);
+                    }}
+                    min={new Date().toISOString().split("T")[0]}
+                  />
+                </div>
               </div>
             </div>
 
@@ -480,88 +444,41 @@ const ProcessingFormPage: React.FC<ProcessingFormPageProps> = ({
                 <Label className="text-xs text-gray-700">
                   Add Purchased Product
                 </Label>
-                <Dialog
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-between mt-1 text-xs"
+                  onClick={() => setPurchasedProductDialogOpen(true)}
+                >
+                  Select purchased product...
+                  <ChevronDownIcon className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                </Button>
+
+                <ProductSelectionDialog
                   open={purchasedProductDialogOpen}
                   onOpenChange={setPurchasedProductDialogOpen}
-                >
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-between mt-1 text-xs"
-                    >
-                      Select purchased product...
-                      <ChevronDownIcon className="ml-2 h-3 w-3 shrink-0 opacity-50" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-lg">
-                    <DialogHeader>
-                      <DialogTitle className="text-sm">
-                        Select Purchased Product
-                      </DialogTitle>
-                      <DialogDescription className="text-xs">
-                        Choose a product to add to the batch
-                      </DialogDescription>
-                    </DialogHeader>
-                    <Command className="bg-gray-50 rounded-lg p-2">
-                      <div className="flex items-center border-b px-3">
-                        <SearchIcon className="mr-2 h-3 w-3 shrink-0 opacity-50" />
-                        <CommandInput
-                          placeholder="Search purchased products..."
-                          value={purchasableSearch}
-                          onValueChange={setPurchasableSearch}
-                          className="border-0 focus:ring-0 text-xs"
-                        />
-                      </div>
-                      <CommandList className="max-h-80 overflow-y-auto">
-                        <CommandEmpty>No product found.</CommandEmpty>
-                        <CommandGroup>
-                          {purchasables
-                            .filter((p) =>
-                              p.name
-                                .toLowerCase()
-                                .includes(purchasableSearch.toLowerCase())
-                            )
-                            .map((purchasable) => (
-                              <CommandItem
-                                key={purchasable.id}
-                                value={purchasable.id.toString()}
-                                onSelect={() => {
-                                  setSelectedPurchasedProduct(purchasable);
-                                }}
-                                className="text-xs"
-                              >
-                                <div className="flex justify-between w-full">
-                                  <span>{purchasable.name}</span>
-                                  <span className="text-gray-500 text-xs">
-                                    {purchasable.unit_type}
-                                  </span>
-                                </div>
-                              </CommandItem>
-                            ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                    <div className="flex justify-end gap-2 mt-6">
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setPurchasedProductDialogOpen(false);
-                          setSelectedPurchasedProduct(null);
-                        }}
-                        className="text-xs"
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        onClick={addPurchasedProduct}
-                        disabled={!selectedPurchasedProduct}
-                        className="text-xs"
-                      >
-                        Add Product
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                  title="Select Purchased Product"
+                  description="Choose a product to add to the batch"
+                  products={purchasables.map((p) => ({
+                    id: p.id.toString(),
+                    name: p.name,
+                    unit_type: p.unit_type,
+                    description: p.description,
+                  }))}
+                  onProductSelect={(product) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      purchasable_product_items: [
+                        ...prev.purchasable_product_items,
+                        parseInt(product.id),
+                      ],
+                    }));
+                  }}
+                  showQuantityInput={false}
+                  allowUnitConversion={false}
+                  primaryButtonText="Add Product"
+                  searchPlaceholder="Search purchased products..."
+                />
               </div>
 
               {formData.purchasable_product_items.length > 0 && (
@@ -605,172 +522,49 @@ const ProcessingFormPage: React.FC<ProcessingFormPageProps> = ({
                 <Label className="text-xs text-gray-700">
                   Add Processed Product
                 </Label>
-                <Dialog
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-between mt-1 text-xs"
+                  onClick={() => setProcessedProductDialogOpen(true)}
+                >
+                  Select processed product...
+                  <ChevronDownIcon className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                </Button>
+
+                <ProductSelectionDialog
                   open={processedProductDialogOpen}
                   onOpenChange={setProcessedProductDialogOpen}
-                >
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-between mt-1 text-xs"
-                    >
-                      Select processed product...
-                      <ChevronDownIcon className="ml-2 h-3 w-3 shrink-0 opacity-50" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-lg">
-                    <DialogHeader>
-                      <DialogTitle className="text-sm">
-                        Select Processed Product
-                      </DialogTitle>
-                      <DialogDescription className="text-xs">
-                        Choose a product and set its quantity
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      {!selectedProcessedProduct ? (
-                        <Command className="bg-gray-50 rounded-lg p-2">
-                          <div className="flex items-center border-b px-3">
-                            <SearchIcon className="mr-2 h-3 w-3 shrink-0 opacity-50" />
-                            <CommandInput
-                              placeholder="Search processed products..."
-                              value={processedProductSearch}
-                              onValueChange={setProcessedProductSearch}
-                              className="border-0 focus:ring-0 text-xs"
-                            />
-                          </div>
-                          <CommandList className="max-h-80 overflow-y-auto">
-                            <CommandEmpty>No product found.</CommandEmpty>
-                            <CommandGroup>
-                              {availableProducts
-                                .filter((p) =>
-                                  p.name
-                                    .toLowerCase()
-                                    .includes(
-                                      processedProductSearch.toLowerCase()
-                                    )
-                                )
-                                .map((product) => (
-                                  <CommandItem
-                                    key={product.id}
-                                    value={product.id.toString()}
-                                    onSelect={() => {
-                                      setSelectedProcessedProduct(product);
-                                    }}
-                                    className="text-xs"
-                                  >
-                                    <div className="flex justify-between w-full">
-                                      <span className="truncate">
-                                        {product.name}
-                                      </span>
-                                      <span className="text-gray-500 text-xs ml-2 flex-shrink-0">
-                                        {product.unit_type}
-                                      </span>
-                                    </div>
-                                  </CommandItem>
-                                ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      ) : (
-                        <div className="space-y-4">
-                          {/* Selected Product Display */}
-                          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div className="flex-1">
-                              <div className="text-xs font-medium text-gray-900">
-                                {selectedProcessedProduct.name}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                {selectedProcessedProduct.unit_type}
-                              </div>
-                            </div>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                setSelectedProcessedProduct(null);
-                                setProcessedProductQuantity(0);
-                                setQuantityUnit("base");
-                              }}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <XIcon className="h-3 w-3" />
-                            </Button>
-                          </div>
+                  title="Select Processed Product"
+                  description="Choose a product and set its quantity. All available products are shown."
+                  products={availableProducts}
+                  onProductSelect={(product, quantity, unit) => {
+                    // Convert quantity based on unit selection
+                    let finalQuantity = quantity;
+                    if (
+                      unit === "kg" &&
+                      product.unit_type.toLowerCase() === "grams"
+                    ) {
+                      finalQuantity = quantity * 1000;
+                    }
 
-                          {/* Quantity Input */}
-                          <div className="space-y-2">
-                            <Label className="text-xs font-medium">
-                              Quantity *
-                            </Label>
-                            <div className="flex gap-2">
-                              <Input
-                                type="number"
-                                placeholder="0"
-                                className="text-xs"
-                                value={processedProductQuantity}
-                                onChange={(e) =>
-                                  setProcessedProductQuantity(
-                                    parseFloat(e.target.value) || 0
-                                  )
-                                }
-                                min="0"
-                                step="0.01"
-                                required
-                              />
-                              <Select
-                                value={quantityUnit}
-                                onValueChange={setQuantityUnit}
-                              >
-                                <SelectTrigger className="w-28 text-xs">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="base">
-                                    {selectedProcessedProduct.unit_type}
-                                  </SelectItem>
-                                  {selectedProcessedProduct.unit_type.toLowerCase() ===
-                                    "grams" && (
-                                    <SelectItem value="kg">kg</SelectItem>
-                                  )}
-                                  {selectedProcessedProduct.unit_type.toLowerCase() ===
-                                    "kilograms" && (
-                                    <SelectItem value="kg">kg</SelectItem>
-                                  )}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex justify-end gap-2 mt-6">
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setProcessedProductDialogOpen(false);
-                          setSelectedProcessedProduct(null);
-                          setProcessedProductQuantity(0);
-                          setQuantityUnit("base");
-                        }}
-                        className="text-xs"
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        onClick={addProcessedProduct}
-                        disabled={
-                          !selectedProcessedProduct ||
-                          processedProductQuantity <= 0
-                        }
-                        className="text-xs"
-                      >
-                        Add Product
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                    setFormData((prev) => ({
+                      ...prev,
+                      processed_products: [
+                        ...prev.processed_products,
+                        {
+                          product_id: product.id,
+                          quantity: finalQuantity,
+                        },
+                      ],
+                    }));
+                  }}
+                  showQuantityInput={true}
+                  allowUnitConversion={true}
+                  primaryButtonText="Add Product"
+                  searchPlaceholder="Search processed products..."
+                  quantityPlaceholder="Enter quantity"
+                />
               </div>
 
               {formData.processed_products.length > 0 && (

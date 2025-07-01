@@ -34,16 +34,25 @@ import {
   PlusIcon,
   Calendar,
   RefreshCw,
+  Trash2,
 } from "lucide-react";
 import { usePurchasables } from "../hooks/usePurchasables";
-import { createPurchaseOrder } from "../domain/purchasable-post";
-import type { CreateOrderPurchaseParams, Purchasable } from "../domain/models";
+import {
+  createPurchaseOrder,
+  deletePurchaseOrder,
+} from "../domain/purchasable-post";
+import type {
+  CreateOrderPurchaseParams,
+  Purchasable,
+  PurchasableOrder,
+} from "../domain/models";
 import type { Supplier } from "@/store/features/suppliers/supplierTypes";
 import { useSelector, useDispatch } from "react-redux";
 import { selectSuppliers } from "@/store/features/suppliers/supplierSelectors";
 import { fetchSuppliers } from "@/store/features/suppliers/supplierThunks";
 import type { AppDispatch } from "@/store/store";
 import { TabNavigation } from "@/components/ui/tab-navigation";
+import DeleteDialog from "@/components/dialogs/DeleteDialog";
 
 interface PurchasableOrderPageProps {
   activeTab?: string;
@@ -88,6 +97,13 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  // Delete states
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState<PurchasableOrder | null>(
+    null
+  );
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchPurchasableOrders();
@@ -212,6 +228,32 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
     }
   };
 
+  const handleDeleteOrder = (order: any) => {
+    setOrderToDelete(order);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteOrder = async () => {
+    if (!orderToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const error = await deletePurchaseOrder(orderToDelete.id.toString());
+      if (error) {
+        toast.error(error);
+      } else {
+        toast.success("Order deleted successfully");
+        fetchPurchasableOrders();
+      }
+    } catch {
+      toast.error("Failed to delete order");
+    } finally {
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
+      setOrderToDelete(null);
+    }
+  };
+
   // Filter orders based on search
   const filteredOrders = purchasableOrders.filter(
     (order) =>
@@ -289,6 +331,7 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                   <TableHead>Supplier</TableHead>
                   <TableHead>Items</TableHead>
                   <TableHead>Total Cost</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -348,6 +391,19 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                         </TableCell>
                         <TableCell className="font-medium">
                           KES {totalCost.toFixed(2)}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteOrder(order)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     );
@@ -811,6 +867,37 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
           </div>
         </div>
       )}
+
+      {/* Delete Dialog */}
+      <DeleteDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Order"
+        description={
+          <div>
+            <p>Are you sure you want to delete this order?</p>
+            {orderToDelete && (
+              <div className="mt-2 p-3 bg-gray-50 rounded-md">
+                <p className="font-medium text-gray-900">
+                  Order #{orderToDelete.id}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Supplier: {orderToDelete.supplier.full_name}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Created:{" "}
+                  {new Date(orderToDelete.created_at).toLocaleDateString()}
+                </p>
+              </div>
+            )}
+            <p className="text-sm text-red-600 mt-2">
+              This action cannot be undone.
+            </p>
+          </div>
+        }
+        onConfirm={confirmDeleteOrder}
+        isLoading={isDeleting}
+      />
     </div>
   );
 };

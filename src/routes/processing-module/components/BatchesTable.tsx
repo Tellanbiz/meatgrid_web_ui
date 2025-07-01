@@ -94,6 +94,8 @@ const BatchesTable: React.FC<BatchesTableProps> = ({ searchString }) => {
               <TableHead>Total Quantity</TableHead>
               <TableHead>Storage Type</TableHead>
               <TableHead>Store</TableHead>
+              <TableHead>Chilled At</TableHead>
+              <TableHead>Frozen At</TableHead>
               <TableHead>Expiry Date</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -147,6 +149,12 @@ const BatchesTable: React.FC<BatchesTableProps> = ({ searchString }) => {
                 </TableCell>
                 <TableCell>{batch.storage_type}</TableCell>
                 <TableCell>{batch.store}</TableCell>
+                <TableCell>
+                  {format(new Date(batch.chilled_at), "MMM d, yyyy")}
+                </TableCell>
+                <TableCell>
+                  {format(new Date(batch.frozen_at), "MMM d, yyyy")}
+                </TableCell>
                 <TableCell>
                   {format(new Date(batch.expiry_at), "MMM d, yyyy")}
                 </TableCell>

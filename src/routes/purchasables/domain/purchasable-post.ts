@@ -16,3 +16,13 @@ export async function createPurchaseOrder(params: CreateOrderPurchaseParams) {
     const response = await axios.post("/purchasables/order/new", params);
     return response.data.error
 }
+
+export async function deletePurchaseOrder(id: string) {
+    const response = await axios.delete(`/purchasables/orders?id=${id}`);
+    return response.data.error
+}
+
+export async function deletePurchasable(id: string) {
+    const response = await axios.delete(`/purchasables?id=${id}`);
+    return response.data.error
+}
