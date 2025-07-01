@@ -263,7 +263,7 @@ const SelectProductsPage = () => {
     rawMaterials.length === 0 || processedProducts.length !== 1;
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50 overflow-hidden">
+    <div className="h-screen flex flex-col bg-white overflow-hidden">
       {/* Header */}
       <div className="bg-white border-b">
         <div className="flex items-center justify-between py-4 px-6">

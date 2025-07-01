@@ -13,7 +13,7 @@ import { RefreshCcw } from "lucide-react";
 
 const DashboardPage = () => {
   const { fetchAllDashboardData, loading } = useDashboard();
-  
+
   // Date range state
   const [startDate, setStartDate] = useState<Date | null>(() => {
     const date = new Date();
@@ -30,8 +30,8 @@ const DashboardPage = () => {
   const handleRefresh = () => {
     if (startDate && endDate) {
       const params = {
-        start_date: startDate.toISOString().split('T')[0],
-        end_date: endDate.toISOString().split('T')[0],
+        start_date: startDate.toISOString().split("T")[0],
+        end_date: endDate.toISOString().split("T")[0],
       };
       fetchAllDashboardData(params);
     }
@@ -40,21 +40,23 @@ const DashboardPage = () => {
   useEffect(() => {
     if (startDate && endDate) {
       const params = {
-        start_date: startDate.toISOString().split('T')[0],
-        end_date: endDate.toISOString().split('T')[0],
+        start_date: startDate.toISOString().split("T")[0],
+        end_date: endDate.toISOString().split("T")[0],
       };
       fetchAllDashboardData(params);
     }
   }, [startDate, endDate, fetchAllDashboardData]);
 
   return (
-    <div className="w-full min-h-screen bg-gray-50 p-6 space-y-6">
+    <div className="w-full min-h-screen bg-white p-6 space-y-6">
       {/* Page Header */}
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="dashboard-title text-3xl mb-2">Dashboard</h1>
-            <p className="dashboard-subtitle text-gray-600">Monitor your business performance and key metrics</p>
+            <p className="dashboard-subtitle text-gray-600">
+              Monitor your business performance and key metrics
+            </p>
           </div>
           <div className="flex items-center gap-3">
             <DashboardDateRangePicker
@@ -69,7 +71,9 @@ const DashboardPage = () => {
               disabled={loading.dashboardStatistics}
             >
               <RefreshCcw
-                className={`h-4 w-4 ${loading.dashboardStatistics ? "animate-spin" : ""}`}
+                className={`h-4 w-4 ${
+                  loading.dashboardStatistics ? "animate-spin" : ""
+                }`}
               />
               <span className="ml-2">Refresh</span>
             </Button>
@@ -107,10 +111,14 @@ const DashboardPage = () => {
 
       {/* Latest Online Orders - Full Width */}
       <div className="">
-        <LatestOnlineOrders pageSize={10} startDate={startDate} endDate={endDate} />
+        <LatestOnlineOrders
+          pageSize={10}
+          startDate={startDate}
+          endDate={endDate}
+        />
       </div>
     </div>
   );
 };
 
-export default DashboardPage; 
+export default DashboardPage;

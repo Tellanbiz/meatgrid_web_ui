@@ -1,53 +1,39 @@
 import { useState, useEffect } from "react";
-import BackButton from "@/components/buttons/BackButton";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { SearchIcon, ChevronDownIcon, XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Edit, Trash, Plus, Loader2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectStorageTypes } from "@/store/features/storages/storageSelectors";
 import { fetchStorageTypes } from "@/store/features/storages/storageThunks";
 import { selectStores } from "@/store/features/stores/storeSelectors";
 import { fetchStores } from "@/store/features/stores/storeThunks";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectProducts } from "@/store/features/products/productSelectors";
 import { fetchProducts } from "@/store/features/products/productThunks";
 import { selectSuppliers } from "@/store/features/suppliers/supplierSelectors";
 import { fetchSuppliers } from "@/store/features/suppliers/supplierThunks";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Product } from "@/store/features/products/productTypes";
 import { restockInventory } from "@/store/features/stock/stockThunks";
 import {
   selectIsRestockingInventory,
   selectStocksError,
 } from "@/store/features/stock/stockSelectors";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { clearStockMessages } from "@/store/features/stock/stockSlice";
-import { Supplier } from "@/store/features/suppliers/supplierTypes";
+import ProductSelectionDialog from "@/components/dialogs/ProductSelectionDialog";
 
 interface ProductToRestock {
   id: string;
@@ -72,16 +58,19 @@ const RestockPage = () => {
   const [productsToRestock, setProductsToRestock] = useState<
     ProductToRestock[]
   >([]);
-
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [selectedProductId, setSelectedProductId] = useState<string>("");
-  const [productQuantity, setProductQuantity] = useState<string>("1");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<ProductToRestock | null>(
-    null
-  );
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+
+  // Search states
+  const [storeSearch, setStoreSearch] = useState("");
+  const [storageTypeSearch, setStorageTypeSearch] = useState("");
+  const [supplierSearch, setSupplierSearch] = useState("");
+
+  // Selected items for display
+  const [selectedStoreDisplay, setSelectedStoreDisplay] = useState<any>(null);
+  const [selectedStorageTypeDisplay, setSelectedStorageTypeDisplay] =
+    useState<any>(null);
+  const [selectedSupplierDisplay, setSelectedSupplierDisplay] =
+    useState<any>(null);
 
   useEffect(() => {
     dispatch(fetchStorageTypes());
@@ -97,22 +86,10 @@ const RestockPage = () => {
     }
   }, [stocksError, dispatch]);
 
-  const handleSelectProduct = (product: Product) => {
-    setSelectedProduct(product);
-    setSelectedProductId(product.id);
-  };
-
-  const handleAddProduct = () => {
-    if (!selectedProduct || !productQuantity) return;
-
-    const quantityValue = parseFloat(productQuantity);
-    if (isNaN(quantityValue) || quantityValue <= 0) {
-      return;
-    }
-
-    const product = products.find((p) => p.id === selectedProductId);
-    if (!product) return;
-
+  const handleAddProduct = (
+    product: { id: string; name: string; unit_type: string },
+    quantity: number
+  ) => {
     const existingProductIndex = productsToRestock.findIndex(
       (p) => p.id === product.id
     );
@@ -120,59 +97,37 @@ const RestockPage = () => {
     if (existingProductIndex !== -1) {
       // Update quantity of existing product
       const updatedProducts = [...productsToRestock];
-      updatedProducts[existingProductIndex].quantity +=
-        parseFloat(productQuantity);
+      updatedProducts[existingProductIndex].quantity += quantity;
       setProductsToRestock(updatedProducts);
     } else {
       // Add new product
       const newProduct: ProductToRestock = {
         id: product.id,
         name: product.name,
-        quantity: parseFloat(productQuantity),
+        quantity: quantity,
         unit_type: product.unit_type,
       };
       setProductsToRestock([...productsToRestock, newProduct]);
     }
-
-    setSelectedProduct(null);
-    setSelectedProductId("");
-    setProductQuantity("1");
-    setIsAddDialogOpen(false);
-  };
-
-  const handleEditProduct = (product: ProductToRestock) => {
-    setEditingProduct(product);
-    setProductQuantity(product.quantity.toString());
-    setIsEditDialogOpen(true);
-  };
-
-  const handleUpdateProduct = () => {
-    if (!editingProduct || !productQuantity) return;
-
-    const quantityValue = parseFloat(productQuantity);
-    if (isNaN(quantityValue) || quantityValue <= 0) {
-      toast.error("Please enter a valid quantity greater than zero");
-      return;
-    }
-
-    const updatedProducts = productsToRestock.map((p) => {
-      if (p.id === editingProduct.id) {
-        return { ...p, quantity: quantityValue };
-      }
-      return p;
-    });
-
-    setProductsToRestock(updatedProducts);
-    setEditingProduct(null);
-    setProductQuantity("1");
-    setIsEditDialogOpen(false);
   };
 
   const handleDeleteProduct = (id: string) => {
     setProductsToRestock(productsToRestock.filter((p) => p.id !== id));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!selectedStore || !selectedStorageType) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    if (productsToRestock.length === 0) {
+      toast.error("Please add at least one product");
+      return;
+    }
+
     try {
       const restockRequest = {
         store_id: selectedStore,
@@ -192,335 +147,333 @@ const RestockPage = () => {
     }
   };
 
+  if (isRestockingInventory) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading...
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <BackButton />
-          <h1 className="text-2xl font-bold">Restock Inventory</h1>
+    <div className="min-h-screen bg-white">
+      {/* Top Navbar */}
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-lg font-medium text-gray-900">
+            Restock Inventory
+          </h1>
+          <Button
+            variant="outline"
+            onClick={() => navigate("/stock")}
+            className="text-sm"
+          >
+            Back to Stock
+          </Button>
         </div>
-        <Button
-          onClick={handleSubmit}
-          disabled={
-            !selectedStore ||
-            !selectedStorageType ||
-            productsToRestock.length === 0 ||
-            isRestockingInventory
-          }
-          variant="default"
-        >
-          {isRestockingInventory ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : null}
-          Complete Restock
-        </Button>
       </div>
 
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Restock Details</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="space-y-2">
-                <Label htmlFor="selectedStore">Store</Label>
-                <Select value={selectedStore} onValueChange={setSelectedStore}>
-                  <SelectTrigger className="bg-gray-50 w-full">
-                    <SelectValue placeholder="Select a store" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {stores.map((store) => (
-                      <SelectItem key={store.id} value={store.id}>
-                        {store.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="selectedStorageType">Storage Type</Label>
-                <Select
-                  value={selectedStorageType}
-                  onValueChange={setSelectedStorageType}
-                  disabled={!selectedStore}
-                >
-                  <SelectTrigger className="bg-gray-50 w-full">
-                    <SelectValue placeholder="Select storage type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {storageTypes.map((type) => (
-                      <SelectItem key={type.id} value={type.id}>
-                        {type.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {!selectedStore && (
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Please select a store first
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="selectedSupplier">Supplier (Optional)</Label>
-                <Select
-                  value={selectedSupplier}
-                  onValueChange={setSelectedSupplier}
-                >
-                  <SelectTrigger className="bg-gray-50 w-full">
-                    <SelectValue placeholder="Select a supplier (optional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {suppliers.map((supplier: Supplier) => (
-                      <SelectItem key={supplier.id} value={supplier.id}>
-                        {supplier.full_name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <CardTitle>Products to Restock</CardTitle>
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="flex items-center gap-2" variant="default">
-                  <Plus className="h-4 w-4" />
-                  Add Product
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add Product for Restocking</DialogTitle>
-                  <DialogDescription>
-                    Select a product and specify quantity
-                  </DialogDescription>
-                </DialogHeader>
-
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleAddProduct();
-                  }}
-                >
-                  <div className="grid gap-4 py-4">
-                    {!selectedProduct ? (
-                      <div className="space-y-2">
-                        <Label htmlFor="product">Search Product</Label>
-                        <Input
-                          type="text"
-                          placeholder="Type to search products..."
-                          className="mb-2"
-                          onChange={(e) => {
-                            const searchTerm = e.target.value.toLowerCase();
-                            const filteredProducts = products.filter((product) =>
-                              product.name.toLowerCase().includes(searchTerm)
-                            );
-                            setFilteredProducts(filteredProducts);
-                          }}
-                        />
-                        <div className="max-h-[200px] overflow-y-auto border rounded-md">
-                          {(filteredProducts || products).map((product) => (
-                            <div
-                              key={product.id}
-                              className="p-2 hover:bg-gray-100 cursor-pointer"
-                              onClick={() => handleSelectProduct(product)}
-                            >
-                              {product.name} ({product.unit_type})
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-medium">Selected Product</h4>
-                            <p className="text-sm text-gray-500">
-                              {selectedProduct.name} ({selectedProduct.unit_type})
-                            </p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedProduct(null);
-                              setSelectedProductId("");
-                            }}
-                          >
-                            Change
-                          </Button>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="quantity">
-                            Quantity ({selectedProduct.unit_type})
-                          </Label>
-                          <Input
-                            id="quantity"
-                            type="number"
-                            step="any"
-                            value={productQuantity}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              setProductQuantity(value === "" ? "" : value);
-                            }}
-                            className="w-full"
+      <div className="p-6">
+        <form onSubmit={handleSubmit} className="h-full">
+          {/* 2-Column Grid Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+            {/* Column 1: Basic Information */}
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <h2 className="text-sm font-medium text-gray-900 mb-4">
+                Basic Information
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-xs text-gray-700">Store *</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className="w-full justify-between mt-1 text-xs"
+                      >
+                        {selectedStoreDisplay ? (
+                          <span className="truncate">
+                            {selectedStoreDisplay.name.length > 30
+                              ? `${selectedStoreDisplay.name.substring(
+                                  0,
+                                  30
+                                )}...`
+                              : selectedStoreDisplay.name}
+                          </span>
+                        ) : (
+                          "Select store..."
+                        )}
+                        <ChevronDownIcon className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <div className="flex items-center border-b px-3">
+                          <SearchIcon className="mr-2 h-3 w-3 shrink-0 opacity-50" />
+                          <CommandInput
+                            placeholder="Search stores..."
+                            value={storeSearch}
+                            onValueChange={setStoreSearch}
+                            className="border-0 focus:ring-0 text-xs"
                           />
                         </div>
-                      </div>
-                    )}
-                  </div>
+                        <CommandList>
+                          <CommandEmpty>No store found.</CommandEmpty>
+                          <CommandGroup>
+                            {stores
+                              .filter((s) =>
+                                s.name
+                                  .toLowerCase()
+                                  .includes(storeSearch.toLowerCase())
+                              )
+                              .map((store) => (
+                                <CommandItem
+                                  key={store.id}
+                                  value={store.id.toString()}
+                                  onSelect={() => {
+                                    setSelectedStore(store.id);
+                                    setSelectedStoreDisplay(store);
+                                  }}
+                                  className="text-xs"
+                                >
+                                  <div className="flex flex-col">
+                                    <span className="font-medium">
+                                      {store.name}
+                                    </span>
+                                    {store.address && (
+                                      <span className="text-gray-500 text-xs truncate">
+                                        {store.address}
+                                      </span>
+                                    )}
+                                  </div>
+                                </CommandItem>
+                              ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
 
-                  <DialogFooter>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsAddDialogOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={
-                        !selectedProduct ||
-                        !productQuantity ||
-                        isNaN(parseFloat(productQuantity)) ||
-                        parseFloat(productQuantity) <= 0
-                      }
-                    >
-                      Add to Restock
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
-          </CardHeader>
-          <CardContent>
-            {productsToRestock.length === 0 ? (
-              <div className="text-center py-12 border rounded-md bg-gray-50">
-                <p className="text-muted-foreground">
-                  No products added for restocking yet.
-                </p>
-                <Button
-                  variant="outline"
-                  className="mt-4"
-                  onClick={() => setIsAddDialogOpen(true)}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Product
-                </Button>
-              </div>
-            ) : (
-              <div className="border rounded-md overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[400px]">Product Name</TableHead>
-                      <TableHead>Quantity</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {productsToRestock.map((product) => (
-                      <TableRow key={product.id}>
-                        <TableCell className="font-medium">
-                          {product.name}
-                        </TableCell>
-                        <TableCell>
-                          {product.quantity} {product.unit_type}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEditProduct(product)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteProduct(product.id)}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              <Trash className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit Product Quantity</DialogTitle>
-              <DialogDescription>
-                Update the quantity for {editingProduct?.name}
-              </DialogDescription>
-            </DialogHeader>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleUpdateProduct();
-              }}
-            >
-              <div className="py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="edit-quantity">
-                    Quantity
-                    {editingProduct ? ` (${editingProduct.unit_type})` : ""}
+                <div>
+                  <Label className="text-xs text-gray-700">
+                    Storage Type *
                   </Label>
-                  <Input
-                    id="edit-quantity"
-                    type="number"
-                    min="1"
-                    value={productQuantity}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setProductQuantity(value === "" ? "" : value);
-                    }}
-                    className="w-full"
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className="w-full justify-between mt-1 text-xs"
+                      >
+                        {selectedStorageTypeDisplay
+                          ? `${selectedStorageTypeDisplay.name} (${selectedStorageTypeDisplay.duration_type})`
+                          : "Select storage type..."}
+                        <ChevronDownIcon className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <div className="flex items-center border-b px-3">
+                          <SearchIcon className="mr-2 h-3 w-3 shrink-0 opacity-50" />
+                          <CommandInput
+                            placeholder="Search storage types..."
+                            value={storageTypeSearch}
+                            onValueChange={setStorageTypeSearch}
+                            className="border-0 focus:ring-0 text-xs"
+                          />
+                        </div>
+                        <CommandList>
+                          <CommandEmpty>No storage type found.</CommandEmpty>
+                          <CommandGroup>
+                            {storageTypes
+                              .filter((s) =>
+                                s.name
+                                  .toLowerCase()
+                                  .includes(storageTypeSearch.toLowerCase())
+                              )
+                              .map((storageType) => (
+                                <CommandItem
+                                  key={storageType.id}
+                                  value={storageType.id.toString()}
+                                  onSelect={() => {
+                                    setSelectedStorageType(storageType.id);
+                                    setSelectedStorageTypeDisplay(storageType);
+                                  }}
+                                  className="text-xs"
+                                >
+                                  {storageType.name}
+                                </CommandItem>
+                              ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div>
+                  <Label className="text-xs text-gray-700">
+                    Supplier (Optional)
+                  </Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className="w-full justify-between mt-1 text-xs"
+                      >
+                        {selectedSupplierDisplay ? (
+                          <span className="truncate">
+                            {selectedSupplierDisplay.full_name.length > 30
+                              ? `${selectedSupplierDisplay.full_name.substring(
+                                  0,
+                                  30
+                                )}...`
+                              : selectedSupplierDisplay.full_name}
+                          </span>
+                        ) : (
+                          "Select supplier..."
+                        )}
+                        <ChevronDownIcon className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <div className="flex items-center border-b px-3">
+                          <SearchIcon className="mr-2 h-3 w-3 shrink-0 opacity-50" />
+                          <CommandInput
+                            placeholder="Search suppliers..."
+                            value={supplierSearch}
+                            onValueChange={setSupplierSearch}
+                            className="border-0 focus:ring-0 text-xs"
+                          />
+                        </div>
+                        <CommandList>
+                          <CommandEmpty>No supplier found.</CommandEmpty>
+                          <CommandGroup>
+                            {suppliers
+                              .filter((s) =>
+                                s.full_name
+                                  .toLowerCase()
+                                  .includes(supplierSearch.toLowerCase())
+                              )
+                              .map((supplier) => (
+                                <CommandItem
+                                  key={supplier.id}
+                                  value={supplier.id.toString()}
+                                  onSelect={() => {
+                                    setSelectedSupplier(supplier.id);
+                                    setSelectedSupplierDisplay(supplier);
+                                  }}
+                                  className="text-xs"
+                                >
+                                  <div className="flex flex-col">
+                                    <span className="font-medium">
+                                      {supplier.full_name}
+                                    </span>
+                                    {supplier.email && (
+                                      <span className="text-gray-500 text-xs truncate">
+                                        {supplier.email}
+                                      </span>
+                                    )}
+                                  </div>
+                                </CommandItem>
+                              ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
+            </div>
 
-              <DialogFooter>
+            {/* Column 2: Products */}
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <h2 className="text-sm font-medium text-gray-900 mb-4">
+                Products to Restock
+              </h2>
+
+              <div className="mb-4">
+                <Label className="text-xs text-gray-700">Add Product</Label>
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setIsEditDialogOpen(false)}
+                  className="w-full justify-between mt-1 text-xs"
+                  onClick={() => setIsAddDialogOpen(true)}
                 >
-                  Cancel
+                  Select product to restock...
+                  <ChevronDownIcon className="ml-2 h-3 w-3 shrink-0 opacity-50" />
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={
-                    !productQuantity ||
-                    isNaN(parseFloat(productQuantity)) ||
-                    parseFloat(productQuantity) <= 0
-                  }
-                >
-                  Update Quantity
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+
+                <ProductSelectionDialog
+                  open={isAddDialogOpen}
+                  onOpenChange={setIsAddDialogOpen}
+                  title="Select Product to Restock"
+                  description="Choose a product and set its quantity"
+                  products={products.map((p) => ({
+                    id: p.id,
+                    name: p.name,
+                    unit_type: p.unit_type,
+                  }))}
+                  onProductSelect={(product, quantity, unit) => {
+                    // Convert quantity if unit is kg for grams products
+                    let finalQuantity = quantity;
+                    if (unit === "kg" && product.unit_type === "grams") {
+                      finalQuantity = quantity * 1000; // Convert kg to grams
+                    }
+                    handleAddProduct(product, finalQuantity);
+                  }}
+                  showQuantityInput={true}
+                  allowUnitConversion={true}
+                  primaryButtonText="Add Product"
+                  searchPlaceholder="Search products..."
+                  quantityPlaceholder="Enter quantity"
+                />
+              </div>
+
+              {productsToRestock.length > 0 && (
+                <div className="space-y-3">
+                  {productsToRestock.map((product, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                    >
+                      <div className="flex-1">
+                        <div className="text-xs font-medium text-gray-900">
+                          {product.name}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {product.quantity} {product.unit_type}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDeleteProduct(product.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <XIcon className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-end mt-6">
+            <Button type="submit" className="px-8 py-2 text-xs">
+              Restock Inventory
+            </Button>
+          </div>
+        </form>
       </div>
     </div>
   );

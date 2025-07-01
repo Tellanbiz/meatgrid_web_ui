@@ -1,50 +1,36 @@
 import { useState, useEffect } from "react";
-import BackButton from "@/components/buttons/BackButton";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { SearchIcon, ChevronDownIcon, XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Edit, Trash, Plus, Loader2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectStorageTypes } from "@/store/features/storages/storageSelectors";
 import { fetchStorageTypes } from "@/store/features/storages/storageThunks";
 import { selectStores } from "@/store/features/stores/storeSelectors";
 import { fetchStores } from "@/store/features/stores/storeThunks";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectProducts } from "@/store/features/products/productSelectors";
 import { fetchProducts } from "@/store/features/products/productThunks";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Product } from "@/store/features/products/productTypes";
 import {
   selectIsTransferringStock,
   selectStocksError,
 } from "@/store/features/stock/stockSelectors";
 import { TransferStockRequest } from "@/store/features/stock/request/TransferStockRequest";
 import { transferStock } from "@/store/features/stock/stockThunks";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import ProductSelectionDialog from "@/components/dialogs/ProductSelectionDialog";
 
 interface ProductToTransfer {
   id: string;
@@ -59,7 +45,7 @@ const TransferStockPage = () => {
   const storageTypes = useAppSelector(selectStorageTypes);
   const stores = useAppSelector(selectStores);
   const products = useAppSelector(selectProducts);
-  const isTranferringStock = useAppSelector(selectIsTransferringStock);
+  const isTransferringStock = useAppSelector(selectIsTransferringStock);
   const stocksError = useAppSelector(selectStocksError);
 
   const [originalStore, setOriginalStore] = useState<string>("");
@@ -68,15 +54,20 @@ const TransferStockPage = () => {
   const [productsToTransfer, setProductsToTransfer] = useState<
     ProductToTransfer[]
   >([]);
-
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [selectedProductId, setSelectedProductId] = useState<string>("");
-  const [productQuantity, setProductQuantity] = useState<string>("1");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingProduct, setEditingProduct] =
-    useState<ProductToTransfer | null>(null);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+
+  // Search states
+  const [originalStoreSearch, setOriginalStoreSearch] = useState("");
+  const [receivingStoreSearch, setReceivingStoreSearch] = useState("");
+  const [storageTypeSearch, setStorageTypeSearch] = useState("");
+
+  // Selected items for display
+  const [selectedOriginalStoreDisplay, setSelectedOriginalStoreDisplay] =
+    useState<any>(null);
+  const [selectedReceivingStoreDisplay, setSelectedReceivingStoreDisplay] =
+    useState<any>(null);
+  const [selectedStorageTypeDisplay, setSelectedStorageTypeDisplay] =
+    useState<any>(null);
 
   useEffect(() => {
     dispatch(fetchStorageTypes());
@@ -90,75 +81,46 @@ const TransferStockPage = () => {
     }
   }, [stocksError]);
 
-  const handleOriginalStoreChange = (value: string) => {
-    setOriginalStore(value);
-    if (value === receivingStore) {
+  const handleOriginalStoreChange = (store: any) => {
+    setOriginalStore(store.id);
+    setSelectedOriginalStoreDisplay(store);
+    if (store.id === receivingStore) {
       setReceivingStore("");
+      setSelectedReceivingStoreDisplay(null);
     }
   };
 
-  const handleSelectProduct = (product: Product) => {
-    setSelectedProduct(product);
-    setSelectedProductId(product.id);
-  };
-
-  const handleAddProduct = () => {
-    if (
-      !selectedProduct ||
-      !productQuantity ||
-      parseFloat(productQuantity) <= 0
-    )
-      return;
-
-    const product = products.find((p) => p.id === selectedProductId);
-    if (!product) return;
-
+  const handleAddProduct = (
+    product: { id: string; name: string; unit_type: string },
+    quantity: number
+  ) => {
     const newProduct: ProductToTransfer = {
       id: product.id,
       name: product.name,
-      quantity: parseFloat(productQuantity),
+      quantity: quantity,
       unit_type: product.unit_type,
     };
 
     setProductsToTransfer([...productsToTransfer, newProduct]);
-    setSelectedProduct(null);
-    setSelectedProductId("");
-    setProductQuantity("1");
-    setIsAddDialogOpen(false);
-  };
-
-  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProductQuantity(e.target.value);
-  };
-
-  const handleEditProduct = (product: ProductToTransfer) => {
-    setEditingProduct(product);
-    setProductQuantity(product.quantity.toString());
-    setIsEditDialogOpen(true);
-  };
-
-  const handleUpdateProduct = () => {
-    if (!editingProduct || !productQuantity || parseFloat(productQuantity) <= 0)
-      return;
-
-    const updatedProducts = productsToTransfer.map((p) => {
-      if (p.id === editingProduct.id) {
-        return { ...p, quantity: parseFloat(productQuantity) };
-      }
-      return p;
-    });
-
-    setProductsToTransfer(updatedProducts);
-    setEditingProduct(null);
-    setProductQuantity("1");
-    setIsEditDialogOpen(false);
   };
 
   const handleDeleteProduct = (id: string) => {
     setProductsToTransfer(productsToTransfer.filter((p) => p.id !== id));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!originalStore || !receivingStore || !storageType) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    if (productsToTransfer.length === 0) {
+      toast.error("Please add at least one product");
+      return;
+    }
+
     try {
       const transferRequest: TransferStockRequest = {
         store_id: originalStore,
@@ -178,334 +140,332 @@ const TransferStockPage = () => {
     }
   };
 
+  if (isTransferringStock) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading...
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <BackButton />
-          <h1 className="text-2xl font-bold">Transfer Stock</h1>
+    <div className="min-h-screen bg-white">
+      {/* Top Navbar */}
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-lg font-medium text-gray-900">Transfer Stock</h1>
+          <Button
+            variant="outline"
+            onClick={() => navigate("/stock")}
+            className="text-sm"
+          >
+            Back to Stock
+          </Button>
         </div>
-        <Button
-          onClick={handleSubmit}
-          disabled={
-            !originalStore ||
-            !receivingStore ||
-            !storageType ||
-            productsToTransfer.length === 0 ||
-            isTranferringStock
-          }
-          variant="default"
-        >
-          {isTranferringStock ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : null}
-          Complete Transfer
-        </Button>
       </div>
 
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Transfer Details</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="space-y-2">
-                <Label htmlFor="originalStore">Original Store</Label>
-                <Select
-                  value={originalStore}
-                  onValueChange={handleOriginalStoreChange}
-                >
-                  <SelectTrigger className="bg-gray-50 w-full">
-                    <SelectValue placeholder="Select a store" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {stores.map((store) => (
-                      <SelectItem key={store.id} value={store.id}>
-                        {store.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="receivingStore">Receiving Store</Label>
-                <Select
-                  value={receivingStore}
-                  onValueChange={setReceivingStore}
-                  disabled={!originalStore}
-                >
-                  <SelectTrigger className="bg-gray-50 w-full">
-                    <SelectValue placeholder="Select a store" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {stores
-                      .filter((store) => store.id !== originalStore)
-                      .map((store) => (
-                        <SelectItem key={store.id} value={store.id}>
-                          {store.name}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-
-                {!originalStore && (
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Please select an original store first
-                  </p>
-                )}
-
-                {originalStore &&
-                  stores.filter((store) => store.id !== originalStore)
-                    .length === 0 && (
-                    <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-amber-700">
-                      No other stores available. Please select a different
-                      original store.
-                    </div>
-                  )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="storageType">Storage Type</Label>
-                <Select value={storageType} onValueChange={setStorageType}>
-                  <SelectTrigger className="bg-gray-50 w-full">
-                    <SelectValue placeholder="Select storage type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {storageTypes.map((type) => (
-                      <SelectItem key={type.id} value={type.id}>
-                        {type.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <CardTitle>Products to Transfer</CardTitle>
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="flex items-center gap-2" variant="default">
-                  <Plus className="h-4 w-4" />
-                  Add Product
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add Product for Transfer</DialogTitle>
-                  <DialogDescription>
-                    Select a product and specify quantity
-                  </DialogDescription>
-                </DialogHeader>
-
-                <div className="grid gap-4 py-4">
-                  {!selectedProduct ? (
-                    <div className="space-y-2">
-                      <Label htmlFor="product">Search Product</Label>
-                      <Input
-                        type="text"
-                        placeholder="Type to search products..."
-                        className="mb-2"
-                        onChange={(e) => {
-                          const searchTerm = e.target.value.toLowerCase();
-                          const filteredProducts = products
-                            .filter((p) => p.stock_info?.total_instock > 0)
-                            .filter((product) =>
-                              product.name.toLowerCase().includes(searchTerm)
-                            );
-                          setFilteredProducts(filteredProducts);
-                        }}
-                      />
-                      <div className="max-h-[200px] overflow-y-auto border rounded-md">
-                        {(filteredProducts || products.filter(p => p.stock_info?.total_instock > 0)).map((product) => (
-                          <div
-                            key={product.id}
-                            className="p-2 hover:bg-gray-100 cursor-pointer"
-                            onClick={() => handleSelectProduct(product)}
-                          >
-                            <div className="font-medium">{product.name}</div>
-                            <div className="text-sm text-gray-500">
-                              Available: {product.stock_info?.total_instock} {product.unit_type}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-medium">Selected Product</h4>
-                          <p className="text-sm text-gray-500">
-                            {selectedProduct.name} - Available: {selectedProduct.stock_info?.total_instock} {selectedProduct.unit_type}
-                          </p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedProduct(null);
-                            setSelectedProductId("");
-                          }}
-                        >
-                          Change
-                        </Button>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="quantity">
-                          Quantity ({selectedProduct.unit_type})
-                        </Label>
-                        <Input
-                          id="quantity"
-                          type="number"
-                          step="any"
-                          value={productQuantity}
-                          onChange={handleQuantityChange}
-                          className="w-full"
-                          min="0"
-                          max={selectedProduct.stock_info?.total_instock}
-                        />
-                        {selectedProduct.stock_info?.total_instock && (
-                          <p className="text-sm text-gray-500">
-                            Maximum available: {selectedProduct.stock_info.total_instock} {selectedProduct.unit_type}
-                          </p>
+      <div className="p-6">
+        <form onSubmit={handleSubmit} className="h-full">
+          {/* 2-Column Grid Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+            {/* Column 1: Transfer Information */}
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <h2 className="text-sm font-medium text-gray-900 mb-4">
+                Transfer Information
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-xs text-gray-700">From Store *</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className="w-full justify-between mt-1 text-xs"
+                      >
+                        {selectedOriginalStoreDisplay ? (
+                          <span className="truncate">
+                            {selectedOriginalStoreDisplay.name.length > 30
+                              ? `${selectedOriginalStoreDisplay.name.substring(
+                                  0,
+                                  30
+                                )}...`
+                              : selectedOriginalStoreDisplay.name}
+                          </span>
+                        ) : (
+                          "Select source store..."
                         )}
-                      </div>
-                    </div>
-                  )}
+                        <ChevronDownIcon className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <div className="flex items-center border-b px-3">
+                          <SearchIcon className="mr-2 h-3 w-3 shrink-0 opacity-50" />
+                          <CommandInput
+                            placeholder="Search stores..."
+                            value={originalStoreSearch}
+                            onValueChange={setOriginalStoreSearch}
+                            className="border-0 focus:ring-0 text-xs"
+                          />
+                        </div>
+                        <CommandList>
+                          <CommandEmpty>No store found.</CommandEmpty>
+                          <CommandGroup>
+                            {stores
+                              .filter((s) =>
+                                s.name
+                                  .toLowerCase()
+                                  .includes(originalStoreSearch.toLowerCase())
+                              )
+                              .map((store) => (
+                                <CommandItem
+                                  key={store.id}
+                                  value={store.id.toString()}
+                                  onSelect={() =>
+                                    handleOriginalStoreChange(store)
+                                  }
+                                  className="text-xs"
+                                >
+                                  <div className="flex flex-col">
+                                    <span className="font-medium">
+                                      {store.name}
+                                    </span>
+                                    {store.address && (
+                                      <span className="text-gray-500 text-xs truncate">
+                                        {store.address}
+                                      </span>
+                                    )}
+                                  </div>
+                                </CommandItem>
+                              ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
-                <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsAddDialogOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleAddProduct}
-                    disabled={
-                      !selectedProduct ||
-                      parseFloat(productQuantity) <= 0 ||
-                      !productQuantity
-                    }
-                  >
-                    Add to Transfer
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </CardHeader>
-          <CardContent>
-            {productsToTransfer.length === 0 ? (
-              <div className="text-center py-12 border rounded-md bg-gray-50">
-                <p className="text-muted-foreground">
-                  No products added for transfer yet.
-                </p>
-                <Button
-                  variant="outline"
-                  className="mt-4"
-                  onClick={() => setIsAddDialogOpen(true)}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Product
-                </Button>
-              </div>
-            ) : (
-              <div className="border rounded-md overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[400px]">Product Name</TableHead>
-                      <TableHead>Quantity</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {productsToTransfer.map((product) => (
-                      <TableRow key={product.id}>
-                        <TableCell className="font-medium">
-                          {product.name}
-                        </TableCell>
-                        <TableCell>
-                          {product.quantity} {product.unit_type}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEditProduct(product)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteProduct(product.id)}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              <Trash className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                <div>
+                  <Label className="text-xs text-gray-700">To Store *</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className="w-full justify-between mt-1 text-xs"
+                        disabled={!originalStore}
+                      >
+                        {selectedReceivingStoreDisplay ? (
+                          <span className="truncate">
+                            {selectedReceivingStoreDisplay.name.length > 30
+                              ? `${selectedReceivingStoreDisplay.name.substring(
+                                  0,
+                                  30
+                                )}...`
+                              : selectedReceivingStoreDisplay.name}
+                          </span>
+                        ) : (
+                          "Select destination store..."
+                        )}
+                        <ChevronDownIcon className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <div className="flex items-center border-b px-3">
+                          <SearchIcon className="mr-2 h-3 w-3 shrink-0 opacity-50" />
+                          <CommandInput
+                            placeholder="Search stores..."
+                            value={receivingStoreSearch}
+                            onValueChange={setReceivingStoreSearch}
+                            className="border-0 focus:ring-0 text-xs"
+                          />
+                        </div>
+                        <CommandList>
+                          <CommandEmpty>No store found.</CommandEmpty>
+                          <CommandGroup>
+                            {stores
+                              .filter(
+                                (s) =>
+                                  s.name
+                                    .toLowerCase()
+                                    .includes(
+                                      receivingStoreSearch.toLowerCase()
+                                    ) && s.id !== originalStore
+                              )
+                              .map((store) => (
+                                <CommandItem
+                                  key={store.id}
+                                  value={store.id.toString()}
+                                  onSelect={() => {
+                                    setReceivingStore(store.id);
+                                    setSelectedReceivingStoreDisplay(store);
+                                  }}
+                                  className="text-xs"
+                                >
+                                  <div className="flex flex-col">
+                                    <span className="font-medium">
+                                      {store.name}
+                                    </span>
+                                    {store.address && (
+                                      <span className="text-gray-500 text-xs truncate">
+                                        {store.address}
+                                      </span>
+                                    )}
+                                  </div>
+                                </CommandItem>
+                              ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
 
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit Product Quantity</DialogTitle>
-              <DialogDescription>
-                Update the quantity for {editingProduct?.name}
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="py-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-quantity">
-                  Quantity
-                  {editingProduct ? ` (${editingProduct.unit_type})` : ""}
-                </Label>
-                <Input
-                  id="edit-quantity"
-                  type="number"
-                  step="any"
-                  value={productQuantity}
-                  onChange={(e) => setProductQuantity(e.target.value)}
-                  className="w-full"
-                  min="0"
-                />
+                <div>
+                  <Label className="text-xs text-gray-700">
+                    Storage Type *
+                  </Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className="w-full justify-between mt-1 text-xs"
+                      >
+                        {selectedStorageTypeDisplay
+                          ? `${selectedStorageTypeDisplay.name} (${selectedStorageTypeDisplay.duration_type})`
+                          : "Select storage type..."}
+                        <ChevronDownIcon className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <div className="flex items-center border-b px-3">
+                          <SearchIcon className="mr-2 h-3 w-3 shrink-0 opacity-50" />
+                          <CommandInput
+                            placeholder="Search storage types..."
+                            value={storageTypeSearch}
+                            onValueChange={setStorageTypeSearch}
+                            className="border-0 focus:ring-0 text-xs"
+                          />
+                        </div>
+                        <CommandList>
+                          <CommandEmpty>No storage type found.</CommandEmpty>
+                          <CommandGroup>
+                            {storageTypes
+                              .filter((s) =>
+                                s.name
+                                  .toLowerCase()
+                                  .includes(storageTypeSearch.toLowerCase())
+                              )
+                              .map((storageType) => (
+                                <CommandItem
+                                  key={storageType.id}
+                                  value={storageType.id.toString()}
+                                  onSelect={() => {
+                                    setStorageType(storageType.id);
+                                    setSelectedStorageTypeDisplay(storageType);
+                                  }}
+                                  className="text-xs"
+                                >
+                                  {storageType.name}
+                                </CommandItem>
+                              ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
             </div>
 
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsEditDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleUpdateProduct}
-                disabled={parseFloat(productQuantity) <= 0 || !productQuantity}
-              >
-                Update Quantity
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            {/* Column 2: Products */}
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <h2 className="text-sm font-medium text-gray-900 mb-4">
+                Products to Transfer
+              </h2>
+
+              <div className="mb-4">
+                <Label className="text-xs text-gray-700">Add Product</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-between mt-1 text-xs"
+                  onClick={() => setIsAddDialogOpen(true)}
+                >
+                  Select product to transfer...
+                  <ChevronDownIcon className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                </Button>
+
+                <ProductSelectionDialog
+                  open={isAddDialogOpen}
+                  onOpenChange={setIsAddDialogOpen}
+                  title="Select Product to Transfer"
+                  description="Choose a product and set its quantity"
+                  products={products.map((p) => ({
+                    id: p.id,
+                    name: p.name,
+                    unit_type: p.unit_type,
+                  }))}
+                  onProductSelect={(product, quantity, unit) => {
+                    // Convert quantity if unit is kg for grams products
+                    let finalQuantity = quantity;
+                    if (unit === "kg" && product.unit_type === "grams") {
+                      finalQuantity = quantity * 1000; // Convert kg to grams
+                    }
+                    handleAddProduct(product, finalQuantity);
+                  }}
+                  showQuantityInput={true}
+                  allowUnitConversion={true}
+                  primaryButtonText="Add Product"
+                  searchPlaceholder="Search products..."
+                  quantityPlaceholder="Enter quantity"
+                />
+              </div>
+
+              {productsToTransfer.length > 0 && (
+                <div className="space-y-3">
+                  {productsToTransfer.map((product, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                    >
+                      <div className="flex-1">
+                        <div className="text-xs font-medium text-gray-900">
+                          {product.name}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {product.quantity} {product.unit_type}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDeleteProduct(product.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <XIcon className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-end mt-6">
+            <Button type="submit" className="px-8 py-2 text-xs">
+              Transfer Stock
+            </Button>
+          </div>
+        </form>
       </div>
     </div>
   );

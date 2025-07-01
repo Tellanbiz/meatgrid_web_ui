@@ -83,7 +83,7 @@ const StocksTable: React.FC<StocksTableProps> = ({
     if (startDate || endDate) {
       filtered = filtered.filter((stock) => {
         const stockDate = new Date(stock.created_at);
-        
+
         if (startDate && endDate) {
           return stockDate >= startDate && stockDate <= endDate;
         } else if (startDate) {
@@ -91,7 +91,7 @@ const StocksTable: React.FC<StocksTableProps> = ({
         } else if (endDate) {
           return stockDate <= endDate;
         }
-        
+
         return true;
       });
     }
@@ -162,6 +162,14 @@ const StocksTable: React.FC<StocksTableProps> = ({
     }
   };
 
+  const formatQuantity = (quantity: number, unitType: string) => {
+    if (unitType.toLowerCase() === "grams" && quantity >= 1000) {
+      const kgQuantity = quantity / 1000;
+      return `${kgQuantity.toLocaleString()} kg`;
+    }
+    return `${quantity.toLocaleString()} ${unitType}`;
+  };
+
   if (isFetchingStocks) {
     return (
       <div className="space-y-3">
@@ -180,7 +188,7 @@ const StocksTable: React.FC<StocksTableProps> = ({
   return (
     <div className="h-full flex flex-col bg-white`">
       {isFetchingStocks && <Progress value={undefined} className="h-1" />}
-    
+
       {/* Table */}
       <div className="flex-1 rounded-md border bg-card overflow-hidden">
         <Table>
@@ -197,7 +205,10 @@ const StocksTable: React.FC<StocksTableProps> = ({
           <TableBody>
             {currentItems.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                <TableCell
+                  colSpan={6}
+                  className="text-center py-8 text-gray-500"
+                >
                   {searchTerm || startDate || endDate
                     ? "No stocks found matching your search criteria."
                     : "No stocks available."}
@@ -211,7 +222,7 @@ const StocksTable: React.FC<StocksTableProps> = ({
                   </TableCell>
                   <TableCell>{stock.store?.name ?? "N/A"}</TableCell>
                   <TableCell>
-                    {stock.quantity.toLocaleString()} {stock.product.unit_type}
+                    {formatQuantity(stock.quantity, stock.product.unit_type)}
                   </TableCell>
                   <TableCell>
                     <Badge className={getStatusColor(stock.status)}>

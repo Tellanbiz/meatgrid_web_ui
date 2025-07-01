@@ -1,20 +1,12 @@
 import React, { useState } from "react";
-import { SearchIcon, XIcon } from "lucide-react";
+import { SearchIcon, XIcon, PackageIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,7 +29,6 @@ interface ProductSelectionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
-  description: string;
   products: ProductItem[];
   onProductSelect: (
     product: ProductItem,
@@ -59,7 +50,6 @@ const ProductSelectionDialog: React.FC<ProductSelectionDialogProps> = ({
   open,
   onOpenChange,
   title,
-  description,
   products,
   onProductSelect,
   showQuantityInput = true,
@@ -109,96 +99,82 @@ const ProductSelectionDialog: React.FC<ProductSelectionDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden border border-gray-200 bg-white">
+        <DialogHeader className="pb-4 border-b border-gray-100">
           <DialogTitle className="text-lg font-semibold text-gray-900">
             {title}
           </DialogTitle>
-          <DialogDescription className="text-sm text-gray-600">
-            {description}
-          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           {!selectedProduct ? (
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium text-gray-700">
-                  Available Products ({products.length})
-                </Label>
-                <div className="text-xs text-gray-500">
-                  Showing all products
-                </div>
+              <div className="relative">
+                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder={searchPlaceholder}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
               </div>
 
-              <Command className="bg-white border border-gray-200 rounded-lg shadow-sm">
-                <div className="flex items-center border-b border-gray-100 px-4 py-3">
-                  <SearchIcon className="mr-3 h-4 w-4 text-gray-400" />
-                  <CommandInput
-                    placeholder={searchPlaceholder}
-                    value={searchTerm}
-                    onValueChange={setSearchTerm}
-                    className="border-0 focus:ring-0 text-sm placeholder:text-gray-400"
-                  />
-                </div>
-
-                <CommandList className="max-h-96 overflow-y-auto">
-                  <CommandEmpty className="py-8 text-center">
+              <div className="bg-white border border-gray-200 rounded-lg max-h-64 overflow-y-auto">
+                {filteredProducts.length === 0 ? (
+                  <div className="py-8 text-center">
                     <div className="text-gray-500">
-                      <SearchIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">No products found</p>
+                      <PackageIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm font-medium">No products found</p>
                       <p className="text-xs">Try adjusting your search terms</p>
                     </div>
-                  </CommandEmpty>
-
-                  <CommandGroup>
+                  </div>
+                ) : (
+                  <div>
                     {filteredProducts.map((product) => (
-                      <CommandItem
+                      <div
                         key={product.id}
-                        value={product.id.toString()}
-                        onSelect={() => handleProductSelect(product)}
-                        className="px-4 py-3 hover:bg-red-50 cursor-pointer border-b border-gray-50 last:border-b-0"
+                        onClick={() => handleProductSelect(product)}
+                        className="px-3 py-2 hover:bg-red-50 cursor-pointer border-b border-gray-50 last:border-b-0 transition-colors"
                       >
                         <div className="flex items-center justify-between w-full">
                           <div className="flex-1 min-w-0">
                             <div className="text-sm font-medium text-gray-900 truncate">
                               {product.name}
                             </div>
-                            <div className="text-xs text-gray-500 mt-1">
-                              Unit: {product.unit_type}
-                              {product.description && (
-                                <span className="ml-2">
-                                  • {product.description}
-                                </span>
-                              )}
+                            <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                              <span className="bg-gray-100 px-2 py-0.5 rounded-md">
+                                {product.unit_type}
+                              </span>
                             </div>
                           </div>
-                          <div className="flex items-center ml-3">
+                          <div className="flex items-center ml-2">
                             <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                           </div>
                         </div>
-                      </CommandItem>
+                      </div>
                     ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* Selected Product Display */}
-              <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg p-4">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <div className="text-sm font-semibold text-gray-900 mb-1">
-                      {selectedProduct.name}
-                    </div>
-                    <div className="text-xs text-gray-600">
-                      Unit Type: {selectedProduct.unit_type}
-                      {selectedProduct.description && (
-                        <span className="ml-2">
-                          • {selectedProduct.description}
-                        </span>
-                      )}
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 bg-red-100 rounded-lg flex items-center justify-center">
+                        <PackageIcon className="h-3 w-3 text-red-600" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-gray-900">
+                          {selectedProduct.name}
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          Unit Type: {selectedProduct.unit_type}
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <Button
@@ -206,24 +182,23 @@ const ProductSelectionDialog: React.FC<ProductSelectionDialogProps> = ({
                     variant="outline"
                     size="sm"
                     onClick={() => setSelectedProduct(null)}
-                    className="text-red-600 hover:text-red-700 border-red-200 hover:bg-red-50"
+                    className="text-gray-600 hover:text-gray-800 border-gray-300 hover:bg-gray-50 h-7 w-7 p-0"
                   >
-                    <XIcon className="h-4 w-4" />
+                    <XIcon className="h-3 w-3" />
                   </Button>
                 </div>
               </div>
 
               {/* Quantity Input */}
               {showQuantityInput && (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <Label className="text-sm font-medium text-gray-700">
                     Quantity *
                   </Label>
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     <Input
                       type="number"
                       placeholder={quantityPlaceholder}
-                      className="text-sm"
                       value={quantity}
                       onChange={(e) =>
                         setQuantity(parseFloat(e.target.value) || 0)
@@ -238,7 +213,7 @@ const ProductSelectionDialog: React.FC<ProductSelectionDialogProps> = ({
                         value={quantityUnit}
                         onValueChange={setQuantityUnit}
                       >
-                        <SelectTrigger className="w-32 text-sm">
+                        <SelectTrigger className="w-28 text-sm border-gray-200 focus:border-red-500 focus:ring-red-500">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -253,24 +228,31 @@ const ProductSelectionDialog: React.FC<ProductSelectionDialogProps> = ({
                       </Select>
                     )}
                   </div>
+                  {quantityUnit === "kg" &&
+                    selectedProduct.unit_type === "grams" && (
+                      <div className="text-xs text-gray-500 bg-red-50 px-2 py-1 rounded-md">
+                        {quantity} kg = {(quantity * 1000).toLocaleString()}{" "}
+                        grams
+                      </div>
+                    )}
                 </div>
               )}
             </div>
           )}
         </div>
 
-        <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
+        <div className="flex justify-end gap-3 pt-3 border-t border-gray-100">
           <Button
             variant="outline"
             onClick={handleClose}
-            className="text-sm px-6"
+            className="text-sm px-6 border-gray-200 hover:bg-gray-50"
           >
             {cancelButtonText}
           </Button>
           <Button
             onClick={handleConfirm}
             disabled={isConfirmDisabled}
-            className="text-sm px-6 bg-red-600 hover:bg-red-700"
+            className="text-sm px-6 bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:text-gray-500"
           >
             {primaryButtonText}
           </Button>

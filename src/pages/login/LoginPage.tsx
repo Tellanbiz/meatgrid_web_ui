@@ -37,7 +37,7 @@ const LoginPage = () => {
   }, [status, token, error, navigate, dispatch]);
 
   return (
-    <div className="min-h-screen flex bg-[#f5f6fa]">
+    <div className="min-h-screen flex bg-white">
       {/* Left illustration area */}
       <div className="hidden md:flex flex-1 relative overflow-hidden bg-gradient-to-br from-[#e9eafc] to-[#f5f6fa]">
         <img

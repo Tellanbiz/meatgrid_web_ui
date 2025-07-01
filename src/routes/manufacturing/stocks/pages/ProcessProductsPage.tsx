@@ -109,7 +109,7 @@ const ProcessProductsPage = () => {
     !selectedStore || !selectedStorageType || selectedSuppliers.length === 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Sticky Header */}
       <div className="sticky top-0 z-50 bg-white border-b">
         <div className="max-w-7xl mx-auto">
