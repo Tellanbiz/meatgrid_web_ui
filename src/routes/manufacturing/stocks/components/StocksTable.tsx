@@ -163,9 +163,9 @@ const StocksTable: React.FC<StocksTableProps> = ({
   };
 
   const formatQuantity = (quantity: number, unitType: string) => {
-    if (unitType.toLowerCase() === "grams" && quantity >= 1000) {
+    if (unitType.toLowerCase() === "kilograms" && quantity >= 1000) {
       const kgQuantity = quantity / 1000;
-      return `${kgQuantity.toLocaleString()} kg`;
+      return `${kgQuantity.toLocaleString()} ${unitType}`;
     }
     return `${quantity.toLocaleString()} ${unitType}`;
   };
