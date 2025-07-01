@@ -404,7 +404,6 @@ const TransferStockPage = () => {
                   open={isAddDialogOpen}
                   onOpenChange={setIsAddDialogOpen}
                   title="Select Product to Transfer"
-                  description="Choose a product and set its quantity"
                   products={products.map((p) => ({
                     id: p.id,
                     name: p.name,

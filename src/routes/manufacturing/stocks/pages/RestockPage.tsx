@@ -412,7 +412,6 @@ const RestockPage = () => {
                   open={isAddDialogOpen}
                   onOpenChange={setIsAddDialogOpen}
                   title="Select Product to Restock"
-                  description="Choose a product and set its quantity"
                   products={products.map((p) => ({
                     id: p.id,
                     name: p.name,

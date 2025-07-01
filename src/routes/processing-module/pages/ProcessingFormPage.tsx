@@ -458,7 +458,6 @@ const ProcessingFormPage: React.FC<ProcessingFormPageProps> = ({
                   open={purchasedProductDialogOpen}
                   onOpenChange={setPurchasedProductDialogOpen}
                   title="Select Purchased Product"
-                  description="Choose a product to add to the batch"
                   products={purchasables.map((p) => ({
                     id: p.id.toString(),
                     name: p.name,
@@ -536,7 +535,6 @@ const ProcessingFormPage: React.FC<ProcessingFormPageProps> = ({
                   open={processedProductDialogOpen}
                   onOpenChange={setProcessedProductDialogOpen}
                   title="Select Processed Product"
-                  description="Choose a product and set its quantity. All available products are shown."
                   products={availableProducts}
                   onProductSelect={(product, quantity, unit) => {
                     // Convert quantity based on unit selection
