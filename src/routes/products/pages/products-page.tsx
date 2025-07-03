@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import ExportButton from "@/components/buttons/ExportButton";
 import ProductsTable from "../components/ProductsTable";
+import { Product } from "@/store/features/products/productTypes";
 
 const ProductsPage = () => {
   const navigate = useNavigate();
@@ -30,11 +31,45 @@ const ProductsPage = () => {
 
   const [searchString, setSearchString] = useState<string>("");
   const [selectedStore, setSelectedStore] = useState<string | null>(null);
+  const [selectedStockStatus, setSelectedStockStatus] = useState<string>("all");
 
   const isFetchingProducts = useAppSelector(selectIsFetchingProducts);
   const stores = useAppSelector(selectStores);
 
   const products = useAppSelector(selectProducts);
+
+  // Helper function to get total in stock
+  const getTotalInStock = (product: Product) => {
+    const stockInfo = product.stock_info;
+    const totalIn = stockInfo.total_instock + stockInfo.total_reclaim;
+    const totalOut =
+      stockInfo.total_damaged +
+      stockInfo.total_migrated +
+      stockInfo.total_processed +
+      stockInfo.total_sold;
+    return totalIn - totalOut;
+  };
+
+  // Filter products based on search string and stock status
+  const getFilteredProducts = () => {
+    let filtered = products.filter(
+      (product) =>
+        product.name.toLowerCase().includes(searchString.toLowerCase()) ||
+        product.id.toLowerCase().includes(searchString.toLowerCase())
+    );
+
+    // Apply stock status filter
+    if (selectedStockStatus !== "all") {
+      filtered = filtered.filter((product) => {
+        const inStock = getTotalInStock(product) > 0;
+        return selectedStockStatus === "instock" ? inStock : !inStock;
+      });
+    }
+
+    return filtered;
+  };
+
+  const filteredProducts = getFilteredProducts();
 
   const handleAddProduct = () => {
     navigate("/products/new");
@@ -46,12 +81,12 @@ const ProductsPage = () => {
 
   const handleExportExcel = () => {
     const config = ReportService.getConfig("products");
-    ExportService.exportToExcel(products, config);
+    ExportService.exportToExcel<Product>(filteredProducts, config);
   };
 
   const handleExportPDF = async () => {
     const config = ReportService.getConfig("products");
-    await ExportService.exportToPDF(products, config);
+    await ExportService.exportToPDF<Product>(filteredProducts, config);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,6 +101,10 @@ const ProductsPage = () => {
       setSelectedStore(value);
       dispatch(fetchProducts({ store_id: value }));
     }
+  };
+
+  const handleStockStatusChange = (value: string) => {
+    setSelectedStockStatus(value);
   };
 
   useEffect(() => {
@@ -103,6 +142,20 @@ const ProductsPage = () => {
                 ))}
               </SelectContent>
             </Select>
+
+            <Select
+              value={selectedStockStatus}
+              onValueChange={handleStockStatusChange}
+            >
+              <SelectTrigger className="w-40 h-10 border-gray-200 bg-white">
+                <SelectValue placeholder="Stock Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Stock</SelectItem>
+                <SelectItem value="instock">In Stock</SelectItem>
+                <SelectItem value="outofstock">Out of Stock</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex space-x-2">
@@ -138,6 +191,8 @@ const ProductsPage = () => {
         <ProductsTable
           searchString={searchString}
           selectedStore={selectedStore}
+          selectedStockStatus={selectedStockStatus}
+          filteredProducts={filteredProducts}
         />
       </div>
     </div>

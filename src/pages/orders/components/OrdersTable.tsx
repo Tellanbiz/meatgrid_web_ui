@@ -590,11 +590,11 @@ const OrdersTable = () => {
           <ExportButton
             onExportExcel={() => {
               const config = ReportService.getConfig("orders");
-              ExportService.exportToExcel(filteredOrders, config);
+              ExportService.exportToExcel<Order>(filteredOrders, config);
             }}
             onExportPDF={async () => {
               const config = ReportService.getConfig("orders");
-              await ExportService.exportToPDF(filteredOrders, config);
+              await ExportService.exportToPDF<Order>(filteredOrders, config);
             }}
           />
         </div>

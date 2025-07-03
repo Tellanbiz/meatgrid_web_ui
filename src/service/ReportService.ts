@@ -1,15 +1,18 @@
-import { PaymentMethod, Recipient } from "../store/features/orders/orderTypes";
+import { PaymentMethod, Recipient, Order } from "../store/features/orders/orderTypes";
 import { ExportOptions } from "./ExportService";
+import { Product } from "../store/features/products/productTypes";
 
-type ReportConfig = {
+type ReportConfig<T> = {
   fileName: string;
-  columns: ExportOptions["columns"];
+  columns: ExportOptions<T>["columns"];
 };
 
 type ReportKeys = "products" | "orders" | "customers";
 
 type ReportData = {
-  [K in ReportKeys]: ReportConfig;
+  products: ReportConfig<Product>;
+  orders: ReportConfig<Order>;
+  customers: ReportConfig<Record<string, unknown>>;
 };
 
 type StockInfo = {
@@ -22,25 +25,28 @@ type StockInfo = {
   total_sold: number;
 };
 
-const getTotalInStock = (stockInfo: StockInfo): number => {
-  const totalIn = stockInfo.total_instock + stockInfo.total_reclaim;
+// Defensive: default all fields to 0 if missing
+const safeStockInfo = (stockInfo: Partial<StockInfo> | undefined | null): StockInfo => ({
+  total_instock: stockInfo?.total_instock ?? 0,
+  total_reclaim: stockInfo?.total_reclaim ?? 0,
+  total_correction: stockInfo?.total_correction ?? 0,
+  total_damaged: stockInfo?.total_damaged ?? 0,
+  total_migrated: stockInfo?.total_migrated ?? 0,
+  total_processed: stockInfo?.total_processed ?? 0,
+  total_sold: stockInfo?.total_sold ?? 0,
+});
 
-  const totalOut =
-    stockInfo.total_correction +
-    stockInfo.total_damaged +
-    stockInfo.total_migrated +
-    stockInfo.total_processed +
-    stockInfo.total_sold;
+// Copy logic from ProductsTable.tsx
+const getTotalInStock = (stockInfo: Partial<StockInfo> | undefined | null): number => {
+  const s = safeStockInfo(stockInfo);
+  const totalIn = s.total_instock + s.total_reclaim;
+  const totalOut = s.total_damaged + s.total_migrated + s.total_processed + s.total_sold;
   return totalIn - totalOut;
 };
 
-const getTotalConsumed = (stockInfo: StockInfo): number => {
-  const totalOut =
-    stockInfo.total_correction +
-    stockInfo.total_damaged +
-    stockInfo.total_migrated +
-    stockInfo.total_processed +
-    stockInfo.total_sold;
+const getTotalConsumed = (stockInfo: Partial<StockInfo> | undefined | null): number => {
+  const s = safeStockInfo(stockInfo);
+  const totalOut = s.total_damaged + s.total_migrated + s.total_processed + s.total_sold;
   return totalOut;
 };
 
@@ -49,47 +55,37 @@ export const Reports: ReportData = {
     fileName: "products-list",
     columns: [
       { field: "name", header: "Product Name" },
+      { field: "unit_type", header: "Unit Type" },
       {
         field: "regular_price",
         header: "Price (Ksh)",
         format: (value) => `${value ? value.toLocaleString() : "0"}`,
       },
-      { field: "unit_type", header: "Unit Type" },
       {
         field: "stock_info",
         header: "Status",
         format: (value) => {
-          const inStock = getTotalInStock(value as StockInfo) > 0;
+          const inStock = getTotalInStock(value as Partial<StockInfo>) > 0;
           return inStock ? "In stock" : "Out of stock";
         },
       },
       {
         field: "stock_info",
         header: "In Stock",
-        format: (value) => {
-          const stockInfo = value as StockInfo;
-          const totalIn = getTotalInStock(stockInfo);
-          return `${totalIn.toLocaleString()}`;
+        format: (value, rowData) => {
+          const totalIn = getTotalInStock(value as Partial<StockInfo>);
+          const unitType = (rowData as any)?.unit_type || "";
+          return `${totalIn.toLocaleString()} ${unitType}`;
         },
       },
       {
         field: "stock_info",
         header: "Consumed",
-        format: (value) => {
-          const stockInfo = value as StockInfo;
-          const totalOut = getTotalConsumed(stockInfo);
-          return `${totalOut.toLocaleString()}`;
+        format: (value, rowData) => {
+          const totalOut = getTotalConsumed(value as Partial<StockInfo>);
+          const unitType = (rowData as any)?.unit_type || "";
+          return `${totalOut.toLocaleString()} ${unitType}`;
         },
-      },
-      {
-        field: "is_product",
-        header: "Is Product",
-        format: (value) => (value ? "Yes" : "No"),
-      },
-      {
-        field: "is_raw_material",
-        header: "Is Raw Material",
-        format: (value) => (value ? "Yes" : "No"),
       },
     ],
   },
@@ -146,7 +142,7 @@ export const Reports: ReportData = {
 };
 
 class ReportService {
-  static getConfig<K extends ReportKeys>(reportKey: K): ReportConfig {
+  static getConfig<K extends keyof ReportData>(reportKey: K): ReportData[K] {
     return Reports[reportKey];
   }
 

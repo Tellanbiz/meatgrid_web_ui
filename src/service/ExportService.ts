@@ -6,9 +6,9 @@ export interface ExportOptions<T = Record<string, unknown>> {
   fileName: string;
   sheetName?: string;
   columns: {
-    field: keyof T;
+    field: keyof T | string;
     header: string;
-    format?: (value: unknown) => unknown;
+    format?: (value: unknown, rowData?: T) => unknown;
   }[];
 }
 
@@ -38,19 +38,19 @@ class ExportService {
 
   private static transformData<T>(
     data: T[],
-    columns: ExportOptions["columns"]
+    columns: ExportOptions<T>["columns"]
   ) {
     return data.map((item) => {
       const row: { [key: string]: unknown } = {};
       columns.forEach((col) => {
-        const value = (item as Record<string, unknown>)[col.field];
-        row[col.header] = col.format ? col.format(value) : value;
+        const value = (item as any)[col.field];
+        row[col.header] = col.format ? col.format(value, item) : value;
       });
       return row;
     });
   }
 
-  static exportToExcel<T>(data: T[], options: ExportOptions) {
+  static exportToExcel<T>(data: T[], options: ExportOptions<T>) {
     const { fileName, sheetName = "Sheet1", columns } = options;
 
     // Transform data according to column specifications
@@ -73,7 +73,7 @@ class ExportService {
     XLSX.writeFile(wb, `${fileName}.xlsx`);
   }
 
-  static async exportToPDF<T>(data: T[], options: ExportOptions) {
+  static async exportToPDF<T>(data: T[], options: ExportOptions<T>) {
     const { fileName, columns } = options;
     const doc = new jsPDF();
     const margin = {
@@ -96,8 +96,8 @@ class ExportService {
     const headers = columns.map((col) => col.header);
     const rows: RowInput[] = data.map((item) =>
       columns.map((col) => {
-        const value = (item as Record<string, unknown>)[col.field];
-        const formattedValue = col.format ? col.format(value) : value;
+        const value = (item as any)[col.field];
+        const formattedValue = col.format ? col.format(value, item) : value;
         return formattedValue != null ? String(formattedValue) : null;
       })
     );

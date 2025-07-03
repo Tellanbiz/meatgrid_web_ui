@@ -24,7 +24,6 @@ import {
 import React from "react";
 import { resetProductState } from "../../../store/features/products/productSlice";
 import { fetchStores } from "../../../store/features/stores/storeThunks";
-import { selectProducts } from "../../../store/features/products/productSelectors";
 import { useNavigate } from "react-router-dom";
 import DeleteDialog from "@/components/dialogs/DeleteDialog";
 import { deleteProduct } from "../domain/products-api";
@@ -48,11 +47,15 @@ import {
 interface ProductsTableProps {
   searchString: string;
   selectedStore: string | null;
+  selectedStockStatus: string;
+  filteredProducts: Product[];
 }
 
 const ProductsTable: React.FC<ProductsTableProps> = ({
   searchString,
   selectedStore,
+  selectedStockStatus,
+  filteredProducts,
 }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -63,7 +66,6 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const { status, error } = useAppSelector((state) => state.products);
-  const products: Product[] = useAppSelector(selectProducts);
 
   useEffect(() => {
     dispatch(fetchStores());
@@ -81,12 +83,22 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
     }
   }, [status, error, dispatch]);
 
-  // Filter products based on search string
-  const filteredProducts = products.filter(
-    (product) =>
-      product.name.toLowerCase().includes(searchString.toLowerCase()) ||
-      product.id.toLowerCase().includes(searchString.toLowerCase())
-  );
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchString, selectedStockStatus, selectedStore]);
+
+  // Helper function to get total in stock
+  const getTotalInStock = (product: Product) => {
+    const stockInfo = product.stock_info;
+    const totalIn = stockInfo.total_instock + stockInfo.total_reclaim;
+    const totalOut =
+      stockInfo.total_damaged +
+      stockInfo.total_migrated +
+      stockInfo.total_processed +
+      stockInfo.total_sold;
+    return totalIn - totalOut;
+  };
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredProducts.length / rowsPerPage);
@@ -166,18 +178,6 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
         {formatCurrency(rowData.regular_price)}
       </div>
     );
-  };
-
-  const getTotalInStock = (product: Product) => {
-    const stockInfo = product.stock_info;
-    const totalIn = stockInfo.total_instock + stockInfo.total_reclaim;
-
-    const totalOut =
-      stockInfo.total_damaged +
-      stockInfo.total_migrated +
-      stockInfo.total_processed +
-      stockInfo.total_sold;
-    return totalIn - totalOut;
   };
 
   const getTotalConsumed = (product: Product) => {
@@ -369,7 +369,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <p className="text-sm text-gray-700">
-                Showing {startIndex + 1} to{" "}
+                Showing {filteredProducts.length > 0 ? startIndex + 1 : 0} to{" "}
                 {Math.min(endIndex, filteredProducts.length)} of{" "}
                 {filteredProducts.length} products
               </p>
