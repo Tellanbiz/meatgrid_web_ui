@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, Pencil } from "lucide-react";
+import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Stock } from "@/store/features/stock/stockTypes";
 import { Badge } from "@/components/ui/badge";
@@ -41,6 +41,15 @@ import {
 } from "@/components/ui/pagination";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { deleteStock } from "../services/stock-helpers";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface StocksTableProps {
   searchTerm: string;
@@ -64,6 +73,8 @@ const StocksTable: React.FC<StocksTableProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
   const [filteredStocks, setFilteredStocks] = useState(stocks);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [stockToDelete, setStockToDelete] = useState<Stock | null>(null);
 
   useEffect(() => {
     dispatch(fetchStocks());
@@ -111,6 +122,37 @@ const StocksTable: React.FC<StocksTableProps> = ({
   const handleEdit = (stock: Stock) => {
     setSelectedStock(stock);
     setIsModalOpen(true);
+  };
+
+  const handleDelete = (stock: Stock) => {
+    setStockToDelete(stock);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!stockToDelete) return;
+
+    setIsLoading(true);
+    try {
+      const success = await deleteStock(stockToDelete.id);
+      if (success) {
+        toast.success("Stock deleted successfully");
+        dispatch(fetchStocks());
+      } else {
+        toast.error("Failed to delete stock");
+      }
+    } catch {
+      toast.error("An error occurred while deleting the stock");
+    } finally {
+      setIsLoading(false);
+      setIsDeleteDialogOpen(false);
+      setStockToDelete(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteDialogOpen(false);
+    setStockToDelete(null);
   };
 
   const handleCloseModal = () => {
@@ -244,6 +286,12 @@ const StocksTable: React.FC<StocksTableProps> = ({
                         >
                           <Pencil className="h-4 w-4" /> Update Stock
                         </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onSelect={() => handleDelete(stock)}
+                          className="flex items-center gap-2 text-red-600 focus:text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4" /> Delete Stock
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -330,6 +378,45 @@ const StocksTable: React.FC<StocksTableProps> = ({
         onUpdate={handleUpdateStock}
         stock={selectedStock}
       />
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Stock</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this stock? This action cannot be
+              undone.
+            </DialogDescription>
+            {stockToDelete && (
+              <div className="mt-2 p-2 bg-gray-50 rounded">
+                <p className="font-medium">{stockToDelete.product.name}</p>
+                <p className="text-sm text-gray-600">
+                  Quantity:{" "}
+                  {formatQuantity(
+                    stockToDelete.quantity,
+                    stockToDelete.product.unit_type
+                  )}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Store: {stockToDelete.store?.name ?? "N/A"}
+                </p>
+              </div>
+            )}
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancelDelete}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmDelete}
+              className="bg-red-600 hover:bg-red-700"
+              disabled={isLoading}
+            >
+              {isLoading ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
