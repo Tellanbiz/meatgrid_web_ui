@@ -1,3 +1,4 @@
+
 // Base product interface that contains common fields
 export interface BaseProduct {
   id: string;
@@ -11,6 +12,8 @@ export interface BaseProduct {
 // Full product interface for admin/management purposes
 export interface Product {
   id: string;
+  sku: number;
+  product_barcode: string;
   images: string[];
   name: string;
   description: string;

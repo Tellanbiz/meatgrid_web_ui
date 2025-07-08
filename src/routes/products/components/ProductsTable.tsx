@@ -167,6 +167,9 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
           <div className="text-sm font-semibold text-gray-900">
             {rowData.name}
           </div>
+          <div className="text-xs text-gray-500">
+            SKU: {rowData.sku}
+          </div>
         </div>
       </div>
     );
@@ -320,6 +323,17 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
               field="name"
               header="Product"
               body={imageBodyTemplate}
+              headerStyle={{ ...TableHeaderStyle }}
+            />
+
+            <Column
+              field="product_barcode"
+              header="Barcode"
+              body={(rowData: Product) => (
+                <div className="text-sm text-gray-600 font-mono">
+                  {rowData.product_barcode}
+                </div>
+              )}
               headerStyle={{ ...TableHeaderStyle }}
             />
 

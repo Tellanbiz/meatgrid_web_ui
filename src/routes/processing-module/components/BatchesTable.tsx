@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { QrCode, Barcode } from "lucide-react";
+import { QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CodeImageDialog from "./CodeImageDialog";
 import {
@@ -89,7 +89,6 @@ const BatchesTable: React.FC<BatchesTableProps> = ({ searchString }) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Batch Number</TableHead>
               <TableHead>Products</TableHead>
               <TableHead>Total Quantity</TableHead>
               <TableHead>Storage Type</TableHead>
@@ -104,38 +103,16 @@ const BatchesTable: React.FC<BatchesTableProps> = ({ searchString }) => {
             {currentItems.map((batch) => (
               <TableRow key={batch.id}>
                 <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        setSelectedImage({
-                          url: batch.bar_code_url,
-                          title: "Barcode",
-                          batchNumber: batch.batch_number,
-                        })
-                      }
-                    >
-                      <Barcode className="h-4 w-4 mr-2" />
-                      {batch.batch_number}
-                    </Button>
-                  </div>
-                </TableCell>
-                <TableCell>
                   <div className="space-y-1">
                     {batch.products.map((product, index) => (
                       <div key={index} className="text-sm">
                         <span className="font-medium">
                           {product.product_name}
                         </span>
-                        <span className="text-muted-foreground ml-2">
-                          (
-                          {formatQuantity(
-                            batch.total_quantity,
-                            product.unit_type
-                          )}
-                          )
-                        </span>
+                        <div className="text-xs text-gray-500 font-bold">
+                          Batch: {batch.batch_number}
+                        </div>
+                        
                       </div>
                     ))}
                   </div>
