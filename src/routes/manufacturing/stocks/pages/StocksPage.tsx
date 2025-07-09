@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
 import { Input } from "@/components/ui/input";
 import StockDateRangePicker from "../components/StockDateRangePicker";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -26,18 +26,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { StockStatus } from "@/store/features/stock/stockTypes";
+import { selectStores } from "@/store/features/stores/storeSelectors";
+import { fetchStores } from "@/store/features/stores/storeThunks";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const StocksPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const isFetchingStocks = useAppSelector(selectIsFetchingStocks);
   const stocks = useAppSelector(selectStocks);
+  const stores = useAppSelector(selectStores);
+  const [selectedStore, setSelectedStore] = useState<string>("all");
 
   // Search and date range state
   const [searchTerm, setSearchTerm] = useState("");
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
+
+  // Fetch stores on mount
+  useEffect(() => {
+    dispatch(fetchStores());
+  }, [dispatch]);
 
   const handleRefresh = () => {
     dispatch(fetchStocks());
@@ -88,6 +98,11 @@ const StocksPage = () => {
       filtered = filtered.filter((stock) => stock.status === selectedStatus);
     }
 
+    // Filter by store
+    if (selectedStore !== "all") {
+      filtered = filtered.filter((stock) => stock.store?.id === selectedStore);
+    }
+
     return filtered;
   };
 
@@ -96,14 +111,16 @@ const StocksPage = () => {
     const productMap = new Map();
     
     for (const stock of filteredStocks) {
-      const key = stock.product.id;
+      const key = stock.product.id + "-" + (stock.store?.id || "");
       if (!productMap.has(key)) {
         productMap.set(key, {
           Product: stock.product.name,
           Quantity: 0,
           Unit: stock.product.unit_type,
           Status: stock.status,
-          "Created At": new Date(stock.created_at).toLocaleDateString(),
+          Store: stock.store?.name || "N/A",
+          // Use local time for Created At
+          "Created At": new Date(stock.created_at).toLocaleString(),
         });
       }
       const entry = productMap.get(key);
@@ -127,6 +144,7 @@ const StocksPage = () => {
       Product: entry.Product,
       Quantity: `${entry.Quantity} ${entry.Unit}`,
       Status: entry.Status,
+      Store: entry.Store,
       "Created At": entry["Created At"],
     }));
   };
@@ -168,6 +186,17 @@ const StocksPage = () => {
                 <SelectItem value={StockStatus.Migrated}>Migrated</SelectItem>
               </SelectContent>
             </Select>
+            <Select value={selectedStore} onValueChange={setSelectedStore}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by store" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Stores</SelectItem>
+                {stores.map((store) => (
+                  <SelectItem key={store.id} value={store.id}>{store.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex gap-x-2">
             <Button
@@ -181,22 +210,26 @@ const StocksPage = () => {
               />
               <span className="ml-2">Refresh</span>
             </Button>
-
-            <Button variant="outline" size="sm" onClick={handleExportExcel}>
-              <FileSpreadsheet className="h-4 w-4" />
-              <span className="ml-2">Export Excel</span>
-            </Button>
-
-            <Button variant="outline" size="sm" onClick={handleExportPDF}>
-              <FileDown className="h-4 w-4" />
-              <span className="ml-2">Export PDF</span>
-            </Button>
-
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <FileSpreadsheet className="h-4 w-4" />
+                  <span className="ml-2">Export</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={handleExportExcel}>
+                  Export as Excel
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={handleExportPDF}>
+                  Export as PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button variant="outline" size="sm" onClick={handleTransferStock}>
               <Forward className="h-4 w-4" />
               <span className="ml-2">Transfer Stock</span>
             </Button>
-
             <Button variant="default" size="sm" onClick={handleRestock}>
               <RedoDot className="h-4 w-4" />
               <span className="ml-2">Restock</span>
@@ -211,6 +244,7 @@ const StocksPage = () => {
           startDate={startDate} 
           endDate={endDate} 
           selectedStatus={selectedStatus}
+          selectedStore={selectedStore}
         />
       </div>
     </div>

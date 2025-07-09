@@ -50,12 +50,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { format } from "date-fns";
 
 interface StocksTableProps {
   searchTerm: string;
   startDate: Date | null;
   endDate: Date | null;
   selectedStatus: string;
+  selectedStore: string;
 }
 
 const StocksTable: React.FC<StocksTableProps> = ({
@@ -63,6 +65,7 @@ const StocksTable: React.FC<StocksTableProps> = ({
   startDate,
   endDate,
   selectedStatus,
+  selectedStore,
 }) => {
   const dispatch = useAppDispatch();
   const isFetchingStocks = useAppSelector(selectIsFetchingStocks);
@@ -90,20 +93,24 @@ const StocksTable: React.FC<StocksTableProps> = ({
       );
     }
 
-    // Filter by date range
+    // Filter by date range (use local time)
     if (startDate || endDate) {
       filtered = filtered.filter((stock) => {
+        // Convert created_at to local Date
         const stockDate = new Date(stock.created_at);
-
-        if (startDate && endDate) {
-          return stockDate >= startDate && stockDate <= endDate;
-        } else if (startDate) {
-          return stockDate >= startDate;
-        } else if (endDate) {
-          return stockDate <= endDate;
+        // Remove time for date-only comparison
+        const stockLocalDate = new Date(stockDate.getFullYear(), stockDate.getMonth(), stockDate.getDate());
+        let afterStart = true;
+        let beforeEnd = true;
+        if (startDate) {
+          const startLocal = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+          afterStart = stockLocalDate >= startLocal;
         }
-
-        return true;
+        if (endDate) {
+          const endLocal = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+          beforeEnd = stockLocalDate <= endLocal;
+        }
+        return afterStart && beforeEnd;
       });
     }
 
@@ -112,12 +119,17 @@ const StocksTable: React.FC<StocksTableProps> = ({
       filtered = filtered.filter((stock) => stock.status === selectedStatus);
     }
 
+    // Filter by store
+    if (selectedStore !== "all") {
+      filtered = filtered.filter((stock) => stock.store?.id === selectedStore);
+    }
+
     setFilteredStocks(filtered);
-  }, [stocks, searchTerm, startDate, endDate, selectedStatus]);
+  }, [stocks, searchTerm, startDate, endDate, selectedStatus, selectedStore]);
 
   useEffect(() => {
     setCurrentPage(1); // Reset to first page when filters change
-  }, [searchTerm, startDate, endDate, selectedStatus]);
+  }, [searchTerm, startDate, endDate, selectedStatus, selectedStore]);
 
   const handleEdit = (stock: Stock) => {
     setSelectedStock(stock);
@@ -271,7 +283,7 @@ const StocksTable: React.FC<StocksTableProps> = ({
                       {stock.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{formatDate(stock.created_at)}</TableCell>
+                  <TableCell>{new Date(stock.created_at).toLocaleString()}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -399,6 +411,9 @@ const StocksTable: React.FC<StocksTableProps> = ({
                 </p>
                 <p className="text-sm text-gray-600">
                   Store: {stockToDelete.store?.name ?? "N/A"}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Created At: {new Date(stockToDelete.created_at).toLocaleString()}
                 </p>
               </div>
             )}
