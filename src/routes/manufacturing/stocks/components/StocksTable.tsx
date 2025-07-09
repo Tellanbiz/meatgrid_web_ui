@@ -22,7 +22,6 @@ import { useModal } from "@/shared/hooks/use-modal";
 import UpdateStockDialog from "./UpdateStockDialog";
 import { toast } from "sonner";
 import { UpdateStockQuantityRequest } from "@/store/features/stock/request/UpdateStockQuantityRequest";
-import { formatDate } from "@/utils/dateUtils";
 import {
   Table,
   TableBody,
@@ -50,7 +49,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { format } from "date-fns";
 
 interface StocksTableProps {
   searchTerm: string;

@@ -2,7 +2,6 @@ import {
   Forward,
   RedoDot,
   RefreshCcw,
-  FileDown,
   FileSpreadsheet,
 } from "lucide-react";
 import StocksTable from "../components/StocksTable";
