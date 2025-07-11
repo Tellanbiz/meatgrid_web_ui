@@ -18,7 +18,6 @@ import type { CreateOrderPurchaseParams } from "@/routes/purchasables/domain/mod
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchSuppliers } from "@/store/features/suppliers/supplierThunks";
 import { selectSuppliers } from "@/store/features/suppliers/supplierSelectors";
-import type { Supplier } from "@/store/features/suppliers/supplierTypes";
 
 interface OrderItem {
   product_id: number;
