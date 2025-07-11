@@ -95,7 +95,7 @@ const BatchesTable: React.FC<BatchesTableProps> = ({ searchString }) => {
               <TableHead>Store</TableHead>
               <TableHead>Chilled At</TableHead>
               <TableHead>Frozen At</TableHead>
-              <TableHead>Expiry Date</TableHead>
+              <TableHead>Manufactured Date</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -133,7 +133,7 @@ const BatchesTable: React.FC<BatchesTableProps> = ({ searchString }) => {
                   {format(new Date(batch.frozen_at), "MMM d, yyyy")}
                 </TableCell>
                 <TableCell>
-                  {format(new Date(batch.expiry_at), "MMM d, yyyy")}
+                  {format(new Date(batch.manufactured_at), "MMM d, yyyy")}
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">

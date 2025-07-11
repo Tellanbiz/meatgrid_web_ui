@@ -15,6 +15,10 @@ import { Plus, Trash2, Search, ArrowLeft } from "lucide-react";
 import { createPurchaseOrder } from "@/routes/purchasables/domain/purchasable-post";
 import { usePurchasables } from "../hooks/usePurchasables";
 import type { CreateOrderPurchaseParams } from "@/routes/purchasables/domain/models";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchSuppliers } from "@/store/features/suppliers/supplierThunks";
+import { selectSuppliers } from "@/store/features/suppliers/supplierSelectors";
+import type { Supplier } from "@/store/features/suppliers/supplierTypes";
 
 interface OrderItem {
   product_id: number;
@@ -24,7 +28,10 @@ interface OrderItem {
 
 export default function PurchasableCreateOrderPage() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { purchasables, fetchPurchasables } = usePurchasables();
+  const suppliers = useAppSelector(selectSuppliers);
+  
   const [supplierId, setSupplierId] = useState("");
   const [items, setItems] = useState<OrderItem[]>([
     { product_id: 0, unit_of_issue: 0, unit_cost: 0 },
@@ -32,10 +39,12 @@ export default function PurchasableCreateOrderPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [productSearch, setProductSearch] = useState("");
+  const [supplierSearch, setSupplierSearch] = useState("");
 
   useEffect(() => {
     fetchPurchasables();
-  }, [fetchPurchasables]);
+    dispatch(fetchSuppliers());
+  }, [fetchPurchasables, dispatch]);
 
   const addItem = () => {
     setItems([...items, { product_id: 0, unit_of_issue: 0, unit_cost: 0 }]);
@@ -114,11 +123,25 @@ export default function PurchasableCreateOrderPage() {
     return purchasables.find((p) => p.id === productId);
   };
 
-  // Filter products based on search
+  const getSelectedSupplier = (supplierId: string) => {
+    return suppliers.find((s) => s.id === supplierId);
+  };
+
+  // Filter products based on search (case-insensitive)
   const filteredProducts = purchasables.filter(
     (product) =>
       product.name.toLowerCase().includes(productSearch.toLowerCase()) ||
-      product.description.toLowerCase().includes(productSearch.toLowerCase())
+      product.description.toLowerCase().includes(productSearch.toLowerCase()) ||
+      product.unit_type.toLowerCase().includes(productSearch.toLowerCase())
+  );
+
+  // Filter suppliers based on search (case-insensitive)
+  const filteredSuppliers = suppliers.filter(
+    (supplier) =>
+      supplier.full_name.toLowerCase().includes(supplierSearch.toLowerCase()) ||
+      supplier.email.toLowerCase().includes(supplierSearch.toLowerCase()) ||
+      supplier.phone_number.toLowerCase().includes(supplierSearch.toLowerCase()) ||
+      supplier.address.toLowerCase().includes(supplierSearch.toLowerCase())
   );
 
   return (
@@ -155,21 +178,51 @@ export default function PurchasableCreateOrderPage() {
 
         <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
           {/* Supplier Selection */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="supplier" className="text-right font-medium">
-              Supplier *
-            </Label>
-            <div className="col-span-3">
+          <div className="space-y-4">
+            <Label className="text-sm font-medium">Supplier *</Label>
+            <div className="space-y-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Search suppliers by name, email, phone, or address..."
+                  value={supplierSearch}
+                  onChange={(e) => setSupplierSearch(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
               <Select value={supplierId} onValueChange={setSupplierId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a supplier" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="supplier1">Supplier 1</SelectItem>
-                  <SelectItem value="supplier2">Supplier 2</SelectItem>
-                  <SelectItem value="supplier3">Supplier 3</SelectItem>
+                  {filteredSuppliers.length > 0 ? (
+                    filteredSuppliers.map((supplier) => (
+                      <SelectItem key={supplier.id} value={supplier.id}>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{supplier.full_name}</span>
+                          <span className="text-sm text-gray-500">
+                            {supplier.email} • {supplier.phone_number}
+                          </span>
+                          {supplier.address && (
+                            <span className="text-sm text-gray-500 truncate">
+                              {supplier.address}
+                            </span>
+                          )}
+                        </div>
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="" disabled>
+                      No suppliers found
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
+              {supplierId && getSelectedSupplier(supplierId) && (
+                <div className="text-sm text-gray-600 p-2 bg-gray-50 rounded">
+                  Selected: {getSelectedSupplier(supplierId)?.full_name}
+                </div>
+              )}
             </div>
           </div>
 
@@ -217,7 +270,7 @@ export default function PurchasableCreateOrderPage() {
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                       <Input
-                        placeholder="Search products..."
+                        placeholder="Search products by name, description, or unit type..."
                         value={productSearch}
                         onChange={(e) => setProductSearch(e.target.value)}
                         className="pl-10"
@@ -233,26 +286,32 @@ export default function PurchasableCreateOrderPage() {
                         <SelectValue placeholder="Select a product" />
                       </SelectTrigger>
                       <SelectContent>
-                        {filteredProducts.map((product) => (
-                          <SelectItem
-                            key={product.id}
-                            value={product.id.toString()}
-                          >
-                            <div className="flex flex-col">
-                              <span className="font-medium">
-                                {product.name}
-                              </span>
-                              <span className="text-sm text-gray-500">
-                                {product.description} ({product.unit_type})
-                              </span>
-                            </div>
+                        {filteredProducts.length > 0 ? (
+                          filteredProducts.map((product) => (
+                            <SelectItem
+                              key={product.id}
+                              value={product.id.toString()}
+                            >
+                              <div className="flex flex-col">
+                                <span className="font-medium">
+                                  {product.name}
+                                </span>
+                                <span className="text-sm text-gray-500">
+                                  {product.description} ({product.unit_type})
+                                </span>
+                              </div>
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="" disabled>
+                            No products found
                           </SelectItem>
-                        ))}
+                        )}
                       </SelectContent>
                     </Select>
                     {item.product_id > 0 &&
                       getSelectedProduct(item.product_id) && (
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-gray-600 p-2 bg-gray-50 rounded">
                           Selected: {getSelectedProduct(item.product_id)?.name}
                         </div>
                       )}

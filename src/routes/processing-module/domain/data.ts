@@ -1,7 +1,7 @@
 export interface ProductBatch {
   id: string;
   batch_number: string;
-  expiry_at: string; // ISO 8601 date string
+  manufactured_at: string; // ISO 8601 date string
   chilled_at: string; // ISO 8601 date string
   frozen_at: string; // ISO 8601 date string
   bar_code_url: string;
@@ -19,7 +19,7 @@ export interface ProductBatch {
 export interface ProcessingParams {
   store_id: string;
   storage_type_id: string;
-  expiry_at: string; // ISO 8601 date string
+  manufactured_at: string; // ISO 8601 date string
   frozen_at: string;
   chilled_at: string;
   purchasable_product_items: number[];

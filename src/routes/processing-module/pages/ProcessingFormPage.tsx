@@ -61,7 +61,7 @@ const ProcessingFormPage: React.FC<ProcessingFormPageProps> = ({
   const [formData, setFormData] = useState<ProcessingParams>({
     store_id: storeId || "",
     storage_type_id: storageTypeId || "",
-    expiry_at: "",
+    manufactured_at: "",
     chilled_at: "",
     frozen_at: "",
     purchasable_product_items: [],
@@ -178,7 +178,7 @@ const ProcessingFormPage: React.FC<ProcessingFormPageProps> = ({
     if (
       !formData.store_id ||
       !formData.storage_type_id ||
-      !formData.expiry_at
+      !formData.manufactured_at
     ) {
       toast.error("Please fill in all required fields");
       return;
@@ -191,15 +191,6 @@ const ProcessingFormPage: React.FC<ProcessingFormPageProps> = ({
 
     if (formData.processed_products.length === 0) {
       toast.error("Please add at least one processed product");
-      return;
-    }
-
-    // Validate expiry date is in the future
-    const expiryDate = new Date(formData.expiry_at);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (expiryDate <= today) {
-      toast.error("Expiry date must be in the future");
       return;
     }
 
@@ -384,18 +375,17 @@ const ProcessingFormPage: React.FC<ProcessingFormPageProps> = ({
                 </div>
 
                 <div>
-                  <Label className="text-xs text-gray-700">Expiry Date</Label>
+                  <Label className="text-xs text-gray-700">Manufactured Date</Label>
                   <Input
                     type="date"
                     className="mt-1 text-xs"
-                    value={getDateInputValue(formData.expiry_at)}
+                    value={getDateInputValue(formData.manufactured_at)}
                     onChange={(e) => {
                       // Convert date to ISO 8601 format with time
                       const date = new Date(e.target.value);
                       const isoString = date.toISOString();
-                      handleInputChange("expiry_at", isoString);
+                      handleInputChange("manufactured_at", isoString);
                     }}
-                    min={new Date().toISOString().split("T")[0]}
                     required
                   />
                 </div>
