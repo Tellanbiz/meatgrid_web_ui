@@ -85,7 +85,9 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
     }[]
   >([]);
   const [supplierSearch, setSupplierSearch] = useState("");
-  const [productSearch, setProductSearch] = useState("");
+  const [productSearch, setProductSearch] = useState<{
+    [key: number]: string;
+  }>({});
 
   // Dialog states
   const [supplierDialogOpen, setSupplierDialogOpen] = useState(false);
@@ -161,7 +163,7 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
         setSelectedSupplier(null);
         setOrderItems([]);
         setSupplierSearch("");
-        setProductSearch("");
+        setProductSearch({});
         // Refresh orders list
         fetchPurchasableOrders();
         // Switch to orders tab
@@ -205,6 +207,8 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
     setOrderItems(newItems);
     // Close the dialog for this specific item
     setProductDialogOpen((prev) => ({ ...prev, [index]: false }));
+    // Clear the search for this specific item
+    setProductSearch((prev) => ({ ...prev, [index]: "" }));
   };
 
   const getProductName = (productId: number) => {
@@ -558,7 +562,10 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                           .filter((s) =>
                             s.full_name
                               .toLowerCase()
-                              .includes(supplierSearch.toLowerCase())
+                              .includes(supplierSearch.toLowerCase()) ||
+                            s.email.toLowerCase().includes(supplierSearch.toLowerCase()) ||
+                            s.phone_number.toLowerCase().includes(supplierSearch.toLowerCase()) ||
+                            s.address.toLowerCase().includes(supplierSearch.toLowerCase())
                           )
                           .map((supplier) => (
                             <CommandItem
@@ -663,8 +670,8 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                                 className="w-full justify-between h-12 text-left bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-red-300 transition-colors duration-200"
                               >
                                 <div className="flex items-center">
-                                  {item.product_name ||
-                                  getProductName(item.product_id) ? (
+                                  {(item.product_name ||
+                                  getProductName(item.product_id)) ? (
                                     <>
                                       <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
                                         <span className="text-red-600 font-semibold text-xs">
@@ -734,8 +741,13 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                                   <SearchIcon className="mr-3 h-5 w-5 shrink-0 text-gray-400" />
                                   <CommandInput
                                     placeholder="Search products by name..."
-                                    value={productSearch}
-                                    onValueChange={setProductSearch}
+                                    value={productSearch[index] || ""}
+                                    onValueChange={(value) =>
+                                      setProductSearch((prev) => ({
+                                        ...prev,
+                                        [index]: value,
+                                      }))
+                                    }
                                     className="border-0 focus:ring-0 text-base"
                                   />
                                 </div>
@@ -768,7 +780,7 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                                       .filter((p) =>
                                         p.name
                                           .toLowerCase()
-                                          .includes(productSearch.toLowerCase())
+                                          .includes((productSearch[index] || "").toLowerCase())
                                       )
                                       .map((product) => (
                                         <CommandItem

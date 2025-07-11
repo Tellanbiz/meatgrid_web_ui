@@ -37,13 +37,37 @@ export default function PurchasableCreateOrderPage() {
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [productSearch, setProductSearch] = useState("");
+  const [productSearch, setProductSearch] = useState<{
+    [key: number]: string;
+  }>({});
   const [supplierSearch, setSupplierSearch] = useState("");
+  const [debouncedSupplierSearch, setDebouncedSupplierSearch] = useState("");
+  const [debouncedProductSearch, setDebouncedProductSearch] = useState<{
+    [key: number]: string;
+  }>({});
 
   useEffect(() => {
     fetchPurchasables();
     dispatch(fetchSuppliers());
   }, [fetchPurchasables, dispatch]);
+
+  // Debounce supplier search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSupplierSearch(supplierSearch);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [supplierSearch]);
+
+  // Debounce product search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedProductSearch(productSearch);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [productSearch]);
 
   const addItem = () => {
     setItems([...items, { product_id: 0, unit_of_issue: 0, unit_cost: 0 }]);
@@ -126,21 +150,38 @@ export default function PurchasableCreateOrderPage() {
     return suppliers.find((s) => s.id === supplierId);
   };
 
-  // Filter products based on search (case-insensitive)
-  const filteredProducts = purchasables.filter(
-    (product) =>
-      product.name.toLowerCase().includes(productSearch.toLowerCase()) ||
-      product.description.toLowerCase().includes(productSearch.toLowerCase()) ||
-      product.unit_type.toLowerCase().includes(productSearch.toLowerCase())
-  );
+  // Helper function to normalize search terms
+  const normalizeSearchTerm = (term: string): string => {
+    return term.toLowerCase().trim().replace(/\s+/g, ' ');
+  };
+
+  // Helper function to check if text matches search term
+  const matchesSearch = (text: string, searchTerm: string): boolean => {
+    if (!searchTerm.trim()) return true;
+    const normalizedText = normalizeSearchTerm(text);
+    const normalizedSearch = normalizeSearchTerm(searchTerm);
+    return normalizedText.includes(normalizedSearch);
+  };
+
+  // Filter products based on search (case-insensitive) - this will be used per item
+  const getFilteredProducts = (searchTerm: string) => {
+    if (!searchTerm.trim()) return purchasables;
+    
+    return purchasables.filter(
+      (product) =>
+        matchesSearch(product.name, searchTerm) ||
+        matchesSearch(product.description || '', searchTerm) ||
+        matchesSearch(product.unit_type || '', searchTerm)
+    );
+  };
 
   // Filter suppliers based on search (case-insensitive)
   const filteredSuppliers = suppliers.filter(
     (supplier) =>
-      supplier.full_name.toLowerCase().includes(supplierSearch.toLowerCase()) ||
-      supplier.email.toLowerCase().includes(supplierSearch.toLowerCase()) ||
-      supplier.phone_number.toLowerCase().includes(supplierSearch.toLowerCase()) ||
-      supplier.address.toLowerCase().includes(supplierSearch.toLowerCase())
+      matchesSearch(supplier.full_name, debouncedSupplierSearch) ||
+      matchesSearch(supplier.email || '', debouncedSupplierSearch) ||
+      matchesSearch(supplier.phone_number || '', debouncedSupplierSearch) ||
+      matchesSearch(supplier.address || '', debouncedSupplierSearch)
   );
 
   return (
@@ -187,6 +228,8 @@ export default function PurchasableCreateOrderPage() {
                   value={supplierSearch}
                   onChange={(e) => setSupplierSearch(e.target.value)}
                   className="pl-10"
+                  autoComplete="off"
+                  spellCheck="false"
                 />
               </div>
               <Select value={supplierId} onValueChange={setSupplierId}>
@@ -270,23 +313,35 @@ export default function PurchasableCreateOrderPage() {
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                       <Input
                         placeholder="Search products by name, description, or unit type..."
-                        value={productSearch}
-                        onChange={(e) => setProductSearch(e.target.value)}
+                        value={productSearch[index] || ""}
+                        onChange={(e) =>
+                          setProductSearch((prev) => ({
+                            ...prev,
+                            [index]: e.target.value,
+                          }))
+                        }
                         className="pl-10"
+                        autoComplete="off"
+                        spellCheck="false"
                       />
                     </div>
                     <Select
                       value={item.product_id.toString()}
-                      onValueChange={(value) =>
-                        updateItem(index, "product_id", parseInt(value))
-                      }
+                      onValueChange={(value) => {
+                        updateItem(index, "product_id", parseInt(value));
+                        // Clear search when product is selected
+                        setProductSearch((prev) => ({
+                          ...prev,
+                          [index]: "",
+                        }));
+                      }}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select a product" />
                       </SelectTrigger>
                       <SelectContent>
-                        {filteredProducts.length > 0 ? (
-                          filteredProducts.map((product) => (
+                        {getFilteredProducts(debouncedProductSearch[index] || "").length > 0 ? (
+                          getFilteredProducts(debouncedProductSearch[index] || "").map((product) => (
                             <SelectItem
                               key={product.id}
                               value={product.id.toString()}
