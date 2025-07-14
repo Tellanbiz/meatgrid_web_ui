@@ -106,7 +106,8 @@ const StorageTypeForm: React.FC<StorageTypeFormProps> = ({
           <div className="flex flex-col gap-y-2">
             <Label>Expected Duration (days)</Label>
             <Input
-              type="tel"
+              type="number"
+              step="any"
               placeholder="e.g., 30"
               value={form.expected_duration}
               onChange={(e) => {
@@ -122,7 +123,8 @@ const StorageTypeForm: React.FC<StorageTypeFormProps> = ({
             <div className="flex flex-col gap-y-2">
               <Label>Min Temp (°C)</Label>
               <Input
-                type="tel"
+                type="number"
+                step="any"
                 placeholder="e.g., -10"
                 value={form.min_temp}
                 onChange={(e) => {
@@ -136,7 +138,8 @@ const StorageTypeForm: React.FC<StorageTypeFormProps> = ({
             <div className="flex flex-col gap-y-2">
               <Label>Max Temp (°C)</Label>
               <Input
-                type="tel"
+                type="number"
+                step="any"
                 placeholder="e.g., 10"
                 value={form.max_temp}
                 onChange={(e) => {

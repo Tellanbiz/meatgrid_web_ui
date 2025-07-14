@@ -823,13 +823,14 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                           </Label>
                           <Input
                             type="number"
+                            step="any"
                             placeholder="Enter quantity"
                             value={item.unit_of_issue}
                             onChange={(e) =>
                               updateOrderItem(
                                 index,
                                 "unit_of_issue",
-                                parseInt(e.target.value) || 0
+                                parseFloat(e.target.value) || 0
                               )
                             }
                             min="0"

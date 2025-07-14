@@ -81,6 +81,7 @@ const CouponForm = ({
           label="Amount"
           name="amount"
           type="number"
+          step="any"
           value={form.amount.toString()}
           onChange={(e) =>
             handleChange("amount", parseFloat(e.target.value) || 0)
