@@ -165,11 +165,34 @@ const ProcessingFormPage: React.FC<ProcessingFormPageProps> = ({
 
   const getQuantityDisplayValue = (quantity: number, unitType: string) => {
     if (unitType.toLowerCase() === "kilograms") {
-      return `${quantity} kg`;
+      // Format to remove unnecessary decimals
+      const formatted =
+        quantity % 1 === 0
+          ? quantity.toString()
+          : quantity.toFixed(2).replace(/\.?0+$/, "");
+      return `${formatted} kg`;
     } else if (unitType.toLowerCase() === "grams") {
-      return quantity >= 1000 ? `${quantity / 1000} kg` : `${quantity} g`;
+      if (quantity >= 1000) {
+        const kgQuantity = quantity / 1000;
+        const formatted =
+          kgQuantity % 1 === 0
+            ? kgQuantity.toString()
+            : kgQuantity.toFixed(2).replace(/\.?0+$/, "");
+        return `${formatted} kg`;
+      } else {
+        const formatted =
+          quantity % 1 === 0
+            ? quantity.toString()
+            : quantity.toFixed(2).replace(/\.?0+$/, "");
+        return `${formatted} g`;
+      }
     }
-    return `${quantity} ${unitType}`;
+    // For other unit types, format to remove unnecessary decimals
+    const formatted =
+      quantity % 1 === 0
+        ? quantity.toString()
+        : quantity.toFixed(2).replace(/\.?0+$/, "");
+    return `${formatted} ${unitType}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -375,7 +398,9 @@ const ProcessingFormPage: React.FC<ProcessingFormPageProps> = ({
                 </div>
 
                 <div>
-                  <Label className="text-xs text-gray-700">Manufactured Date</Label>
+                  <Label className="text-xs text-gray-700">
+                    Manufactured Date
+                  </Label>
                   <Input
                     type="date"
                     className="mt-1 text-xs"
