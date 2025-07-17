@@ -30,7 +30,7 @@ export default function PurchasableCreateOrderPage() {
   const dispatch = useAppDispatch();
   const { purchasables, fetchPurchasables } = usePurchasables();
   const suppliers = useAppSelector(selectSuppliers);
-  
+
   const [supplierId, setSupplierId] = useState("");
   const [items, setItems] = useState<OrderItem[]>([
     { product_id: 0, unit_of_issue: 0, unit_cost: 0 },
@@ -152,7 +152,7 @@ export default function PurchasableCreateOrderPage() {
 
   // Helper function to normalize search terms
   const normalizeSearchTerm = (term: string): string => {
-    return term.toLowerCase().trim().replace(/\s+/g, ' ');
+    return term.toLowerCase().trim().replace(/\s+/g, " ");
   };
 
   // Helper function to check if text matches search term
@@ -166,12 +166,12 @@ export default function PurchasableCreateOrderPage() {
   // Filter products based on search (case-insensitive) - this will be used per item
   const getFilteredProducts = (searchTerm: string) => {
     if (!searchTerm.trim()) return purchasables;
-    
+
     return purchasables.filter(
       (product) =>
         matchesSearch(product.name, searchTerm) ||
-        matchesSearch(product.description || '', searchTerm) ||
-        matchesSearch(product.unit_type || '', searchTerm)
+        matchesSearch(product.description || "", searchTerm) ||
+        matchesSearch(product.unit_type || "", searchTerm)
     );
   };
 
@@ -179,9 +179,9 @@ export default function PurchasableCreateOrderPage() {
   const filteredSuppliers = suppliers.filter(
     (supplier) =>
       matchesSearch(supplier.full_name, debouncedSupplierSearch) ||
-      matchesSearch(supplier.email || '', debouncedSupplierSearch) ||
-      matchesSearch(supplier.phone_number || '', debouncedSupplierSearch) ||
-      matchesSearch(supplier.address || '', debouncedSupplierSearch)
+      matchesSearch(supplier.email || "", debouncedSupplierSearch) ||
+      matchesSearch(supplier.phone_number || "", debouncedSupplierSearch) ||
+      matchesSearch(supplier.address || "", debouncedSupplierSearch)
   );
 
   return (
@@ -241,7 +241,9 @@ export default function PurchasableCreateOrderPage() {
                     filteredSuppliers.map((supplier) => (
                       <SelectItem key={supplier.id} value={supplier.id}>
                         <div className="flex flex-col">
-                          <span className="font-medium">{supplier.full_name}</span>
+                          <span className="font-medium">
+                            {supplier.full_name}
+                          </span>
                           <span className="text-sm text-gray-500">
                             {supplier.email} • {supplier.phone_number}
                           </span>
@@ -340,8 +342,12 @@ export default function PurchasableCreateOrderPage() {
                         <SelectValue placeholder="Select a product" />
                       </SelectTrigger>
                       <SelectContent>
-                        {getFilteredProducts(debouncedProductSearch[index] || "").length > 0 ? (
-                          getFilteredProducts(debouncedProductSearch[index] || "").map((product) => (
+                        {getFilteredProducts(
+                          debouncedProductSearch[index] || ""
+                        ).length > 0 ? (
+                          getFilteredProducts(
+                            debouncedProductSearch[index] || ""
+                          ).map((product) => (
                             <SelectItem
                               key={product.id}
                               value={product.id.toString()}

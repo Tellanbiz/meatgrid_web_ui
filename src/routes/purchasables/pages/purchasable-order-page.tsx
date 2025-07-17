@@ -11,14 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
+
 import {
   Table,
   TableBody,
@@ -53,6 +46,8 @@ import { fetchSuppliers } from "@/store/features/suppliers/supplierThunks";
 import type { AppDispatch } from "@/store/store";
 import { TabNavigation } from "@/components/ui/tab-navigation";
 import DeleteDialog from "@/components/dialogs/DeleteDialog";
+import ExportButton from "@/components/buttons/ExportButton";
+import ExportService from "@/service/ExportService";
 
 interface PurchasableOrderPageProps {
   activeTab?: string;
@@ -232,7 +227,133 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
     }
   };
 
-  const handleDeleteOrder = (order: any) => {
+  const handleExportExcel = () => {
+    const exportConfig = {
+      fileName: "purchasable-orders",
+      columns: [
+        {
+          field: "id",
+          header: "Order ID",
+          format: (value: unknown) => `#${value}`,
+        },
+        {
+          field: "created_at",
+          header: "Created Date",
+          format: (value: unknown) =>
+            new Date(value as string).toLocaleDateString("en-GB", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            }),
+        },
+        {
+          field: "user",
+          header: "Created By",
+          format: (value: unknown) =>
+            (value as { full_name: string }).full_name,
+        },
+        {
+          field: "supplier",
+          header: "Supplier",
+          format: (value: unknown) =>
+            (value as { full_name: string }).full_name,
+        },
+        {
+          field: "supplier",
+          header: "Supplier Email",
+          format: (value: unknown) => (value as { email: string }).email,
+        },
+        {
+          field: "items",
+          header: "Items Count",
+          format: (value: unknown) =>
+            (value as PurchasableOrder["items"]).length.toString(),
+        },
+        {
+          field: "items",
+          header: "Items Details",
+          format: (value: unknown) =>
+            (value as PurchasableOrder["items"])
+              .map(
+                (item) =>
+                  `${item.product.name} - ${item.unit_of_issue} ${item.product.unit_type}`
+              )
+              .join("; "),
+        },
+        {
+          field: "items",
+          header: "Total Cost (KES)",
+          format: (value: unknown) => {
+            const items = value as PurchasableOrder["items"];
+            const total = items.reduce((sum, item) => sum + item.unit_cost, 0);
+            return total.toFixed(2);
+          },
+        },
+      ],
+    };
+
+    ExportService.exportToExcel(filteredOrders, exportConfig);
+    toast.success("Excel file exported successfully");
+  };
+
+  const handleExportPDF = async () => {
+    const exportConfig = {
+      fileName: "purchasable-orders",
+      columns: [
+        {
+          field: "id",
+          header: "Order ID",
+          format: (value: unknown) => `#${value}`,
+        },
+        {
+          field: "created_at",
+          header: "Created Date",
+          format: (value: unknown) =>
+            new Date(value as string).toLocaleDateString("en-GB", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            }),
+        },
+        {
+          field: "user",
+          header: "Created By",
+          format: (value: unknown) =>
+            (value as { full_name: string }).full_name,
+        },
+        {
+          field: "supplier",
+          header: "Supplier",
+          format: (value: unknown) =>
+            (value as { full_name: string }).full_name,
+        },
+        {
+          field: "items",
+          header: "Items",
+          format: (value: unknown) =>
+            (value as PurchasableOrder["items"]).length.toString(),
+        },
+        {
+          field: "items",
+          header: "Total Cost (KES)",
+          format: (value: unknown) => {
+            const items = value as PurchasableOrder["items"];
+            const total = items.reduce((sum, item) => sum + item.unit_cost, 0);
+            return total.toFixed(2);
+          },
+        },
+      ],
+    };
+
+    try {
+      await ExportService.exportToPDF(filteredOrders, exportConfig);
+      toast.success("PDF file exported successfully");
+    } catch {
+      toast.error("Failed to export PDF");
+    }
+  };
+
+  const handleDeleteOrder = (order: PurchasableOrder) => {
     setOrderToDelete(order);
     setDeleteDialogOpen(true);
   };
@@ -321,6 +442,10 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh
               </Button>
+              <ExportButton
+                onExportExcel={handleExportExcel}
+                onExportPDF={handleExportPDF}
+              />
             </div>
           </div>
 
@@ -523,81 +648,86 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                       Choose a supplier for this order from the list below
                     </DialogDescription>
                   </DialogHeader>
-                  <Command className="bg-white rounded-lg border border-gray-200">
+                  <div className="bg-white rounded-lg border border-gray-200">
                     <div className="flex items-center border-b border-gray-200 px-4 py-3">
                       <SearchIcon className="mr-3 h-5 w-5 shrink-0 text-gray-400" />
-                      <CommandInput
+                      <Input
                         placeholder="Search suppliers by name or email..."
                         value={supplierSearch}
-                        onValueChange={setSupplierSearch}
-                        className="border-0 focus:ring-0 text-base"
+                        onChange={(e) => setSupplierSearch(e.target.value)}
+                        className="border-0 focus:ring-0 text-base shadow-none"
                       />
                     </div>
-                    <CommandList className="max-h-80 overflow-y-auto">
-                      <CommandEmpty className="py-8 text-center">
-                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <svg
-                            className="w-6 h-6 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                            />
-                          </svg>
-                        </div>
-                        <p className="text-gray-500 font-medium">
-                          No supplier found
-                        </p>
-                        <p className="text-sm text-gray-400 mt-1">
-                          Try adjusting your search terms
-                        </p>
-                      </CommandEmpty>
-                      <CommandGroup>
-                        {suppliers
-                          .filter((s) =>
-                            s.full_name
-                              .toLowerCase()
-                              .includes(supplierSearch.toLowerCase()) ||
-                            s.email.toLowerCase().includes(supplierSearch.toLowerCase()) ||
-                            s.phone_number.toLowerCase().includes(supplierSearch.toLowerCase()) ||
-                            s.address.toLowerCase().includes(supplierSearch.toLowerCase())
-                          )
-                          .map((supplier) => (
-                            <CommandItem
-                              key={supplier.id}
-                              value={supplier.id}
-                              onSelect={() => {
-                                setSelectedSupplier(supplier);
-                                setSupplierDialogOpen(false);
-                              }}
-                              className="px-4 py-3 hover:bg-red-50 cursor-pointer"
-                            >
-                              <div className="flex items-center w-full">
-                                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
-                                  <span className="text-red-600 font-semibold text-sm">
-                                    {supplier.full_name.charAt(0).toUpperCase()}
-                                  </span>
-                                </div>
-                                <div className="flex-1">
-                                  <div className="font-medium text-gray-900">
-                                    {supplier.full_name}
-                                  </div>
-                                  <div className="text-sm text-gray-500">
-                                    {supplier.email}
-                                  </div>
-                                </div>
-                                <div className="w-2 h-2 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                    <div className="max-h-80 overflow-y-auto">
+                      {(() => {
+                        const filteredSuppliers = suppliers.filter((s) => {
+                          const searchTerm = supplierSearch.toLowerCase();
+                          return (
+                            s.full_name.toLowerCase().includes(searchTerm) ||
+                            s.email.toLowerCase().includes(searchTerm) ||
+                            s.phone_number.toLowerCase().includes(searchTerm) ||
+                            s.address.toLowerCase().includes(searchTerm)
+                          );
+                        });
+
+                        if (filteredSuppliers.length === 0) {
+                          return (
+                            <div className="py-8 text-center">
+                              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <svg
+                                  className="w-6 h-6 text-gray-400"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                  />
+                                </svg>
                               </div>
-                            </CommandItem>
-                          ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
+                              <p className="text-gray-500 font-medium">
+                                No supplier found
+                              </p>
+                              <p className="text-sm text-gray-400 mt-1">
+                                Try adjusting your search terms
+                              </p>
+                            </div>
+                          );
+                        }
+
+                        return filteredSuppliers.map((supplier) => (
+                          <div
+                            key={supplier.id}
+                            onClick={() => {
+                              setSelectedSupplier(supplier);
+                              setSupplierDialogOpen(false);
+                              setSupplierSearch("");
+                            }}
+                            className="px-4 py-3 hover:bg-red-50 cursor-pointer"
+                          >
+                            <div className="flex items-center w-full">
+                              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                                <span className="text-red-600 font-semibold text-sm">
+                                  {supplier.full_name.charAt(0).toUpperCase()}
+                                </span>
+                              </div>
+                              <div className="flex-1">
+                                <div className="font-medium text-gray-900">
+                                  {supplier.full_name}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {supplier.email}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </div>
                 </DialogContent>
               </Dialog>
             </div>
@@ -670,8 +800,8 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                                 className="w-full justify-between h-12 text-left bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-red-300 transition-colors duration-200"
                               >
                                 <div className="flex items-center">
-                                  {(item.product_name ||
-                                  getProductName(item.product_id)) ? (
+                                  {item.product_name ||
+                                  getProductName(item.product_id) ? (
                                     <>
                                       <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
                                         <span className="text-red-600 font-semibold text-xs">
@@ -736,84 +866,91 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                                   list below
                                 </DialogDescription>
                               </DialogHeader>
-                              <Command className="bg-white rounded-lg border border-gray-200">
+                              <div className="bg-white rounded-lg border border-gray-200">
                                 <div className="flex items-center border-b border-gray-200 px-4 py-3">
                                   <SearchIcon className="mr-3 h-5 w-5 shrink-0 text-gray-400" />
-                                  <CommandInput
+                                  <Input
                                     placeholder="Search products by name..."
                                     value={productSearch[index] || ""}
-                                    onValueChange={(value) =>
+                                    onChange={(e) =>
                                       setProductSearch((prev) => ({
                                         ...prev,
-                                        [index]: value,
+                                        [index]: e.target.value,
                                       }))
                                     }
-                                    className="border-0 focus:ring-0 text-base"
+                                    className="border-0 focus:ring-0 text-base shadow-none"
                                   />
                                 </div>
-                                <CommandList className="max-h-80 overflow-y-auto">
-                                  <CommandEmpty className="py-8 text-center">
-                                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                      <svg
-                                        className="w-6 h-6 text-gray-400"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth={2}
-                                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                        />
-                                      </svg>
-                                    </div>
-                                    <p className="text-gray-500 font-medium">
-                                      No product found
-                                    </p>
-                                    <p className="text-sm text-gray-400 mt-1">
-                                      Try adjusting your search terms
-                                    </p>
-                                  </CommandEmpty>
-                                  <CommandGroup>
-                                    {purchasables
-                                      .filter((p) =>
-                                        p.name
+                                <div className="max-h-80 overflow-y-auto">
+                                  {(() => {
+                                    const filteredProducts =
+                                      purchasables.filter((p) => {
+                                        const searchTerm = (
+                                          productSearch[index] || ""
+                                        ).toLowerCase();
+                                        return p.name
                                           .toLowerCase()
-                                          .includes((productSearch[index] || "").toLowerCase())
-                                      )
-                                      .map((product) => (
-                                        <CommandItem
-                                          key={product.id}
-                                          value={product.id.toString()}
-                                          onSelect={() =>
-                                            selectProduct(index, product)
-                                          }
-                                          className="px-4 py-3 hover:bg-red-50 cursor-pointer"
-                                        >
-                                          <div className="flex items-center w-full">
-                                            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
-                                              <span className="text-red-600 font-semibold text-sm">
-                                                {product.name
-                                                  .charAt(0)
-                                                  .toUpperCase()}
-                                              </span>
-                                            </div>
-                                            <div className="flex-1">
-                                              <div className="font-medium text-gray-900">
-                                                {product.name}
-                                              </div>
-                                              <div className="text-sm text-gray-500">
-                                                {product.unit_type}
-                                              </div>
-                                            </div>
-                                            <div className="w-2 h-2 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                                          .includes(searchTerm);
+                                      });
+
+                                    if (filteredProducts.length === 0) {
+                                      return (
+                                        <div className="py-8 text-center">
+                                          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                            <svg
+                                              className="w-6 h-6 text-gray-400"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              viewBox="0 0 24 24"
+                                            >
+                                              <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                              />
+                                            </svg>
                                           </div>
-                                        </CommandItem>
-                                      ))}
-                                  </CommandGroup>
-                                </CommandList>
-                              </Command>
+                                          <p className="text-gray-500 font-medium">
+                                            No product found
+                                          </p>
+                                          <p className="text-sm text-gray-400 mt-1">
+                                            Try adjusting your search terms
+                                          </p>
+                                        </div>
+                                      );
+                                    }
+
+                                    return filteredProducts.map((product) => (
+                                      <div
+                                        key={product.id}
+                                        onClick={() =>
+                                          selectProduct(index, product)
+                                        }
+                                        className="px-4 py-3 hover:bg-red-50 cursor-pointer"
+                                      >
+                                        <div className="flex items-center w-full">
+                                          <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                                            <span className="text-red-600 font-semibold text-sm">
+                                              {product.name
+                                                .charAt(0)
+                                                .toUpperCase()}
+                                            </span>
+                                          </div>
+                                          <div className="flex-1">
+                                            <div className="font-medium text-gray-900">
+                                              {product.name}
+                                            </div>
+                                            <div className="text-sm text-gray-500">
+                                              {product.unit_type}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ));
+                                  })()}
+                                </div>
+                              </div>
                             </DialogContent>
                           </Dialog>
                         </div>
