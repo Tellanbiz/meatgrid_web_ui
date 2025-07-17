@@ -24,6 +24,7 @@ import {
 import ExportButton from "@/components/buttons/ExportButton";
 import ProductsTable from "../components/ProductsTable";
 import { Product } from "@/store/features/products/productTypes";
+import StockDateRangePicker from "@/routes/manufacturing/stocks/components/StockDateRangePicker";
 
 const ProductsPage = () => {
   const navigate = useNavigate();
@@ -32,11 +33,21 @@ const ProductsPage = () => {
   const [searchString, setSearchString] = useState<string>("");
   const [selectedStore, setSelectedStore] = useState<string | null>(null);
   const [selectedStockStatus, setSelectedStockStatus] = useState<string>("all");
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
 
   const isFetchingProducts = useAppSelector(selectIsFetchingProducts);
   const stores = useAppSelector(selectStores);
 
   const products = useAppSelector(selectProducts);
+
+  // Helper function to convert local date to UTC date string
+  const convertToUTCDateString = (localDate: Date): string => {
+    const utcDate = new Date(
+      localDate.getTime() - localDate.getTimezoneOffset() * 60000
+    );
+    return utcDate.toISOString().split("T")[0];
+  };
 
   // Helper function to get total in stock
   const getTotalInStock = (product: Product) => {
@@ -66,6 +77,18 @@ const ProductsPage = () => {
       });
     }
 
+    // Sort by stock status - in-stock products first
+    filtered.sort((a, b) => {
+      const aInStock = getTotalInStock(a) > 0;
+      const bInStock = getTotalInStock(b) > 0;
+
+      // If both have same stock status, maintain original order
+      if (aInStock === bInStock) return 0;
+
+      // In-stock products come first
+      return bInStock ? 1 : -1;
+    });
+
     return filtered;
   };
 
@@ -76,7 +99,21 @@ const ProductsPage = () => {
   };
 
   const handleRefresh = () => {
-    dispatch(fetchProducts());
+    if (startDate) {
+      const params = {
+        ...(selectedStore && { store_id: selectedStore }),
+        start_date: convertToUTCDateString(startDate),
+        end_date: convertToUTCDateString(endDate || startDate),
+      };
+      dispatch(fetchProducts(params));
+    } else {
+      const params = {
+        ...(selectedStore && { store_id: selectedStore }),
+      };
+      dispatch(
+        fetchProducts(Object.keys(params).length > 0 ? params : undefined)
+      );
+    }
   };
 
   const handleExportExcel = () => {
@@ -96,15 +133,56 @@ const ProductsPage = () => {
   const handleStoreChange = (value: string) => {
     if (value === "all") {
       setSelectedStore(null);
-      dispatch(fetchProducts());
+      if (startDate) {
+        const params = {
+          start_date: convertToUTCDateString(startDate),
+          end_date: convertToUTCDateString(endDate || startDate),
+        };
+        dispatch(fetchProducts(params));
+      } else {
+        dispatch(fetchProducts());
+      }
     } else {
       setSelectedStore(value);
-      dispatch(fetchProducts({ store_id: value }));
+      if (startDate) {
+        const params = {
+          store_id: value,
+          start_date: convertToUTCDateString(startDate),
+          end_date: convertToUTCDateString(endDate || startDate),
+        };
+        dispatch(fetchProducts(params));
+      } else {
+        dispatch(fetchProducts({ store_id: value }));
+      }
     }
   };
 
   const handleStockStatusChange = (value: string) => {
     setSelectedStockStatus(value);
+  };
+
+  const handleDateRangeChange = (start: Date | null, end: Date | null) => {
+    setStartDate(start);
+    setEndDate(end);
+
+    // Only trigger API call when we have at least a start date
+    if (start) {
+      const params = {
+        ...(selectedStore && { store_id: selectedStore }),
+        start_date: convertToUTCDateString(start),
+        // If no end date, use start date as end date for single day selection
+        end_date: convertToUTCDateString(end || start),
+      };
+      dispatch(fetchProducts(params));
+    } else {
+      // If no start date, fetch all products with current filters
+      const params = {
+        ...(selectedStore && { store_id: selectedStore }),
+      };
+      dispatch(
+        fetchProducts(Object.keys(params).length > 0 ? params : undefined)
+      );
+    }
   };
 
   useEffect(() => {
@@ -156,6 +234,12 @@ const ProductsPage = () => {
                 <SelectItem value="outofstock">Out of Stock</SelectItem>
               </SelectContent>
             </Select>
+
+            <StockDateRangePicker
+              startDate={startDate}
+              endDate={endDate}
+              onChange={handleDateRangeChange}
+            />
           </div>
 
           <div className="flex space-x-2">

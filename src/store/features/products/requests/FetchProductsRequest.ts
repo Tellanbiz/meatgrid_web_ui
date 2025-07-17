@@ -4,4 +4,6 @@ export interface FetchProductsRequest {
   store_id?: string;
   skip?: number;
   limit?: number;
+  start_date?: string;
+  end_date?: string;
 }

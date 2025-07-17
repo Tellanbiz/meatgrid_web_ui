@@ -1,15 +1,9 @@
 import { useEffect, useState } from "react";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import {
-  DataTableStyle,
-  TableHeaderStyle,
-} from "../../../shared/constants/TableStyles";
 import { Product } from "../../../store/features/products/productTypes";
 import { Badge } from "@/components/ui/badge";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { fetchProducts } from "../../../store/features/products/productThunks";
-import { ProgressBar } from "primereact/progressbar";
+import { selectIsFetchingProducts } from "../../../store/features/products/productSelectors";
 import { toast } from "sonner";
 import { fetchCategories } from "../../../store/features/categories/categoryThunks";
 import { fetchTags } from "../../../store/features/tags/tagThunks";
@@ -43,6 +37,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ProductsTableProps {
   searchString: string;
@@ -66,6 +70,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const { status, error } = useAppSelector((state) => state.products);
+  const isFetchingProducts = useAppSelector(selectIsFetchingProducts);
 
   useEffect(() => {
     dispatch(fetchStores());
@@ -149,40 +154,6 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
     });
   };
 
-  const imageBodyTemplate = (rowData: Product) => {
-    return (
-      <div className="flex items-center px-4">
-        <div className="flex-shrink-0">
-          <img
-            src={rowData.images[0] || "https://via.placeholder.com/40"}
-            alt={rowData.name}
-            className="h-10 w-10 rounded-md object-cover border border-gray-200"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src =
-                "https://via.placeholder.com/40";
-            }}
-          />
-        </div>
-        <div className="ml-3">
-          <div className="text-sm font-semibold text-gray-900">
-            {rowData.name}
-          </div>
-          <div className="text-xs text-gray-500">
-            SKU: {rowData.sku}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const priceBodyTemplate = (rowData: Product) => {
-    return (
-      <div className="font-medium text-sm">
-        {formatCurrency(rowData.regular_price)}
-      </div>
-    );
-  };
-
   const getTotalConsumed = (product: Product) => {
     const stockInfo = product.stock_info;
     const totalOut =
@@ -191,68 +162,6 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
       stockInfo.total_processed +
       stockInfo.total_sold;
     return totalOut;
-  };
-
-  const statusBodyTemplate = (product: Product) => {
-    const inStock = getTotalInStock(product) > 0;
-
-    return inStock ? (
-      <Badge variant="default" className="bg-green-500 hover:bg-green-600">
-        In stock
-      </Badge>
-    ) : (
-      <Badge variant="default" className="bg-red-500 hover:bg-red-600">
-        Out of stock
-      </Badge>
-    );
-  };
-
-  const totalConsumedBodyTemplate = (product: Product) => {
-    const totalOut = getTotalConsumed(product);
-    return (
-      <div className="text-sm">
-        {totalOut.toLocaleString()} {product.unit_type}
-      </div>
-    );
-  };
-
-  const totalInStockBodyTemplate = (product: Product) => {
-    const totalIn = getTotalInStock(product);
-    return (
-      <div className="text-sm font-medium">
-        {totalIn.toLocaleString()} {product.unit_type}
-      </div>
-    );
-  };
-
-  const unitTypeBodyTemplate = (product: Product) => {
-    return <div className="text-sm">{product.unit_type}</div>;
-  };
-
-  const actionsBodyTemplate = (rowData: Product) => {
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <MoreVertical className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            onSelect={() => handleEdit(rowData)}
-            className="flex items-center gap-2"
-          >
-            <Pencil className="h-4 w-4" /> Edit
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onSelect={() => handleDelete(rowData)}
-            className="flex items-center gap-2 text-red-600"
-          >
-            <Trash2 className="h-4 w-4" /> Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
   };
 
   const handleEdit = (rowData: Product) => {
@@ -287,178 +196,231 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
     }
   };
 
-  const rowClassName = () => {
-    return " hover:bg-gray-50";
-  };
+  if (isFetchingProducts) {
+    return (
+      <div className="space-y-3">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="flex space-x-4">
+            <Skeleton className="h-12 w-1/6" />
+            <Skeleton className="h-12 w-1/6" />
+            <Skeleton className="h-12 w-1/6" />
+            <Skeleton className="h-12 w-1/6" />
+            <Skeleton className="h-12 w-1/6" />
+            <Skeleton className="h-12 w-1/6" />
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
-    <div className="h-full flex flex-col">
-      {status === "loading" && (
-        <ProgressBar
-          mode="indeterminate"
-          style={{ height: "4px" }}
-          className="mb-2"
-        />
-      )}
+    <div className="h-full flex flex-col bg-white">
+      {isFetchingProducts && <Progress value={undefined} className="h-1" />}
 
-      <div className="bg-white rounded-md overflow-hidden flex flex-col flex-1">
-        <div className="flex-1">
-          <DataTable
-            value={currentProducts}
-            dataKey="id"
-            tableStyle={{
-              ...DataTableStyle,
-              borderCollapse: "separate",
-              borderSpacing: "0 4px",
-            }}
-            scrollable
-            scrollHeight="flex"
-            size="normal"
-            emptyMessage="No products found"
-            rowHover
-            className="p-datatable-sm"
-            rowClassName={rowClassName}
-          >
-            <Column
-              field="name"
-              header="Product"
-              body={imageBodyTemplate}
-              headerStyle={{ ...TableHeaderStyle }}
-            />
-
-            <Column
-              field="product_barcode"
-              header="Barcode"
-              body={(rowData: Product) => (
-                <div className="text-sm text-gray-600 font-mono">
-                  {rowData.product_barcode}
-                </div>
-              )}
-              headerStyle={{ ...TableHeaderStyle }}
-            />
-
-            <Column
-              field="unit_type"
-              header="Unit Type"
-              body={unitTypeBodyTemplate}
-              headerStyle={{ ...TableHeaderStyle }}
-            />
-
-            <Column
-              header="Price"
-              body={priceBodyTemplate}
-              headerStyle={{ ...TableHeaderStyle }}
-            />
-
-            <Column
-              header="Status"
-              body={statusBodyTemplate}
-              headerStyle={{ ...TableHeaderStyle }}
-            />
-
-            <Column
-              header="In Stock"
-              body={totalInStockBodyTemplate}
-              headerStyle={{ ...TableHeaderStyle }}
-            />
-
-            <Column
-              header="Consumed"
-              body={totalConsumedBodyTemplate}
-              headerStyle={{ ...TableHeaderStyle }}
-            />
-
-            <Column
-              header="Actions"
-              body={actionsBodyTemplate}
-              headerStyle={{
-                ...TableHeaderStyle,
-              }}
-            />
-          </DataTable>
-        </div>
-
-        {/* ShadCN Pagination - Always at the end */}
-        <div className="border-t border-gray-200 bg-gray-50 px-4 py-3 mt-auto">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <p className="text-sm text-gray-700">
-                Showing {filteredProducts.length > 0 ? startIndex + 1 : 0} to{" "}
-                {Math.min(endIndex, filteredProducts.length)} of{" "}
-                {filteredProducts.length} products
-              </p>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <p className="text-sm text-gray-700">Rows per page:</p>
-                <Select
-                  value={rowsPerPage.toString()}
-                  onValueChange={(value) => {
-                    setRowsPerPage(Number(value));
-                    setCurrentPage(1);
-                  }}
+      {/* Table */}
+      <div className="flex-1 rounded-md bg-card overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Product</TableHead>
+              <TableHead>Barcode</TableHead>
+              <TableHead>Unit Type</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>In Stock</TableHead>
+              <TableHead>Consumed</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {currentProducts.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={8}
+                  className="text-center py-8 text-gray-500"
                 >
-                  <SelectTrigger className="h-8 w-16">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="5">5</SelectItem>
-                    <SelectItem value="10">10</SelectItem>
-                    <SelectItem value="25">25</SelectItem>
-                    <SelectItem value="50">50</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                  {searchString ||
+                  selectedStockStatus !== "all" ||
+                  selectedStore
+                    ? "No products found matching your search criteria."
+                    : "No products available."}
+                </TableCell>
+              </TableRow>
+            ) : (
+              currentProducts.map((product) => (
+                <TableRow key={product.id}>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <img
+                          src={
+                            product.images[0] ||
+                            "https://via.placeholder.com/40"
+                          }
+                          alt={product.name}
+                          className="h-10 w-10 rounded-md object-cover border border-gray-200"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src =
+                              "https://via.placeholder.com/40";
+                          }}
+                        />
+                      </div>
+                      <div className="ml-3">
+                        <div className="text-sm font-semibold text-gray-900">
+                          {product.name}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          SKU: {product.sku}
+                        </div>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm text-gray-600 font-mono">
+                      {product.product_barcode}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm">{product.unit_type}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-medium text-sm">
+                      {formatCurrency(product.regular_price)}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {getTotalInStock(product) > 0 ? (
+                      <Badge className="bg-green-100 text-green-800">
+                        In stock
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-red-100 text-red-800">
+                        Out of stock
+                      </Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm font-medium">
+                      {getTotalInStock(product).toLocaleString()}{" "}
+                      {product.unit_type}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm">
+                      {getTotalConsumed(product).toLocaleString()}{" "}
+                      {product.unit_type}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onSelect={() => handleEdit(product)}
+                          className="flex items-center gap-2"
+                        >
+                          <Pencil className="h-4 w-4" /> Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onSelect={() => handleDelete(product)}
+                          className="flex items-center gap-2 text-red-600 focus:text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4" /> Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
-              {totalPages > 1 && (
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious
-                        onClick={() =>
-                          setCurrentPage(Math.max(1, currentPage - 1))
-                        }
-                        className={
-                          currentPage === 1
-                            ? "pointer-events-none opacity-50"
-                            : "cursor-pointer"
-                        }
-                      />
-                    </PaginationItem>
+      {/* Pagination */}
+      <div className="border-t border-gray-200 bg-gray-50 px-4 py-3 mt-auto">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <p className="text-sm text-gray-700">
+              Showing {filteredProducts.length > 0 ? startIndex + 1 : 0} to{" "}
+              {Math.min(endIndex, filteredProducts.length)} of{" "}
+              {filteredProducts.length} products
+            </p>
+          </div>
 
-                    {generatePageNumbers().map((page, index) => (
-                      <PaginationItem key={index}>
-                        {page === "ellipsis" ? (
-                          <PaginationEllipsis />
-                        ) : (
-                          <PaginationLink
-                            isActive={currentPage === page}
-                            onClick={() => setCurrentPage(page as number)}
-                            className="cursor-pointer"
-                          >
-                            {page}
-                          </PaginationLink>
-                        )}
-                      </PaginationItem>
-                    ))}
-
-                    <PaginationItem>
-                      <PaginationNext
-                        onClick={() =>
-                          setCurrentPage(Math.min(totalPages, currentPage + 1))
-                        }
-                        className={
-                          currentPage === totalPages
-                            ? "pointer-events-none opacity-50"
-                            : "cursor-pointer"
-                        }
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              )}
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <p className="text-sm text-gray-700">Rows per page:</p>
+              <Select
+                value={rowsPerPage.toString()}
+                onValueChange={(value) => {
+                  setRowsPerPage(Number(value));
+                  setCurrentPage(1);
+                }}
+              >
+                <SelectTrigger className="h-8 w-16">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5</SelectItem>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+
+            {totalPages > 1 && (
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() =>
+                        setCurrentPage(Math.max(1, currentPage - 1))
+                      }
+                      className={
+                        currentPage === 1
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
+                    />
+                  </PaginationItem>
+
+                  {generatePageNumbers().map((page, index) => (
+                    <PaginationItem key={index}>
+                      {page === "ellipsis" ? (
+                        <PaginationEllipsis />
+                      ) : (
+                        <PaginationLink
+                          isActive={currentPage === page}
+                          onClick={() => setCurrentPage(page as number)}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      )}
+                    </PaginationItem>
+                  ))}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() =>
+                        setCurrentPage(Math.min(totalPages, currentPage + 1))
+                      }
+                      className={
+                        currentPage === totalPages
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
           </div>
         </div>
       </div>

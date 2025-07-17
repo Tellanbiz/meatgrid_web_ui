@@ -1,9 +1,4 @@
-import {
-  Forward,
-  RedoDot,
-  RefreshCcw,
-  FileSpreadsheet,
-} from "lucide-react";
+import { Forward, RedoDot, RefreshCcw, FileSpreadsheet } from "lucide-react";
 import StocksTable from "../components/StocksTable";
 import { Button } from "@/components/ui/button";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -27,7 +22,12 @@ import {
 import { StockStatus } from "@/store/features/stock/stockTypes";
 import { selectStores } from "@/store/features/stores/storeSelectors";
 import { fetchStores } from "@/store/features/stores/storeThunks";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const StocksPage = () => {
   const navigate = useNavigate();
@@ -79,16 +79,43 @@ const StocksPage = () => {
     if (startDate || endDate) {
       filtered = filtered.filter((stock) => {
         const stockDate = new Date(stock.created_at);
-        
-        if (startDate && endDate) {
-          return stockDate >= startDate && stockDate <= endDate;
-        } else if (startDate) {
-          return stockDate >= startDate;
-        } else if (endDate) {
-          return stockDate <= endDate;
+        // Remove time for date-only comparison
+        const stockLocalDate = new Date(
+          stockDate.getFullYear(),
+          stockDate.getMonth(),
+          stockDate.getDate()
+        );
+
+        let afterStart = true;
+        let beforeEnd = true;
+
+        if (startDate) {
+          const startLocal = new Date(
+            startDate.getFullYear(),
+            startDate.getMonth(),
+            startDate.getDate()
+          );
+          afterStart = stockLocalDate >= startLocal;
         }
-        
-        return true;
+
+        if (endDate) {
+          const endLocal = new Date(
+            endDate.getFullYear(),
+            endDate.getMonth(),
+            endDate.getDate()
+          );
+          beforeEnd = stockLocalDate <= endLocal;
+        } else if (startDate) {
+          // If only start date is selected, treat it as single day filter
+          const startLocal = new Date(
+            startDate.getFullYear(),
+            startDate.getMonth(),
+            startDate.getDate()
+          );
+          beforeEnd = stockLocalDate <= startLocal;
+        }
+
+        return afterStart && beforeEnd;
       });
     }
 
@@ -108,7 +135,7 @@ const StocksPage = () => {
   const aggregateStocks = () => {
     const filteredStocks = getFilteredStocks();
     const productMap = new Map();
-    
+
     for (const stock of filteredStocks) {
       const key = stock.product.id + "-" + (stock.store?.id || "");
       if (!productMap.has(key)) {
@@ -125,20 +152,22 @@ const StocksPage = () => {
       const entry = productMap.get(key);
       entry.Quantity += stock.quantity;
     }
-    
+
     // Convert grams to kilograms if needed
     for (const entry of productMap.values()) {
       if (
         (entry.Unit === "gram" || entry.Unit === "grams") &&
         entry.Quantity >= 1000
       ) {
-        entry.Quantity = (entry.Quantity / 1000).toLocaleString(undefined, { maximumFractionDigits: 2 });
+        entry.Quantity = (entry.Quantity / 1000).toLocaleString(undefined, {
+          maximumFractionDigits: 2,
+        });
         entry.Unit = "kilograms";
       } else {
         entry.Quantity = entry.Quantity.toLocaleString();
       }
     }
-    
+
     return Array.from(productMap.values()).map((entry) => ({
       Product: entry.Product,
       Quantity: `${entry.Quantity} ${entry.Unit}`,
@@ -192,7 +221,9 @@ const StocksPage = () => {
               <SelectContent>
                 <SelectItem value="all">All Stores</SelectItem>
                 {stores.map((store) => (
-                  <SelectItem key={store.id} value={store.id}>{store.name}</SelectItem>
+                  <SelectItem key={store.id} value={store.id}>
+                    {store.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -238,10 +269,10 @@ const StocksPage = () => {
       </div>
 
       <div className="h-table">
-        <StocksTable 
-          searchTerm={searchTerm} 
-          startDate={startDate} 
-          endDate={endDate} 
+        <StocksTable
+          searchTerm={searchTerm}
+          startDate={startDate}
+          endDate={endDate}
           selectedStatus={selectedStatus}
           selectedStore={selectedStore}
         />

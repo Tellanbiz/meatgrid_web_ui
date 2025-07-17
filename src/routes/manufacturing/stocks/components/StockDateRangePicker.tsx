@@ -59,11 +59,11 @@ const StockDateRangePicker: React.FC<StockDateRangePickerProps> = ({
         dateFormat="MMM dd, yyyy"
         placeholderText="Select date range"
         className="w-full"
-        popperClassName="z-50"
+        popperClassName="z-[9999]"
         popperPlacement="bottom-start"
       />
     </div>
   );
 };
 
-export default StockDateRangePicker; 
+export default StockDateRangePicker;
