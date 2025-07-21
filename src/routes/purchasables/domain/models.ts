@@ -40,32 +40,33 @@ export interface PurchasableOrder {
 }
 
 export interface CreatePurchaseParams {
-    id?: number
-    name: string, 
-    description: string, 
-    unit_type: 'grams'| 'kilograms'|'liters'| 'pieces'
+  id?: number
+  name: string,
+  description: string,
+  unit_type: 'grams' | 'kilograms' | 'liters' | 'pieces'
 }
 
 export interface ProcessPurchaseParams {
   id?: number
-  name: string, 
-  description: string, 
-  unit_type: 'grams'| 'kilograms'|'liters'| 'pieces'
+  name: string,
+  description: string,
+  unit_type: 'grams' | 'kilograms' | 'liters' | 'pieces'
 }
 
 export interface CreateOrderPurchaseParams {
-    supplier_id: string;
-    storage_type_id: string;
-    store_id: string;
-    items: {
-      product_id: number;
-      unit_of_issue: number;
-      unit_cost: number;
-    }[];
+  supplier_id: string;
+  storage_type_id: string;
+  store_id: string;
+  items: {
+    product_id: number;
+    unit_of_issue: number;
+    unit_cost: number;
+  }[];
 }
 
 export interface PurchasableStock {
   id: string;
+  production_id: string;
   quantity: number;
   status: string;
   purchasable?: {

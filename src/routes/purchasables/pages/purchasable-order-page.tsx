@@ -82,7 +82,8 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
     null
   );
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
-  const [selectedStorageType, setSelectedStorageType] = useState<StorageType | null>(null);
+  const [selectedStorageType, setSelectedStorageType] =
+    useState<StorageType | null>(null);
   const [orderItems, setOrderItems] = useState<
     {
       product_id: number;
@@ -427,7 +428,7 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
 
   // Helper function to normalize search terms
   const normalizeSearchTerm = (term: string): string => {
-    return term.toLowerCase().trim().replace(/\s+/g, ' ');
+    return term.toLowerCase().trim().replace(/\s+/g, " ");
   };
 
   // Helper function to check if text matches search term
@@ -706,125 +707,37 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                       Choose a supplier for this order from the list below
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="bg-white rounded-lg border border-gray-200">
-                    <div className="flex items-center border-b border-gray-200 px-4 py-3">
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <div className="flex items-center border-b border-gray-200 px-4 py-3 bg-gray-50/50">
                       <SearchIcon className="mr-3 h-5 w-5 shrink-0 text-gray-400" />
                       <Input
-                        placeholder="Search suppliers by name or email..."
+                        placeholder="Search suppliers by name, email, or phone..."
                         value={supplierSearch}
                         onChange={(e) => setSupplierSearch(e.target.value)}
-                        className="border-0 focus:ring-0 text-base shadow-none"
+                        className="border-0 focus:ring-0 text-base shadow-none bg-transparent"
                       />
                     </div>
-<<<<<<< HEAD
-                    <CommandList className="max-h-80 overflow-y-auto">
-                      <CommandEmpty className="py-8 text-center">
-                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <svg
-                            className="w-6 h-6 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                            />
-                          </svg>
-                        </div>
-                        <p className="text-gray-500 font-medium">
-                          No supplier found
-                        </p>
-                        <p className="text-sm text-gray-400 mt-1">
-                          Try adjusting your search terms
-                        </p>
-                      </CommandEmpty>
-                      <CommandGroup>
-                        {suppliers
-                          .filter((s) =>
+                    <div className="max-h-80 overflow-y-auto py-2">
+                      {suppliers
+                        .filter(
+                          (s) =>
                             matchesSearch(s.full_name, supplierSearch) ||
-                            matchesSearch(s.email || '', supplierSearch) ||
-                            matchesSearch(s.phone_number || '', supplierSearch) ||
-                            matchesSearch(s.address || '', supplierSearch)
-                          )
-                          .map((supplier) => (
-                            <CommandItem
-                              key={supplier.id}
-                              value={supplier.id}
-                              onSelect={() => {
-                                setSelectedSupplier(supplier);
-                                setSupplierDialogOpen(false);
-                              }}
-                              className="px-4 py-3 hover:bg-red-50 cursor-pointer"
-                            >
-                              <div className="flex items-center w-full">
-                                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
-                                  <span className="text-red-600 font-semibold text-sm">
-                                    {supplier.full_name.charAt(0).toUpperCase()}
-                                  </span>
-                                </div>
-                                <div className="flex-1">
-                                  <div className="font-medium text-gray-900">
-                                    {supplier.full_name}
-                                  </div>
-                                  <div className="text-sm text-gray-500">
-                                    {supplier.email}
-                                  </div>
-                                </div>
-                                <div className="w-2 h-2 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-=======
-                    <div className="max-h-80 overflow-y-auto">
-                      {(() => {
-                        const filteredSuppliers = suppliers.filter((s) => {
-                          const searchTerm = supplierSearch.toLowerCase();
-                          return (
-                            s.full_name.toLowerCase().includes(searchTerm) ||
-                            s.email.toLowerCase().includes(searchTerm) ||
-                            s.phone_number.toLowerCase().includes(searchTerm) ||
-                            s.address.toLowerCase().includes(searchTerm)
-                          );
-                        });
-
-                        if (filteredSuppliers.length === 0) {
-                          return (
-                            <div className="py-8 text-center">
-                              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                <svg
-                                  className="w-6 h-6 text-gray-400"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                  />
-                                </svg>
->>>>>>> a8f5b90817b725b3ff3c80977f8598bff94c2ac1
-                              </div>
-                              <p className="text-gray-500 font-medium">
-                                No supplier found
-                              </p>
-                              <p className="text-sm text-gray-400 mt-1">
-                                Try adjusting your search terms
-                              </p>
-                            </div>
-                          );
-                        }
-
-                        return filteredSuppliers.map((supplier) => (
-                          <div
+                            matchesSearch(s.email || "", supplierSearch) ||
+                            matchesSearch(
+                              s.phone_number || "",
+                              supplierSearch
+                            ) ||
+                            matchesSearch(s.address || "", supplierSearch)
+                        )
+                        .map((supplier) => (
+                          <button
                             key={supplier.id}
+                            className="w-full px-4 py-3 flex items-center space-x-3 hover:bg-red-50 border-l-4 border-transparent hover:border-red-500 transition-all duration-200 cursor-pointer text-left"
                             onClick={() => {
                               setSelectedSupplier(supplier);
                               setSupplierDialogOpen(false);
                               setSupplierSearch("");
                             }}
-                            className="px-4 py-3 hover:bg-red-50 cursor-pointer"
                           >
                             <div className="flex items-center w-full">
                               <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
@@ -833,17 +746,16 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                                 </span>
                               </div>
                               <div className="flex-1">
-                                <div className="font-medium text-gray-900">
+                                <div className="font-semibold text-gray-900 text-base">
                                   {supplier.full_name}
                                 </div>
-                                <div className="text-sm text-gray-500">
+                                <div className="text-sm text-gray-600">
                                   {supplier.email}
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        ));
-                      })()}
+                          </button>
+                        ))}
                     </div>
                   </div>
                 </DialogContent>
@@ -878,10 +790,7 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                 </div>
               </div>
 
-              <Dialog
-                open={storeDialogOpen}
-                onOpenChange={setStoreDialogOpen}
-              >
+              <Dialog open={storeDialogOpen} onOpenChange={setStoreDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
                     variant="outline"
@@ -944,79 +853,53 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                       Choose a store for this order from the list below
                     </DialogDescription>
                   </DialogHeader>
-                  <Command className="bg-white rounded-lg border border-gray-200">
-                    <div className="flex items-center border-b border-gray-200 px-4 py-3">
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <div className="flex items-center border-b border-gray-200 px-4 py-3 bg-gray-50/50">
                       <SearchIcon className="mr-3 h-5 w-5 shrink-0 text-gray-400" />
-                      <CommandInput
-                        placeholder="Search stores by name or address..."
+                      <Input
+                        placeholder="Search stores by name, address, or description..."
                         value={storeSearch}
-                        onValueChange={setStoreSearch}
-                        className="border-0 focus:ring-0 text-base"
+                        onChange={(e) => setStoreSearch(e.target.value)}
+                        className="border-0 focus:ring-0 text-base shadow-none bg-transparent"
                       />
                     </div>
-                    <CommandList className="max-h-80 overflow-y-auto">
-                      <CommandEmpty className="py-8 text-center">
-                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <svg
-                            className="w-6 h-6 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                            />
-                          </svg>
-                        </div>
-                        <p className="text-gray-500 font-medium">
-                          No store found
-                        </p>
-                        <p className="text-sm text-gray-400 mt-1">
-                          Try adjusting your search terms
-                        </p>
-                      </CommandEmpty>
-                      <CommandGroup>
-                        {stores
-                          .filter((s) =>
+                    <div className="max-h-80 overflow-y-auto py-2">
+                      {stores
+                        .filter(
+                          (s) =>
                             matchesSearch(s.name, storeSearch) ||
-                            matchesSearch(s.address || '', storeSearch) ||
-                            matchesSearch(s.description || '', storeSearch)
-                          )
-                          .map((store) => (
-                            <CommandItem
-                              key={store.id}
-                              value={store.id}
-                              onSelect={() => {
-                                setSelectedStore(store);
-                                setStoreDialogOpen(false);
-                                setStoreSearch("");
-                              }}
-                              className="px-4 py-3 hover:bg-blue-50 cursor-pointer"
-                            >
-                              <div className="flex items-center w-full">
-                                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                  <span className="text-blue-600 font-semibold text-sm">
-                                    {store.name.charAt(0).toUpperCase()}
-                                  </span>
-                                </div>
-                                <div className="flex-1">
-                                  <div className="font-medium text-gray-900">
-                                    {store.name}
-                                  </div>
-                                  <div className="text-sm text-gray-500">
-                                    {store.address}
-                                  </div>
-                                </div>
-                                <div className="w-2 h-2 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                            matchesSearch(s.address || "", storeSearch) ||
+                            matchesSearch(s.description || "", storeSearch)
+                        )
+                        .map((store) => (
+                          <button
+                            key={store.id}
+                            className="w-full px-4 py-3 flex items-center space-x-3 hover:bg-blue-50 border-l-4 border-transparent hover:border-blue-500 transition-all duration-200 cursor-pointer text-left"
+                            onClick={() => {
+                              setSelectedStore(store);
+                              setStoreDialogOpen(false);
+                              setStoreSearch("");
+                            }}
+                          >
+                            <div className="flex items-center w-full">
+                              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <span className="text-blue-600 font-semibold text-sm">
+                                  {store.name.charAt(0).toUpperCase()}
+                                </span>
                               </div>
-                            </CommandItem>
-                          ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
+                              <div className="flex-1">
+                                <div className="font-semibold text-gray-900 text-base">
+                                  {store.name}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  {store.address}
+                                </div>
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                    </div>
+                  </div>
                 </DialogContent>
               </Dialog>
             </div>
@@ -1115,78 +998,55 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                       Choose a storage type for this order from the list below
                     </DialogDescription>
                   </DialogHeader>
-                  <Command className="bg-white rounded-lg border border-gray-200">
-                    <div className="flex items-center border-b border-gray-200 px-4 py-3">
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <div className="flex items-center border-b border-gray-200 px-4 py-3 bg-gray-50/50">
                       <SearchIcon className="mr-3 h-5 w-5 shrink-0 text-gray-400" />
-                      <CommandInput
+                      <Input
                         placeholder="Search storage types by name or description..."
                         value={storageTypeSearch}
-                        onValueChange={setStorageTypeSearch}
-                        className="border-0 focus:ring-0 text-base"
+                        onChange={(e) => setStorageTypeSearch(e.target.value)}
+                        className="border-0 focus:ring-0 text-base shadow-none bg-transparent"
                       />
                     </div>
-                    <CommandList className="max-h-80 overflow-y-auto">
-                      <CommandEmpty className="py-8 text-center">
-                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <svg
-                            className="w-6 h-6 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                            />
-                          </svg>
-                        </div>
-                        <p className="text-gray-500 font-medium">
-                          No storage type found
-                        </p>
-                        <p className="text-sm text-gray-400 mt-1">
-                          Try adjusting your search terms
-                        </p>
-                      </CommandEmpty>
-                      <CommandGroup>
-                        {storageTypes
-                          .filter((s) =>
+                    <div className="max-h-80 overflow-y-auto py-2">
+                      {storageTypes
+                        .filter(
+                          (s) =>
                             matchesSearch(s.name, storageTypeSearch) ||
-                            matchesSearch(s.description || '', storageTypeSearch)
-                          )
-                          .map((storageType) => (
-                            <CommandItem
-                              key={storageType.id}
-                              value={storageType.id}
-                              onSelect={() => {
-                                setSelectedStorageType(storageType);
-                                setStorageTypeDialogOpen(false);
-                                setStorageTypeSearch("");
-                              }}
-                              className="px-4 py-3 hover:bg-green-50 cursor-pointer"
-                            >
-                              <div className="flex items-center w-full">
-                                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                                  <span className="text-green-600 font-semibold text-sm">
-                                    {storageType.name.charAt(0).toUpperCase()}
-                                  </span>
-                                </div>
-                                <div className="flex-1">
-                                  <div className="font-medium text-gray-900">
-                                    {storageType.name}
-                                  </div>
-                                  <div className="text-sm text-gray-500">
-                                    {storageType.description}
-                                  </div>
-                                </div>
-                                <div className="w-2 h-2 bg-green-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                            matchesSearch(
+                              s.description || "",
+                              storageTypeSearch
+                            )
+                        )
+                        .map((storageType) => (
+                          <button
+                            key={storageType.id}
+                            className="w-full px-4 py-3 flex items-center space-x-3 hover:bg-green-50 border-l-4 border-transparent hover:border-green-500 transition-all duration-200 cursor-pointer text-left"
+                            onClick={() => {
+                              setSelectedStorageType(storageType);
+                              setStorageTypeDialogOpen(false);
+                              setStorageTypeSearch("");
+                            }}
+                          >
+                            <div className="flex items-center w-full">
+                              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                <span className="text-green-600 font-semibold text-sm">
+                                  {storageType.name.charAt(0).toUpperCase()}
+                                </span>
                               </div>
-                            </CommandItem>
-                          ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
+                              <div className="flex-1">
+                                <div className="font-semibold text-gray-900 text-base">
+                                  {storageType.name}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  {storageType.description}
+                                </div>
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                    </div>
+                  </div>
                 </DialogContent>
               </Dialog>
             </div>
@@ -1325,11 +1185,11 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                                   list below
                                 </DialogDescription>
                               </DialogHeader>
-                              <div className="bg-white rounded-lg border border-gray-200">
-                                <div className="flex items-center border-b border-gray-200 px-4 py-3">
+                              <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                                <div className="flex items-center border-b border-gray-200 px-4 py-3 bg-gray-50/50">
                                   <SearchIcon className="mr-3 h-5 w-5 shrink-0 text-gray-400" />
                                   <Input
-                                    placeholder="Search products by name..."
+                                    placeholder="Search products by name or description..."
                                     value={productSearch[index] || ""}
                                     onChange={(e) =>
                                       setProductSearch((prev) => ({
@@ -1337,116 +1197,33 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                                         [index]: e.target.value,
                                       }))
                                     }
-                                    className="border-0 focus:ring-0 text-base shadow-none"
+                                    className="border-0 focus:ring-0 text-base shadow-none bg-transparent"
                                   />
                                 </div>
-<<<<<<< HEAD
-                                <CommandList className="max-h-80 overflow-y-auto">
-                                  <CommandEmpty className="py-8 text-center">
-                                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                      <svg
-                                        className="w-6 h-6 text-gray-400"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth={2}
-                                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                        />
-                                      </svg>
-                                    </div>
-                                    <p className="text-gray-500 font-medium">
-                                      No product found
-                                    </p>
-                                    <p className="text-sm text-gray-400 mt-1">
-                                      Try adjusting your search terms
-                                    </p>
-                                  </CommandEmpty>
-                                  <CommandGroup>
-                                    {purchasables
-                                      .filter((p) =>
-                                        matchesSearch(p.name, productSearch[index] || "") ||
-                                        matchesSearch(p.description || '', productSearch[index] || "") ||
-                                        matchesSearch(p.unit_type || '', productSearch[index] || "")
-                                      )
-                                      .map((product) => (
-                                        <CommandItem
-                                          key={product.id}
-                                          value={product.id.toString()}
-                                          onSelect={() =>
-                                            selectProduct(index, product)
-                                          }
-                                          className="px-4 py-3 hover:bg-red-50 cursor-pointer"
-                                        >
-                                          <div className="flex items-center w-full">
-                                            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
-                                              <span className="text-red-600 font-semibold text-sm">
-                                                {product.name
-                                                  .charAt(0)
-                                                  .toUpperCase()}
-                                              </span>
-                                            </div>
-                                            <div className="flex-1">
-                                              <div className="font-medium text-gray-900">
-                                                {product.name}
-                                              </div>
-                                              <div className="text-sm text-gray-500">
-                                                {product.unit_type}
-                                              </div>
-                                            </div>
-                                            <div className="w-2 h-2 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-=======
-                                <div className="max-h-80 overflow-y-auto">
-                                  {(() => {
-                                    const filteredProducts =
-                                      purchasables.filter((p) => {
-                                        const searchTerm = (
+                                <div className="max-h-80 overflow-y-auto py-2">
+                                  {purchasables
+                                    .filter(
+                                      (p) =>
+                                        matchesSearch(
+                                          p.name,
                                           productSearch[index] || ""
-                                        ).toLowerCase();
-                                        return p.name
-                                          .toLowerCase()
-                                          .includes(searchTerm);
-                                      });
-
-                                    if (filteredProducts.length === 0) {
-                                      return (
-                                        <div className="py-8 text-center">
-                                          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                            <svg
-                                              className="w-6 h-6 text-gray-400"
-                                              fill="none"
-                                              stroke="currentColor"
-                                              viewBox="0 0 24 24"
-                                            >
-                                              <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                              />
-                                            </svg>
->>>>>>> a8f5b90817b725b3ff3c80977f8598bff94c2ac1
-                                          </div>
-                                          <p className="text-gray-500 font-medium">
-                                            No product found
-                                          </p>
-                                          <p className="text-sm text-gray-400 mt-1">
-                                            Try adjusting your search terms
-                                          </p>
-                                        </div>
-                                      );
-                                    }
-
-                                    return filteredProducts.map((product) => (
-                                      <div
+                                        ) ||
+                                        matchesSearch(
+                                          p.description || "",
+                                          productSearch[index] || ""
+                                        ) ||
+                                        matchesSearch(
+                                          p.unit_type || "",
+                                          productSearch[index] || ""
+                                        )
+                                    )
+                                    .map((product) => (
+                                      <button
                                         key={product.id}
+                                        className="w-full px-4 py-3 flex items-center space-x-3 hover:bg-red-50 border-l-4 border-transparent hover:border-red-500 transition-all duration-200 cursor-pointer text-left"
                                         onClick={() =>
                                           selectProduct(index, product)
                                         }
-                                        className="px-4 py-3 hover:bg-red-50 cursor-pointer"
                                       >
                                         <div className="flex items-center w-full">
                                           <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
@@ -1457,17 +1234,16 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                                             </span>
                                           </div>
                                           <div className="flex-1">
-                                            <div className="font-medium text-gray-900">
+                                            <div className="font-semibold text-gray-900 text-base">
                                               {product.name}
                                             </div>
-                                            <div className="text-sm text-gray-500">
-                                              {product.unit_type}
+                                            <div className="text-sm text-gray-600">
+                                              Unit: {product.unit_type}
                                             </div>
                                           </div>
                                         </div>
-                                      </div>
-                                    ));
-                                  })()}
+                                      </button>
+                                    ))}
                                 </div>
                               </div>
                             </DialogContent>

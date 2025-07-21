@@ -13,11 +13,14 @@ export interface PurchasableProcessParams {
   storage_type_id: string; // UUID as string
   materials: PurchasableInventoryItemParams[];
   finished_products: PurchasableInventoryItemParams[];
-} 
+}
 
 export interface PurchasableProductionParams {
   store_id: string; // UUID as string
   storage_type_id: string; // UUID as string
   materials: PurchasableInventoryItemParams[];
   products: PurchasableProductionItemParams[];
+  frozen_at?: string; // ISO date string, optional
+  chilled_at?: string; // ISO date string, optional
+  manufactured_at?: string; // ISO date string, optional
 } 

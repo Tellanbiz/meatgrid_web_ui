@@ -14,7 +14,7 @@ export async function processPurchasable(params: PurchasableProcessParams): Prom
 }
 
 export async function produceProducts(params: PurchasableProductionParams): Promise<string | undefined> {
-    const response = await axios.post("/purchasables/pruduction", params);
+    const response = await axios.post("/purchasables/production", params);
     return response.data.error;
 }
 
