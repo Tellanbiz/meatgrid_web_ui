@@ -45,6 +45,8 @@ export function PurchasableOrderCreateDialog({
   onSuccess,
 }: PurchasableOrderCreateDialogProps) {
   const [supplierId, setSupplierId] = useState("");
+  const [storeId, setStoreId] = useState("");
+  const [storageTypeId, setStorageTypeId] = useState("");
   const [items, setItems] = useState<OrderItem[]>([
     { product_id: 0, unit_of_issue: 0, unit_cost: 0 },
   ]);
@@ -57,6 +59,8 @@ export function PurchasableOrderCreateDialog({
     if (open) {
       setError(null);
       setSupplierId("");
+      setStoreId("");
+      setStorageTypeId("");
       setItems([{ product_id: 0, unit_of_issue: 0, unit_cost: 0 }]);
       setProductSearch("");
     }
@@ -85,6 +89,16 @@ export function PurchasableOrderCreateDialog({
       return;
     }
 
+    if (!storeId.trim()) {
+      setError("Please select a store");
+      return;
+    }
+
+    if (!storageTypeId.trim()) {
+      setError("Please select a storage type");
+      return;
+    }
+
     if (items.some((item) => item.product_id === 0)) {
       setError("Please select a product for all items");
       return;
@@ -106,6 +120,8 @@ export function PurchasableOrderCreateDialog({
     try {
       const orderData: CreateOrderPurchaseParams = {
         supplier_id: supplierId,
+        storage_type_id: storageTypeId,
+        store_id: storeId,
         items: items.map((item) => ({
           product_id: item.product_id,
           unit_of_issue: item.unit_of_issue,

@@ -10,6 +10,14 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   ChevronLeft,
   ChevronRight,
@@ -18,6 +26,7 @@ import {
   Plus,
   Edit,
   Trash2,
+  Store,
 } from "lucide-react";
 import { PurchasableEditDialog } from "@/components/purchasable-edit-dialog";
 import type { Purchasable } from "../domain/models";
@@ -26,7 +35,18 @@ import DeleteDialog from "@/components/dialogs/DeleteDialog";
 import { toast } from "sonner";
 
 export default function PurchasablePage() {
-  const { purchasables, loading, error, fetchPurchasables } = usePurchasables();
+  const { 
+    purchasables, 
+    stores,
+    selectedStore,
+    loading, 
+    storesLoading,
+    error, 
+    fetchPurchasables, 
+    fetchStores,
+    setSelectedStore,
+    refreshData 
+  } = usePurchasables();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -38,9 +58,43 @@ export default function PurchasablePage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const itemsPerPage = 15;
 
+  // Helper function to get total in stock (same logic as product table)
+  const getTotalInStock = (purchasable: Purchasable) => {
+    const stockInfo = purchasable.stock_info;
+    const totalIn = stockInfo.total_instock + stockInfo.total_reclaim;
+    const totalOut =
+      stockInfo.total_damaged +
+      stockInfo.total_migrated +
+      stockInfo.total_processed +
+      stockInfo.total_sold;
+    return totalIn - totalOut;
+  };
+
+  // Helper function to get total consumed
+  const getTotalConsumed = (purchasable: Purchasable) => {
+    const stockInfo = purchasable.stock_info;
+    const totalOut =
+      stockInfo.total_damaged +
+      stockInfo.total_migrated +
+      stockInfo.total_processed +
+      stockInfo.total_sold;
+    return totalOut;
+  };
+
+  // Helper function to format quantity with unit conversion
+  const formatQuantity = (quantity: number, unitType: string) => {
+    // Convert grams to kilograms if quantity is >= 1000 and unit type is kilograms
+    if ((unitType === "kilograms" || unitType === "kilogram") && quantity >= 1000) {
+      const kgQuantity = quantity / 1000;
+      return `${kgQuantity.toLocaleString(undefined, { maximumFractionDigits: 2 })} kg`;
+    }
+    return `${quantity.toLocaleString()} ${unitType}`;
+  };
+
   useEffect(() => {
     fetchPurchasables();
-  }, [fetchPurchasables]);
+    fetchStores();
+  }, [fetchPurchasables, fetchStores]);
 
   // Filter purchasables based on search query
   const filteredPurchasables = purchasables.filter(
@@ -68,8 +122,9 @@ export default function PurchasablePage() {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   };
 
-  const handleRefresh = () => {
-    fetchPurchasables();
+  const handleRefresh = async () => {
+    await refreshData();
+    toast.success("Data refreshed successfully!");
   };
 
   const handleNew = () => {
@@ -83,7 +138,7 @@ export default function PurchasablePage() {
   };
 
   const handleDialogSuccess = () => {
-    fetchPurchasables();
+    refreshData();
   };
 
   const handleDelete = (purchasable: Purchasable) => {
@@ -101,7 +156,7 @@ export default function PurchasablePage() {
         toast.error(error);
       } else {
         toast.success("Purchasable deleted successfully");
-        fetchPurchasables();
+        refreshData();
       }
     } catch {
       toast.error("Failed to delete purchasable");
@@ -113,27 +168,49 @@ export default function PurchasablePage() {
   };
 
   return (
-    <div className="p-8 font-lato">
+    <div className="p-8 font-lato bg-white min-h-screen">
       <div className="flex items-center justify-between mb-6">
-        {/* Search Bar */}
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <Input
-            placeholder="Search purchasables..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
+        <div className="flex items-center space-x-4">
+          {/* Store Selection */}
+          <div className="flex items-center space-x-2">
+            <Store className="h-4 w-4 text-gray-500" />
+            <Select value={selectedStore || "all"} onValueChange={setSelectedStore}>
+              <SelectTrigger className="w-48" disabled={storesLoading}>
+                <SelectValue placeholder={storesLoading ? "Loading stores..." : "Select a store"} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Stores</SelectItem>
+                {stores.map((store) => (
+                  <SelectItem key={store.id} value={store.id}>
+                    {store.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Search Bar */}
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Search purchasables..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
         </div>
+
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
             size="sm"
             onClick={handleRefresh}
             disabled={loading}
+            className="flex items-center space-x-2"
           >
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <span>Refresh</span>
           </Button>
           <Button size="sm" onClick={handleNew}>
             <Plus className="h-4 w-4 mr-2" />
@@ -166,13 +243,16 @@ export default function PurchasablePage() {
 
       {!loading && !error && filteredPurchasables.length > 0 && (
         <>
-          <div className="rounded-md border bg-white">
+          <div className="rounded-md border bg-white shadow-sm">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead>Unit Type</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>In Stock</TableHead>
+                  <TableHead>Consumed</TableHead>
                   <TableHead>Created At</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -185,6 +265,27 @@ export default function PurchasablePage() {
                     </TableCell>
                     <TableCell>{purchasable.description}</TableCell>
                     <TableCell>{purchasable.unit_type}</TableCell>
+                    <TableCell>
+                      {getTotalInStock(purchasable) > 0 ? (
+                        <Badge variant="default" className="bg-green-500 hover:bg-green-600">
+                          In stock
+                        </Badge>
+                      ) : (
+                        <Badge variant="default" className="bg-red-500 hover:bg-red-600">
+                          Out of stock
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm font-medium">
+                        {formatQuantity(getTotalInStock(purchasable), purchasable.unit_type)}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        {formatQuantity(getTotalConsumed(purchasable), purchasable.unit_type)}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       {new Date(purchasable.created_at).toLocaleDateString()}
                     </TableCell>

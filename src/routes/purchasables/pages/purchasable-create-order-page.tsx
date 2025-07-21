@@ -4,20 +4,34 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Plus, Trash2, Search, ArrowLeft } from "lucide-react";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { Plus, Trash2, Search, ArrowLeft, ChevronDownIcon } from "lucide-react";
 import { createPurchaseOrder } from "@/routes/purchasables/domain/purchasable-post";
 import { usePurchasables } from "../hooks/usePurchasables";
 import type { CreateOrderPurchaseParams } from "@/routes/purchasables/domain/models";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchSuppliers } from "@/store/features/suppliers/supplierThunks";
 import { selectSuppliers } from "@/store/features/suppliers/supplierSelectors";
+import { fetchStores } from "@/store/features/stores/storeThunks";
+import { selectStores } from "@/store/features/stores/storeSelectors";
+import { fetchStorageTypes } from "@/store/features/storages/storageThunks";
+import { selectStorageTypes } from "@/store/features/storages/storageSelectors";
 
 interface OrderItem {
   product_id: number;
@@ -30,8 +44,12 @@ export default function PurchasableCreateOrderPage() {
   const dispatch = useAppDispatch();
   const { purchasables, fetchPurchasables } = usePurchasables();
   const suppliers = useAppSelector(selectSuppliers);
+  const stores = useAppSelector(selectStores);
+  const storageTypes = useAppSelector(selectStorageTypes);
   
   const [supplierId, setSupplierId] = useState("");
+  const [storeId, setStoreId] = useState("");
+  const [storageTypeId, setStorageTypeId] = useState("");
   const [items, setItems] = useState<OrderItem[]>([
     { product_id: 0, unit_of_issue: 0, unit_cost: 0 },
   ]);
@@ -41,14 +59,24 @@ export default function PurchasableCreateOrderPage() {
     [key: number]: string;
   }>({});
   const [supplierSearch, setSupplierSearch] = useState("");
+  const [storeSearch, setStoreSearch] = useState("");
+  const [storageTypeSearch, setStorageTypeSearch] = useState("");
   const [debouncedSupplierSearch, setDebouncedSupplierSearch] = useState("");
-  const [debouncedProductSearch, setDebouncedProductSearch] = useState<{
-    [key: number]: string;
+
+  
+  // Dialog states
+  const [supplierDialogOpen, setSupplierDialogOpen] = useState(false);
+  const [storeDialogOpen, setStoreDialogOpen] = useState(false);
+  const [storageTypeDialogOpen, setStorageTypeDialogOpen] = useState(false);
+  const [productDialogOpen, setProductDialogOpen] = useState<{
+    [key: number]: boolean;
   }>({});
 
   useEffect(() => {
     fetchPurchasables();
     dispatch(fetchSuppliers());
+    dispatch(fetchStores());
+    dispatch(fetchStorageTypes());
   }, [fetchPurchasables, dispatch]);
 
   // Debounce supplier search
@@ -60,14 +88,7 @@ export default function PurchasableCreateOrderPage() {
     return () => clearTimeout(timer);
   }, [supplierSearch]);
 
-  // Debounce product search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedProductSearch(productSearch);
-    }, 300);
 
-    return () => clearTimeout(timer);
-  }, [productSearch]);
 
   const addItem = () => {
     setItems([...items, { product_id: 0, unit_of_issue: 0, unit_cost: 0 }]);
@@ -92,6 +113,16 @@ export default function PurchasableCreateOrderPage() {
       return;
     }
 
+    if (!storeId.trim()) {
+      setError("Please select a store");
+      return;
+    }
+
+    if (!storageTypeId.trim()) {
+      setError("Please select a storage type");
+      return;
+    }
+
     if (items.some((item) => item.product_id === 0)) {
       setError("Please select a product for all items");
       return;
@@ -113,6 +144,8 @@ export default function PurchasableCreateOrderPage() {
     try {
       const orderData: CreateOrderPurchaseParams = {
         supplier_id: supplierId,
+        storage_type_id: storageTypeId,
+        store_id: storeId,
         items: items.map((item) => ({
           product_id: item.product_id,
           unit_of_issue: item.unit_of_issue,
@@ -150,6 +183,14 @@ export default function PurchasableCreateOrderPage() {
     return suppliers.find((s) => s.id === supplierId);
   };
 
+  const getSelectedStore = (storeId: string) => {
+    return stores.find((s) => s.id === storeId);
+  };
+
+  const getSelectedStorageType = (storageTypeId: string) => {
+    return storageTypes.find((s) => s.id === storageTypeId);
+  };
+
   // Helper function to normalize search terms
   const normalizeSearchTerm = (term: string): string => {
     return term.toLowerCase().trim().replace(/\s+/g, ' ');
@@ -168,7 +209,7 @@ export default function PurchasableCreateOrderPage() {
     if (!searchTerm.trim()) return purchasables;
     
     return purchasables.filter(
-      (product) =>
+    (product) =>
         matchesSearch(product.name, searchTerm) ||
         matchesSearch(product.description || '', searchTerm) ||
         matchesSearch(product.unit_type || '', searchTerm)
@@ -221,50 +262,436 @@ export default function PurchasableCreateOrderPage() {
           <div className="space-y-4">
             <Label className="text-sm font-medium">Supplier *</Label>
             <div className="space-y-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search suppliers by name, email, phone, or address..."
+              <Dialog
+                open={supplierDialogOpen}
+                onOpenChange={setSupplierDialogOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-between h-14 text-left bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-red-300 transition-colors duration-200"
+                  >
+                    <div className="flex items-center">
+                      {supplierId && getSelectedSupplier(supplierId) ? (
+                        <>
+                          <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                            <span className="text-red-600 font-semibold text-sm">
+                              {getSelectedSupplier(supplierId)?.full_name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="text-left">
+                            <div className="font-medium text-gray-900">
+                              {getSelectedSupplier(supplierId)?.full_name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {getSelectedSupplier(supplierId)?.email}
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex items-center">
+                          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                            <svg
+                              className="w-5 h-5 text-gray-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                              />
+                            </svg>
+                          </div>
+                          <div className="text-left">
+                            <div className="font-medium text-gray-500">
+                              Select supplier...
+                            </div>
+                            <div className="text-sm text-gray-400">
+                              Choose a supplier for this order
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <ChevronDownIcon className="ml-2 h-5 w-5 shrink-0 text-gray-400" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-semibold text-gray-900">
+                      Select Supplier
+                    </DialogTitle>
+                    <DialogDescription className="text-gray-600">
+                      Choose a supplier for this order from the list below
+                    </DialogDescription>
+                  </DialogHeader>
+                  <Command className="bg-white rounded-lg border border-gray-200">
+                    <div className="flex items-center border-b border-gray-200 px-4 py-3">
+                      <Search className="mr-3 h-5 w-5 shrink-0 text-gray-400" />
+                      <CommandInput
+                        placeholder="Search suppliers by name or email..."
                   value={supplierSearch}
-                  onChange={(e) => setSupplierSearch(e.target.value)}
-                  className="pl-10"
-                  autoComplete="off"
-                  spellCheck="false"
+                        onValueChange={setSupplierSearch}
+                        className="border-0 focus:ring-0 text-base"
                 />
               </div>
-              <Select value={supplierId} onValueChange={setSupplierId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a supplier" />
-                </SelectTrigger>
-                <SelectContent>
-                  {filteredSuppliers.length > 0 ? (
-                    filteredSuppliers.map((supplier) => (
-                      <SelectItem key={supplier.id} value={supplier.id}>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{supplier.full_name}</span>
-                          <span className="text-sm text-gray-500">
-                            {supplier.email} • {supplier.phone_number}
-                          </span>
-                          {supplier.address && (
-                            <span className="text-sm text-gray-500 truncate">
-                              {supplier.address}
-                            </span>
-                          )}
+                    <CommandList className="max-h-80 overflow-y-auto">
+                      <CommandEmpty className="py-8 text-center">
+                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <svg
+                            className="w-6 h-6 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            />
+                          </svg>
                         </div>
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem value="" disabled>
-                      No suppliers found
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
-              {supplierId && getSelectedSupplier(supplierId) && (
-                <div className="text-sm text-gray-600 p-2 bg-gray-50 rounded">
-                  Selected: {getSelectedSupplier(supplierId)?.full_name}
+                        <p className="text-gray-500 font-medium">
+                          No supplier found
+                        </p>
+                        <p className="text-sm text-gray-400 mt-1">
+                          Try adjusting your search terms
+                        </p>
+                      </CommandEmpty>
+                      <CommandGroup>
+                        {filteredSuppliers.map((supplier) => (
+                          <CommandItem
+                            key={supplier.id}
+                            value={supplier.id}
+                            onSelect={() => {
+                              setSupplierId(supplier.id);
+                              setSupplierDialogOpen(false);
+                              setSupplierSearch("");
+                            }}
+                            className="px-4 py-3 hover:bg-red-50 cursor-pointer"
+                          >
+                            <div className="flex items-center w-full">
+                              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                                <span className="text-red-600 font-semibold text-sm">
+                                  {supplier.full_name.charAt(0).toUpperCase()}
+                          </span>
+                              </div>
+                              <div className="flex-1">
+                                <div className="font-medium text-gray-900">
+                                  {supplier.full_name}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {supplier.email}
+                                </div>
+                              </div>
+                              <div className="w-2 h-2 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                            </div>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+
+          {/* Store Selection */}
+          <div className="space-y-4">
+            <Label className="text-sm font-medium">Store *</Label>
+            <div className="space-y-2">
+              <Dialog
+                open={storeDialogOpen}
+                onOpenChange={setStoreDialogOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-between h-14 text-left bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-blue-300 transition-colors duration-200"
+                  >
+                    <div className="flex items-center">
+                      {storeId && getSelectedStore(storeId) ? (
+                        <>
+                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                            <span className="text-blue-600 font-semibold text-sm">
+                              {getSelectedStore(storeId)?.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="text-left">
+                            <div className="font-medium text-gray-900">
+                              {getSelectedStore(storeId)?.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {getSelectedStore(storeId)?.address}
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex items-center">
+                          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                            <svg
+                              className="w-5 h-5 text-gray-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                              />
+                            </svg>
+                          </div>
+                          <div className="text-left">
+                            <div className="font-medium text-gray-500">
+                              Select store...
+                            </div>
+                            <div className="text-sm text-gray-400">
+                              Choose a store for this order
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <ChevronDownIcon className="ml-2 h-5 w-5 shrink-0 text-gray-400" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-semibold text-gray-900">
+                      Select Store
+                    </DialogTitle>
+                    <DialogDescription className="text-gray-600">
+                      Choose a store for this order from the list below
+                    </DialogDescription>
+                  </DialogHeader>
+                  <Command className="bg-white rounded-lg border border-gray-200">
+                    <div className="flex items-center border-b border-gray-200 px-4 py-3">
+                      <Search className="mr-3 h-5 w-5 shrink-0 text-gray-400" />
+                      <CommandInput
+                        placeholder="Search stores by name or address..."
+                        value={storeSearch}
+                        onValueChange={setStoreSearch}
+                        className="border-0 focus:ring-0 text-base"
+                      />
+                    </div>
+                    <CommandList className="max-h-80 overflow-y-auto">
+                      <CommandEmpty className="py-8 text-center">
+                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <svg
+                            className="w-6 h-6 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            />
+                          </svg>
+                        </div>
+                        <p className="text-gray-500 font-medium">
+                          No store found
+                        </p>
+                        <p className="text-sm text-gray-400 mt-1">
+                          Try adjusting your search terms
+                        </p>
+                      </CommandEmpty>
+                      <CommandGroup>
+                        {stores
+                          .filter((s) =>
+                            matchesSearch(s.name, storeSearch) ||
+                            matchesSearch(s.address || '', storeSearch) ||
+                            matchesSearch(s.description || '', storeSearch)
+                          )
+                          .map((store) => (
+                            <CommandItem
+                              key={store.id}
+                              value={store.id}
+                              onSelect={() => {
+                                setStoreId(store.id);
+                                setStoreDialogOpen(false);
+                                setStoreSearch("");
+                              }}
+                              className="px-4 py-3 hover:bg-blue-50 cursor-pointer"
+                            >
+                              <div className="flex items-center w-full">
+                                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                  <span className="text-blue-600 font-semibold text-sm">
+                                    {store.name.charAt(0).toUpperCase()}
+                                  </span>
+                                </div>
+                                <div className="flex-1">
+                                  <div className="font-medium text-gray-900">
+                                    {store.name}
+                                  </div>
+                                  <div className="text-sm text-gray-500">
+                                    {store.address}
+                                  </div>
+                                </div>
+                                <div className="w-2 h-2 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                              </div>
+                            </CommandItem>
+                          ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+
+          {/* Storage Type Selection */}
+          <div className="space-y-4">
+            <Label className="text-sm font-medium">Storage Type *</Label>
+            <div className="space-y-2">
+              <Dialog
+                open={storageTypeDialogOpen}
+                onOpenChange={setStorageTypeDialogOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-between h-14 text-left bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-green-300 transition-colors duration-200"
+                  >
+                    <div className="flex items-center">
+                      {storageTypeId && getSelectedStorageType(storageTypeId) ? (
+                        <>
+                          <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                            <span className="text-green-600 font-semibold text-sm">
+                              {getSelectedStorageType(storageTypeId)?.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="text-left">
+                            <div className="font-medium text-gray-900">
+                              {getSelectedStorageType(storageTypeId)?.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {getSelectedStorageType(storageTypeId)?.description}
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex items-center">
+                          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                            <svg
+                              className="w-5 h-5 text-gray-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                              />
+                            </svg>
+                          </div>
+                          <div className="text-left">
+                            <div className="font-medium text-gray-500">
+                              Select storage type...
+                            </div>
+                            <div className="text-sm text-gray-400">
+                              Choose a storage type for this order
+                            </div>
+                          </div>
                 </div>
               )}
+                    </div>
+                    <ChevronDownIcon className="ml-2 h-5 w-5 shrink-0 text-gray-400" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-semibold text-gray-900">
+                      Select Storage Type
+                    </DialogTitle>
+                    <DialogDescription className="text-gray-600">
+                      Choose a storage type for this order from the list below
+                    </DialogDescription>
+                  </DialogHeader>
+                  <Command className="bg-white rounded-lg border border-gray-200">
+                    <div className="flex items-center border-b border-gray-200 px-4 py-3">
+                      <Search className="mr-3 h-5 w-5 shrink-0 text-gray-400" />
+                      <CommandInput
+                        placeholder="Search storage types by name or description..."
+                        value={storageTypeSearch}
+                        onValueChange={setStorageTypeSearch}
+                        className="border-0 focus:ring-0 text-base"
+                      />
+                    </div>
+                    <CommandList className="max-h-80 overflow-y-auto">
+                      <CommandEmpty className="py-8 text-center">
+                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <svg
+                            className="w-6 h-6 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            />
+                          </svg>
+                        </div>
+                        <p className="text-gray-500 font-medium">
+                          No storage type found
+                        </p>
+                        <p className="text-sm text-gray-400 mt-1">
+                          Try adjusting your search terms
+                        </p>
+                      </CommandEmpty>
+                      <CommandGroup>
+                        {storageTypes
+                          .filter((s) =>
+                            matchesSearch(s.name, storageTypeSearch) ||
+                            matchesSearch(s.description || '', storageTypeSearch)
+                          )
+                          .map((storageType) => (
+                            <CommandItem
+                              key={storageType.id}
+                              value={storageType.id}
+                              onSelect={() => {
+                                setStorageTypeId(storageType.id);
+                                setStorageTypeDialogOpen(false);
+                                setStorageTypeSearch("");
+                              }}
+                              className="px-4 py-3 hover:bg-green-50 cursor-pointer"
+                            >
+                              <div className="flex items-center w-full">
+                                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                  <span className="text-green-600 font-semibold text-sm">
+                                    {storageType.name.charAt(0).toUpperCase()}
+                                  </span>
+                                </div>
+                                <div className="flex-1">
+                                  <div className="font-medium text-gray-900">
+                                    {storageType.name}
+                                  </div>
+                                  <div className="text-sm text-gray-500">
+                                    {storageType.description}
+                                  </div>
+                                </div>
+                                <div className="w-2 h-2 bg-green-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                              </div>
+                            </CommandItem>
+                          ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
 
@@ -309,66 +736,157 @@ export default function PurchasableCreateOrderPage() {
                   {/* Product Selection */}
                   <div className="space-y-2">
                     <Label className="text-sm font-medium">Product *</Label>
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                      <Input
-                        placeholder="Search products by name, description, or unit type..."
-                        value={productSearch[index] || ""}
-                        onChange={(e) =>
-                          setProductSearch((prev) => ({
-                            ...prev,
-                            [index]: e.target.value,
-                          }))
-                        }
-                        className="pl-10"
-                        autoComplete="off"
-                        spellCheck="false"
-                      />
-                    </div>
-                    <Select
-                      value={item.product_id.toString()}
-                      onValueChange={(value) => {
-                        updateItem(index, "product_id", parseInt(value));
-                        // Clear search when product is selected
-                        setProductSearch((prev) => ({
+                    <Dialog
+                      open={productDialogOpen[index] || false}
+                      onOpenChange={(open) =>
+                        setProductDialogOpen((prev) => ({
                           ...prev,
-                          [index]: "",
-                        }));
-                      }}
+                          [index]: open,
+                        }))
+                      }
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a product" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {getFilteredProducts(debouncedProductSearch[index] || "").length > 0 ? (
-                          getFilteredProducts(debouncedProductSearch[index] || "").map((product) => (
-                            <SelectItem
-                              key={product.id}
-                              value={product.id.toString()}
-                            >
-                              <div className="flex flex-col">
-                                <span className="font-medium">
-                                  {product.name}
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-between h-12 text-left bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-red-300 transition-colors duration-200"
+                        >
+                          <div className="flex items-center">
+                            {item.product_id > 0 && getSelectedProduct(item.product_id) ? (
+                              <>
+                                <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                                  <span className="text-red-600 font-semibold text-xs">
+                                    {getSelectedProduct(item.product_id)?.name.charAt(0).toUpperCase()}
                                 </span>
-                                <span className="text-sm text-gray-500">
-                                  {product.description} ({product.unit_type})
-                                </span>
+                                </div>
+                                <div className="text-left">
+                                  <div className="font-medium text-gray-900">
+                                    {getSelectedProduct(item.product_id)?.name}
+                                  </div>
+                                  <div className="text-sm text-gray-500">
+                                    {getSelectedProduct(item.product_id)?.unit_type}
+                                  </div>
+                                </div>
+                              </>
+                            ) : (
+                              <div className="flex items-center">
+                                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                                  <svg
+                                    className="w-4 h-4 text-gray-400"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                                    />
+                                  </svg>
+                                </div>
+                                <div className="text-left">
+                                  <div className="font-medium text-gray-500">
+                                    Select product...
+                                  </div>
+                                  <div className="text-sm text-gray-400">
+                                    Choose a product for this item
+                                  </div>
+                                </div>
                               </div>
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem value="" disabled>
-                            No products found
-                          </SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
-                    {item.product_id > 0 &&
-                      getSelectedProduct(item.product_id) && (
-                        <div className="text-sm text-gray-600 p-2 bg-gray-50 rounded">
-                          Selected: {getSelectedProduct(item.product_id)?.name}
+                            )}
+                          </div>
+                          <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 text-gray-400" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-lg">
+                        <DialogHeader>
+                          <DialogTitle className="text-xl font-semibold text-gray-900">
+                            Select Product
+                          </DialogTitle>
+                          <DialogDescription className="text-gray-600">
+                            Choose a product for this order item from the list below
+                          </DialogDescription>
+                        </DialogHeader>
+                        <Command className="bg-white rounded-lg border border-gray-200">
+                          <div className="flex items-center border-b border-gray-200 px-4 py-3">
+                            <Search className="mr-3 h-5 w-5 shrink-0 text-gray-400" />
+                            <CommandInput
+                              placeholder="Search products by name..."
+                              value={productSearch[index] || ""}
+                              onValueChange={(value) =>
+                                setProductSearch((prev) => ({
+                                  ...prev,
+                                  [index]: value,
+                                }))
+                              }
+                              className="border-0 focus:ring-0 text-base"
+                            />
+                          </div>
+                          <CommandList className="max-h-80 overflow-y-auto">
+                            <CommandEmpty className="py-8 text-center">
+                              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <svg
+                                  className="w-6 h-6 text-gray-400"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                  />
+                                </svg>
+                              </div>
+                              <p className="text-gray-500 font-medium">
+                                No product found
+                              </p>
+                              <p className="text-sm text-gray-400 mt-1">
+                                Try adjusting your search terms
+                              </p>
+                            </CommandEmpty>
+                            <CommandGroup>
+                              {getFilteredProducts(productSearch[index] || "").map((product) => (
+                                <CommandItem
+                                  key={product.id}
+                                  value={product.id.toString()}
+                                  onSelect={() => {
+                                    updateItem(index, "product_id", product.id);
+                                    setProductDialogOpen((prev) => ({
+                                      ...prev,
+                                      [index]: false,
+                                    }));
+                                    setProductSearch((prev) => ({
+                                      ...prev,
+                                      [index]: "",
+                                    }));
+                                  }}
+                                  className="px-4 py-3 hover:bg-red-50 cursor-pointer"
+                                >
+                                  <div className="flex items-center w-full">
+                                    <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                                      <span className="text-red-600 font-semibold text-sm">
+                                        {product.name.charAt(0).toUpperCase()}
+                                      </span>
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="font-medium text-gray-900">
+                                        {product.name}
+                                      </div>
+                                      <div className="text-sm text-gray-500">
+                                        {product.unit_type}
+                                      </div>
+                                    </div>
+                                    <div className="w-2 h-2 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                         </div>
-                      )}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </DialogContent>
+                    </Dialog>
                   </div>
 
                   {/* Unit of Issue */}

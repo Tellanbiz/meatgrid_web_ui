@@ -79,6 +79,11 @@ export const sidebarData = {
           url: "/purchasable-orders",
           icon: "solar:bill-list-linear",
         },
+        {
+          title: "Purchasable Stocks",
+          url: "/purchasable-stocks",
+          icon: "solar:box-minimalistic-linear",
+        },
       ],
     },
     {

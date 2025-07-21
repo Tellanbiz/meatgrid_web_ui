@@ -43,6 +43,9 @@ import SchedulesPage from "@/pages/schedules/SchedulesPage.js";
 import PurchasablePage from "@/routes/purchasables/pages/purchasable-page";
 import PurchasableOrderPage from "@/routes/purchasables/pages/purchasable-order-page";
 import PurchasableCreateOrderPage from "@/routes/purchasables/pages/purchasable-create-order-page";
+import PurchasableStockPage from "@/routes/purchasables/pages/purchasable-stock-page";
+import PurchasableProcessStockPage from "@/routes/purchasables/pages/purchasable-process-stock-page";
+import PurchasableProducePage from "@/routes/purchasables/pages/purchasable-produce-page";
 
 // New Zustand-based accounts page
 import AccountsPage from "@/routes/accounts/pages/accounts-page";
@@ -482,6 +485,30 @@ const routes: RouteObject[] = [
         element: (
           <PrivateRoute>
             <PurchasableCreateOrderPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "purchasable-stocks",
+        element: (
+          <PrivateRoute>
+            <PurchasableStockPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "purchasable-stocks/process",
+        element: (
+          <PrivateRoute>
+            <PurchasableProcessStockPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "purchasable-produce",
+        element: (
+          <PrivateRoute>
+            <PurchasableProducePage />
           </PrivateRoute>
         ),
       },
