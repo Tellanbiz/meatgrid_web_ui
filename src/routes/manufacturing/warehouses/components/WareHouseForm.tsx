@@ -121,6 +121,7 @@ const WarehouseForm: React.FC<WarehouseFormProps> = ({
               </Label>
               <Input
                 type="number"
+                step="any"
                 placeholder="-2.98759"
                 value={form.latitude}
                 onChange={(e) => handleChange("latitude", e.target.value)}
@@ -135,6 +136,7 @@ const WarehouseForm: React.FC<WarehouseFormProps> = ({
               </Label>
               <Input
                 type="number"
+                step="any"
                 placeholder="31.2568"
                 value={form.longitude}
                 onChange={(e) => handleChange("longitude", e.target.value)}

@@ -14,34 +14,77 @@ import { RefreshCcw } from "lucide-react";
 const DashboardPage = () => {
   const { fetchAllDashboardData, loading } = useDashboard();
 
-  // Date range state
+  // Date range state - default to last 30 days
   const [startDate, setStartDate] = useState<Date | null>(() => {
     const date = new Date();
     date.setDate(date.getDate() - 30);
     return date;
   });
-  const [endDate, setEndDate] = useState<Date | null>(new Date());
+  const [endDate, setEndDate] = useState<Date | null>(() => new Date());
 
   const handleDateRangeChange = (start: Date | null, end: Date | null) => {
     setStartDate(start);
     setEndDate(end);
   };
 
+  const convertToUTC = (date: Date) => {
+    // Convert local date to UTC date string in YYYY-MM-DD format
+    const utcYear = date.getUTCFullYear();
+    const utcMonth = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const utcDay = String(date.getUTCDate()).padStart(2, "0");
+    return `${utcYear}-${utcMonth}-${utcDay}`;
+  };
+
+  const formatDateForBackend = (date: Date) => {
+    // For dashboard, we want to convert local date to UTC properly
+    // Set the date to start of day in local timezone, then convert to UTC
+    const localDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+    return convertToUTC(localDate);
+  };
+
   const handleRefresh = () => {
+    // Don't refresh if we're in the middle of date selection
+    if (startDate && !endDate) {
+      return;
+    }
+
     if (startDate && endDate) {
       const params = {
-        start_date: startDate.toISOString().split("T")[0],
-        end_date: endDate.toISOString().split("T")[0],
+        start_date: formatDateForBackend(startDate),
+        end_date: formatDateForBackend(endDate),
+      };
+      fetchAllDashboardData(params);
+    } else if (startDate) {
+      // Single date selection
+      const params = {
+        start_date: formatDateForBackend(startDate),
+        end_date: formatDateForBackend(startDate),
       };
       fetchAllDashboardData(params);
     }
   };
 
   useEffect(() => {
+    // Don't fetch if we're in the middle of date range selection
+    if (startDate && !endDate) {
+      return;
+    }
+
     if (startDate && endDate) {
       const params = {
-        start_date: startDate.toISOString().split("T")[0],
-        end_date: endDate.toISOString().split("T")[0],
+        start_date: formatDateForBackend(startDate),
+        end_date: formatDateForBackend(endDate),
+      };
+      fetchAllDashboardData(params);
+    } else if (startDate) {
+      // Single date selection
+      const params = {
+        start_date: formatDateForBackend(startDate),
+        end_date: formatDateForBackend(startDate),
       };
       fetchAllDashboardData(params);
     }

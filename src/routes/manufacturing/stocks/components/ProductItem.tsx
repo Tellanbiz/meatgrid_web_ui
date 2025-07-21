@@ -27,6 +27,7 @@ const ProductItem: React.FC<ProductItemProps> = ({
       <div className="col-span-5 flex items-center space-x-2">
         <Input
           type="number"
+          step="any"
           value={product.quantity}
           onChange={(e) =>
             onQuantityChange(product.id, e.target.value, isRawMaterial)

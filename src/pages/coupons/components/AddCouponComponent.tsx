@@ -86,6 +86,7 @@ const AddCouponComponent = () => {
           label="Amount"
           name="amount"
           type="number"
+          step="any"
           value={amount.toString()}
           onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
           placeholder="e.g. 300"

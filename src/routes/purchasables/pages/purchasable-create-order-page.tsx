@@ -44,9 +44,13 @@ export default function PurchasableCreateOrderPage() {
   const dispatch = useAppDispatch();
   const { purchasables, fetchPurchasables } = usePurchasables();
   const suppliers = useAppSelector(selectSuppliers);
+<<<<<<< HEAD
   const stores = useAppSelector(selectStores);
   const storageTypes = useAppSelector(selectStorageTypes);
   
+=======
+
+>>>>>>> a8f5b90817b725b3ff3c80977f8598bff94c2ac1
   const [supplierId, setSupplierId] = useState("");
   const [storeId, setStoreId] = useState("");
   const [storageTypeId, setStorageTypeId] = useState("");
@@ -193,7 +197,7 @@ export default function PurchasableCreateOrderPage() {
 
   // Helper function to normalize search terms
   const normalizeSearchTerm = (term: string): string => {
-    return term.toLowerCase().trim().replace(/\s+/g, ' ');
+    return term.toLowerCase().trim().replace(/\s+/g, " ");
   };
 
   // Helper function to check if text matches search term
@@ -207,12 +211,12 @@ export default function PurchasableCreateOrderPage() {
   // Filter products based on search (case-insensitive) - this will be used per item
   const getFilteredProducts = (searchTerm: string) => {
     if (!searchTerm.trim()) return purchasables;
-    
+
     return purchasables.filter(
     (product) =>
         matchesSearch(product.name, searchTerm) ||
-        matchesSearch(product.description || '', searchTerm) ||
-        matchesSearch(product.unit_type || '', searchTerm)
+        matchesSearch(product.description || "", searchTerm) ||
+        matchesSearch(product.unit_type || "", searchTerm)
     );
   };
 
@@ -220,9 +224,9 @@ export default function PurchasableCreateOrderPage() {
   const filteredSuppliers = suppliers.filter(
     (supplier) =>
       matchesSearch(supplier.full_name, debouncedSupplierSearch) ||
-      matchesSearch(supplier.email || '', debouncedSupplierSearch) ||
-      matchesSearch(supplier.phone_number || '', debouncedSupplierSearch) ||
-      matchesSearch(supplier.address || '', debouncedSupplierSearch)
+      matchesSearch(supplier.email || "", debouncedSupplierSearch) ||
+      matchesSearch(supplier.phone_number || "", debouncedSupplierSearch) ||
+      matchesSearch(supplier.address || "", debouncedSupplierSearch)
   );
 
   return (
@@ -338,6 +342,7 @@ export default function PurchasableCreateOrderPage() {
                         className="border-0 focus:ring-0 text-base"
                 />
               </div>
+<<<<<<< HEAD
                     <CommandList className="max-h-80 overflow-y-auto">
                       <CommandEmpty className="py-8 text-center">
                         <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -354,6 +359,28 @@ export default function PurchasableCreateOrderPage() {
                               d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                             />
                           </svg>
+=======
+              <Select value={supplierId} onValueChange={setSupplierId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a supplier" />
+                </SelectTrigger>
+                <SelectContent>
+                  {filteredSuppliers.length > 0 ? (
+                    filteredSuppliers.map((supplier) => (
+                      <SelectItem key={supplier.id} value={supplier.id}>
+                        <div className="flex flex-col">
+                          <span className="font-medium">
+                            {supplier.full_name}
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            {supplier.email} • {supplier.phone_number}
+                          </span>
+                          {supplier.address && (
+                            <span className="text-sm text-gray-500 truncate">
+                              {supplier.address}
+                            </span>
+                          )}
+>>>>>>> a8f5b90817b725b3ff3c80977f8598bff94c2ac1
                         </div>
                         <p className="text-gray-500 font-medium">
                           No supplier found
@@ -745,6 +772,7 @@ export default function PurchasableCreateOrderPage() {
                         }))
                       }
                     >
+<<<<<<< HEAD
                       <DialogTrigger asChild>
                         <Button
                           variant="outline"
@@ -756,6 +784,28 @@ export default function PurchasableCreateOrderPage() {
                                 <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
                                   <span className="text-red-600 font-semibold text-xs">
                                     {getSelectedProduct(item.product_id)?.name.charAt(0).toUpperCase()}
+=======
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a product" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getFilteredProducts(
+                          debouncedProductSearch[index] || ""
+                        ).length > 0 ? (
+                          getFilteredProducts(
+                            debouncedProductSearch[index] || ""
+                          ).map((product) => (
+                            <SelectItem
+                              key={product.id}
+                              value={product.id.toString()}
+                            >
+                              <div className="flex flex-col">
+                                <span className="font-medium">
+                                  {product.name}
+                                </span>
+                                <span className="text-sm text-gray-500">
+                                  {product.description} ({product.unit_type})
+>>>>>>> a8f5b90817b725b3ff3c80977f8598bff94c2ac1
                                 </span>
                                 </div>
                                 <div className="text-left">

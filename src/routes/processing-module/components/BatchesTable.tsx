@@ -69,7 +69,12 @@ const BatchesTable: React.FC<BatchesTableProps> = ({ searchString }) => {
       return `${formattedQuantity} kilograms`;
     }
 
-    return `${quantity} ${unitType}`;
+    // For other unit types, format to remove unnecessary decimals
+    const formatted =
+      quantity % 1 === 0
+        ? quantity.toString()
+        : quantity.toFixed(2).replace(/\.?0+$/, "");
+    return `${formatted} ${unitType}`;
   };
 
   if (loading && batches.length === 0) {
@@ -112,7 +117,6 @@ const BatchesTable: React.FC<BatchesTableProps> = ({ searchString }) => {
                         <div className="text-xs text-gray-500 font-bold">
                           Batch: {batch.batch_number}
                         </div>
-                        
                       </div>
                     ))}
                   </div>

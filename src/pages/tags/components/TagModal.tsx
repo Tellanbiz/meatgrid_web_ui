@@ -88,6 +88,7 @@ const TagModal = ({
             <Label className="mb-2">Promotional Price</Label>
             <Input
               type="number"
+              step="any"
               {...form.register("promotional_price", { valueAsNumber: true })}
             />
             {form.formState.errors.promotional_price && (

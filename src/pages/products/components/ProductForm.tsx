@@ -290,7 +290,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
                     Regular Price
                   </Label>
                   <Input
-                    type="tel"
+                    type="number"
+                    step="any"
                     id="regular_price"
                     placeholder="0.00"
                     value={form.regular_price}
@@ -331,7 +332,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
                     Maximum Package Quantity
                   </Label>
                   <Input
-                    type="tel"
+                    type="number"
+                    step="any"
                     id="package_quantity"
                     placeholder="0.00"
                     value={form.package_quantity}
@@ -366,7 +368,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   Minimum Stock Quantity
                 </Label>
                 <Input
-                  type="tel"
+                  type="number"
+                  step="any"
                   id="min_stock_quantity"
                   placeholder="0.00"
                   value={form.min_stock_quantity}
