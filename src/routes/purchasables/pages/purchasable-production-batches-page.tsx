@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { RefreshCw, Search, ChevronLeft, ChevronRight, Factory } from "lucide-react";
+import {
+  RefreshCw,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  Factory,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -14,6 +20,8 @@ import {
 import { getProductionBatches } from "../domain/purchasable-get";
 import type { ProductionBatch } from "../domain/production-models";
 import { toast } from "sonner";
+import ExportButton from "@/components/buttons/ExportButton";
+import ExportService from "@/service/ExportService";
 
 const PurchasableProductionBatchesPage = () => {
   const navigate = useNavigate();
@@ -34,7 +42,7 @@ const PurchasableProductionBatchesPage = () => {
     try {
       const data = await getProductionBatches();
       setBatches(data);
-    } catch (err) {
+    } catch {
       setError("Failed to fetch production batches");
       toast.error("Failed to fetch production batches");
     } finally {
@@ -52,10 +60,11 @@ const PurchasableProductionBatchesPage = () => {
   };
 
   // Filter batches based on search query
-  const filteredBatches = batches.filter(batch =>
-    batch.batch_number.toLowerCase().includes(searchString.toLowerCase()) ||
-    batch.product.name.toLowerCase().includes(searchString.toLowerCase()) ||
-    batch.production_id.toLowerCase().includes(searchString.toLowerCase())
+  const filteredBatches = batches.filter(
+    (batch) =>
+      batch.batch_number.toLowerCase().includes(searchString.toLowerCase()) ||
+      batch.product.name.toLowerCase().includes(searchString.toLowerCase()) ||
+      batch.production_id.toLowerCase().includes(searchString.toLowerCase())
   );
 
   // Pagination logic
@@ -65,24 +74,71 @@ const PurchasableProductionBatchesPage = () => {
   const currentBatches = filteredBatches.slice(startIndex, endIndex);
 
   const handlePreviousPage = () => {
-    setCurrentPage(prev => Math.max(prev - 1, 1));
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
 
   const handleNextPage = () => {
-    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   };
 
   const handleProduceProducts = () => {
     navigate("/purchasable-produce");
   };
 
+  // Export columns for ProductionBatch
+  const exportColumns = [
+    { field: "batch_number", header: "Batch Number" },
+    { field: "product_name", header: "Product" },
+    { field: "quantity", header: "Quantity" },
+    {
+      field: "frozen_at",
+      header: "Frozen At",
+      format: (value: unknown) =>
+        value ? new Date(value as string).toLocaleDateString() : "Not frozen",
+    },
+    {
+      field: "chilled_at",
+      header: "Chilled At",
+      format: (value: unknown) =>
+        value ? new Date(value as string).toLocaleDateString() : "Not chilled",
+    },
+    {
+      field: "manufactured_at",
+      header: "Manufactured At",
+      format: (value: unknown) =>
+        value
+          ? new Date(value as string).toLocaleDateString()
+          : "Not manufactured",
+    },
+    {
+      field: "created_at",
+      header: "Created At",
+      format: (value: unknown) =>
+        new Date(value as string).toLocaleDateString(),
+    },
+  ];
 
+  // Transform data for export (flatten product name)
+  const exportData = filteredBatches.map((batch) => ({
+    ...batch,
+    product_name: batch.product.name,
+  }));
 
+  const handleExportExcel = () => {
+    ExportService.exportToExcel(exportData, {
+      fileName: "production-batches",
+      columns: exportColumns,
+    });
+  };
 
+  const handleExportPDF = async () => {
+    await ExportService.exportToPDF(exportData, {
+      fileName: "production-batches",
+      columns: exportColumns,
+    });
+  };
 
-
-
-    return (
+  return (
     <div className="space-y-4 p-6 bg-white">
       <div className="flex flex-col border-b border-gray-100">
         <div className="flex justify-between items-center">
@@ -120,6 +176,10 @@ const PurchasableProductionBatchesPage = () => {
               />
               <span className="ml-2">Refresh</span>
             </Button>
+            <ExportButton
+              onExportExcel={handleExportExcel}
+              onExportPDF={handleExportPDF}
+            />
           </div>
         </div>
       </div>
@@ -165,10 +225,12 @@ const PurchasableProductionBatchesPage = () => {
                 </TableHeader>
                 <TableBody>
                   {currentBatches.map((batch) => (
-                    <TableRow 
-                      key={batch.id} 
+                    <TableRow
+                      key={batch.id}
                       className="hover:bg-gray-50 cursor-pointer"
-                      onClick={() => navigate(`/purchasable-production-batches/${batch.id}`)}
+                      onClick={() =>
+                        navigate(`/purchasable-production-batches/${batch.id}`)
+                      }
                     >
                       <TableCell className="font-medium">
                         {batch.batch_number}
@@ -183,27 +245,39 @@ const PurchasableProductionBatchesPage = () => {
                             />
                           )}
                           <div>
-                            <div className="font-medium">{batch.product.name}</div>
+                            <div className="font-medium">
+                              {batch.product.name}
+                            </div>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className="font-medium">{(batch.quantity || 0).toLocaleString()}</span>
+                        <span className="font-medium">
+                          {(batch.quantity || 0).toLocaleString()}
+                        </span>
                         {/* Note: Unit type not available in ProductionBatch interface */}
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
-                          {batch.frozen_at ? new Date(batch.frozen_at).toLocaleDateString() : 'Not frozen'}
+                          {batch.frozen_at
+                            ? new Date(batch.frozen_at).toLocaleDateString()
+                            : "Not frozen"}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
-                          {batch.chilled_at ? new Date(batch.chilled_at).toLocaleDateString() : 'Not chilled'}
+                          {batch.chilled_at
+                            ? new Date(batch.chilled_at).toLocaleDateString()
+                            : "Not chilled"}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
-                          {batch.manufactured_at ? new Date(batch.manufactured_at).toLocaleDateString() : 'Not manufactured'}
+                          {batch.manufactured_at
+                            ? new Date(
+                                batch.manufactured_at
+                              ).toLocaleDateString()
+                            : "Not manufactured"}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -217,7 +291,9 @@ const PurchasableProductionBatchesPage = () => {
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/purchasable-production-batches/${batch.id}`);
+                            navigate(
+                              `/purchasable-production-batches/${batch.id}`
+                            );
                           }}
                         >
                           View Details
@@ -269,4 +345,4 @@ const PurchasableProductionBatchesPage = () => {
   );
 };
 
-export default PurchasableProductionBatchesPage; 
+export default PurchasableProductionBatchesPage;

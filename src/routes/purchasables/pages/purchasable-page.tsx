@@ -33,19 +33,21 @@ import type { Purchasable } from "../domain/models";
 import { deletePurchasable } from "../domain/purchasable-post";
 import DeleteDialog from "@/components/dialogs/DeleteDialog";
 import { toast } from "sonner";
+import ExportButton from "@/components/buttons/ExportButton";
+import ExportService from "@/service/ExportService";
 
 export default function PurchasablePage() {
-  const { 
-    purchasables, 
+  const {
+    purchasables,
     stores,
     selectedStore,
-    loading, 
+    loading,
     storesLoading,
-    error, 
-    fetchPurchasables, 
+    error,
+    fetchPurchasables,
     fetchStores,
     setSelectedStore,
-    refreshData 
+    refreshData,
   } = usePurchasables();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -57,6 +59,60 @@ export default function PurchasablePage() {
     useState<Purchasable | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const itemsPerPage = 15;
+
+  // Export columns for Purchasable
+  const exportColumns = [
+    { field: "name", header: "Name" },
+    { field: "description", header: "Description" },
+    { field: "unit_type", header: "Unit Type" },
+    {
+      field: "stock_info",
+      header: "Status",
+      format: (value: unknown, rowData?: Purchasable) => {
+        if (!rowData) return "Unknown";
+        const totalIn = getTotalInStock(rowData);
+        return totalIn > 0 ? "In stock" : "Out of stock";
+      },
+    },
+    {
+      field: "stock_info",
+      header: "In Stock",
+      format: (value: unknown, rowData?: Purchasable) => {
+        if (!rowData) return "0";
+        const totalIn = getTotalInStock(rowData);
+        return formatQuantity(totalIn, rowData.unit_type);
+      },
+    },
+    {
+      field: "stock_info",
+      header: "Consumed",
+      format: (value: unknown, rowData?: Purchasable) => {
+        if (!rowData) return "0";
+        const totalOut = getTotalConsumed(rowData);
+        return formatQuantity(totalOut, rowData.unit_type);
+      },
+    },
+    {
+      field: "created_at",
+      header: "Created At",
+      format: (value: unknown) =>
+        new Date(value as string).toLocaleDateString(),
+    },
+  ];
+
+  const handleExportExcel = () => {
+    ExportService.exportToExcel(filteredPurchasables, {
+      fileName: "purchasables",
+      columns: exportColumns,
+    });
+  };
+
+  const handleExportPDF = async () => {
+    await ExportService.exportToPDF(filteredPurchasables, {
+      fileName: "purchasables",
+      columns: exportColumns,
+    });
+  };
 
   // Helper function to get total in stock (same logic as product table)
   const getTotalInStock = (purchasable: Purchasable) => {
@@ -84,9 +140,14 @@ export default function PurchasablePage() {
   // Helper function to format quantity with unit conversion
   const formatQuantity = (quantity: number, unitType: string) => {
     // Convert grams to kilograms if quantity is >= 1000 and unit type is kilograms
-    if ((unitType === "kilograms" || unitType === "kilogram") && quantity >= 1000) {
+    if (
+      (unitType === "kilograms" || unitType === "kilogram") &&
+      quantity >= 1000
+    ) {
       const kgQuantity = quantity / 1000;
-      return `${kgQuantity.toLocaleString(undefined, { maximumFractionDigits: 2 })} kg`;
+      return `${kgQuantity.toLocaleString(undefined, {
+        maximumFractionDigits: 2,
+      })} kg`;
     }
     return `${quantity.toLocaleString()} ${unitType}`;
   };
@@ -174,9 +235,16 @@ export default function PurchasablePage() {
           {/* Store Selection */}
           <div className="flex items-center space-x-2">
             <Store className="h-4 w-4 text-gray-500" />
-            <Select value={selectedStore || "all"} onValueChange={setSelectedStore}>
+            <Select
+              value={selectedStore || "all"}
+              onValueChange={setSelectedStore}
+            >
               <SelectTrigger className="w-48" disabled={storesLoading}>
-                <SelectValue placeholder={storesLoading ? "Loading stores..." : "Select a store"} />
+                <SelectValue
+                  placeholder={
+                    storesLoading ? "Loading stores..." : "Select a store"
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Stores</SelectItem>
@@ -202,6 +270,10 @@ export default function PurchasablePage() {
         </div>
 
         <div className="flex items-center space-x-2">
+          <ExportButton
+            onExportExcel={handleExportExcel}
+            onExportPDF={handleExportPDF}
+          />
           <Button
             variant="outline"
             size="sm"
@@ -209,7 +281,7 @@ export default function PurchasablePage() {
             disabled={loading}
             className="flex items-center space-x-2"
           >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             <span>Refresh</span>
           </Button>
           <Button size="sm" onClick={handleNew}>
@@ -267,23 +339,35 @@ export default function PurchasablePage() {
                     <TableCell>{purchasable.unit_type}</TableCell>
                     <TableCell>
                       {getTotalInStock(purchasable) > 0 ? (
-                        <Badge variant="default" className="bg-green-500 hover:bg-green-600">
+                        <Badge
+                          variant="default"
+                          className="bg-green-500 hover:bg-green-600"
+                        >
                           In stock
                         </Badge>
                       ) : (
-                        <Badge variant="default" className="bg-red-500 hover:bg-red-600">
+                        <Badge
+                          variant="default"
+                          className="bg-red-500 hover:bg-red-600"
+                        >
                           Out of stock
                         </Badge>
                       )}
                     </TableCell>
                     <TableCell>
                       <div className="text-sm font-medium">
-                        {formatQuantity(getTotalInStock(purchasable), purchasable.unit_type)}
+                        {formatQuantity(
+                          getTotalInStock(purchasable),
+                          purchasable.unit_type
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
-                        {formatQuantity(getTotalConsumed(purchasable), purchasable.unit_type)}
+                        {formatQuantity(
+                          getTotalConsumed(purchasable),
+                          purchasable.unit_type
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
