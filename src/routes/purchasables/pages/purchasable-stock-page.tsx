@@ -1,9 +1,7 @@
 import {
-  Forward,
   RefreshCcw,
   FileSpreadsheet,
   Package,
-  Factory,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,16 +61,8 @@ const PurchasableStockPage = () => {
     fetchStocks();
   };
 
-  const handleTransferStock = () => {
-    navigate("/purchasable-stocks/transfer");
-  };
-
   const handleProcessStock = () => {
     navigate("/purchasable-stocks/process");
-  };
-
-  const handleProduceProducts = () => {
-    navigate("/purchasable-produce");
   };
 
   const getFilteredStocks = () => {
@@ -236,22 +226,9 @@ const PurchasableStockPage = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button variant="outline" size="sm" onClick={handleTransferStock}>
-              <Forward className="h-4 w-4" />
-              <span className="ml-2">Transfer Stock</span>
-            </Button>
             <Button variant="default" size="sm" onClick={handleProcessStock}>
               <Package className="h-4 w-4" />
               <span className="ml-2">Process Stock</span>
-            </Button>
-            <Button 
-              variant="default" 
-              size="sm" 
-              onClick={handleProduceProducts}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              <Factory className="h-4 w-4" />
-              <span className="ml-2">Produce</span>
             </Button>
           </div>
         </div>

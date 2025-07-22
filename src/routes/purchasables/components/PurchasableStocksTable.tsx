@@ -104,7 +104,7 @@ const PurchasableStocksTable: React.FC<PurchasableStocksTableProps> = ({
         />
       )}
 
-      <div className="bg-white rounded-md overflow-hidden">
+      <div className="bg-white rounded-md overflow-hidden border border-gray-200">
         <div className="flex-1">
           <Table>
             <TableHeader>

@@ -46,6 +46,8 @@ import PurchasableCreateOrderPage from "@/routes/purchasables/pages/purchasable-
 import PurchasableStockPage from "@/routes/purchasables/pages/purchasable-stock-page";
 import PurchasableProcessStockPage from "@/routes/purchasables/pages/purchasable-process-stock-page";
 import PurchasableProducePage from "@/routes/purchasables/pages/purchasable-produce-page";
+import PurchasableProductionBatchesPage from "@/routes/purchasables/pages/purchasable-production-batches-page";
+import PurchasableBatchInfoPage from "@/routes/purchasables/pages/purchasable-batch-info-page";
 
 // New Zustand-based accounts page
 import AccountsPage from "@/routes/accounts/pages/accounts-page";
@@ -509,6 +511,22 @@ const routes: RouteObject[] = [
         element: (
           <PrivateRoute>
             <PurchasableProducePage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "purchasable-production-batches",
+        element: (
+          <PrivateRoute>
+            <PurchasableProductionBatchesPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "purchasable-production-batches/:batchId",
+        element: (
+          <PrivateRoute>
+            <PurchasableBatchInfoPage />
           </PrivateRoute>
         ),
       },

@@ -84,6 +84,11 @@ export const sidebarData = {
           url: "/purchasable-stocks",
           icon: "solar:box-minimalistic-linear",
         },
+        {
+          title: "Production Batches",
+          url: "/purchasable-production-batches",
+          icon: "solar:box-linear",
+        },
       ],
     },
     {
