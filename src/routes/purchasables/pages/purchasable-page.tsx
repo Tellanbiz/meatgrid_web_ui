@@ -68,7 +68,7 @@ export default function PurchasablePage() {
     {
       field: "stock_info",
       header: "Status",
-      format: (value: unknown, rowData?: Purchasable) => {
+      format: (_value: unknown, rowData?: Purchasable) => {
         if (!rowData) return "Unknown";
         const totalIn = getTotalInStock(rowData);
         return totalIn > 0 ? "In stock" : "Out of stock";
@@ -77,7 +77,7 @@ export default function PurchasablePage() {
     {
       field: "stock_info",
       header: "In Stock",
-      format: (value: unknown, rowData?: Purchasable) => {
+      format: (_value: unknown, rowData?: Purchasable) => {
         if (!rowData) return "0";
         const totalIn = getTotalInStock(rowData);
         return formatQuantity(totalIn, rowData.unit_type);
@@ -86,7 +86,7 @@ export default function PurchasablePage() {
     {
       field: "stock_info",
       header: "Consumed",
-      format: (value: unknown, rowData?: Purchasable) => {
+      format: (_value: unknown, rowData?: Purchasable) => {
         if (!rowData) return "0";
         const totalOut = getTotalConsumed(rowData);
         return formatQuantity(totalOut, rowData.unit_type);

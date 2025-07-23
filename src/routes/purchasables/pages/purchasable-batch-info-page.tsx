@@ -48,13 +48,13 @@ const PurchasableBatchInfoPage = () => {
 
   const fetchBatchInfo = async () => {
     if (!batchId) return;
-    
+
     setLoading(true);
     setError(null);
     try {
       const data = await getProductionBatchInfo(batchId);
       setBatchInfo(data);
-    } catch (err) {
+    } catch {
       setError("Failed to fetch batch information");
       toast.error("Failed to fetch batch information");
     } finally {
@@ -67,58 +67,57 @@ const PurchasableBatchInfoPage = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     });
   };
 
   const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const getStatusBadge = (status: string) => {
     const statusColors = {
-      'instock': 'bg-green-100 text-green-800',
-      'sold': 'bg-blue-100 text-blue-800',
-      'migrated': 'bg-yellow-100 text-yellow-800',
-      'processed': 'bg-purple-100 text-purple-800',
-      'damaged': 'bg-red-100 text-red-800'
+      instock: "bg-green-100 text-green-800",
+      sold: "bg-blue-100 text-blue-800",
+      migrated: "bg-yellow-100 text-yellow-800",
+      processed: "bg-purple-100 text-purple-800",
+      damaged: "bg-red-100 text-red-800",
     };
-    
+
     return (
-      <Badge variant="secondary" className={statusColors[status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'}>
+      <Badge
+        variant="secondary"
+        className={
+          statusColors[status as keyof typeof statusColors] ||
+          "bg-gray-100 text-gray-800"
+        }
+      >
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </Badge>
     );
   };
 
-  const getMovementTypeBadge = (movementType: string) => {
-    const typeColors = {
-      'in': 'bg-green-100 text-green-800',
-      'out': 'bg-red-100 text-red-800',
-      'transfer': 'bg-blue-100 text-blue-800'
-    };
-    
-    return (
-      <Badge variant="secondary" className={typeColors[movementType as keyof typeof typeColors] || 'bg-gray-100 text-gray-800'}>
-        {movementType.charAt(0).toUpperCase() + movementType.slice(1)}
-      </Badge>
-    );
-  };
+  // Removed unused getMovementTypeBadge function
 
   const formatQuantity = (quantity: number, unitType: string) => {
     // Convert grams to kilograms if quantity is >= 1000 and unit type is kilograms
-    if ((unitType === "kilograms" || unitType === "kilogram") && quantity >= 1000) {
+    if (
+      (unitType === "kilograms" || unitType === "kilogram") &&
+      quantity >= 1000
+    ) {
       const kgQuantity = quantity / 1000;
-      return `${kgQuantity.toLocaleString(undefined, { maximumFractionDigits: 2 })} kg`;
+      return `${kgQuantity.toLocaleString(undefined, {
+        maximumFractionDigits: 2,
+      })} kg`;
     }
     return `${quantity.toLocaleString()} ${unitType}`;
   };
@@ -159,7 +158,9 @@ const PurchasableBatchInfoPage = () => {
           </Button>
           <div className="flex items-center space-x-2">
             <Package className="h-5 w-5 text-blue-600" />
-            <h1 className="text-2xl font-semibold text-gray-900">Batch Information</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">
+              Batch Information
+            </h1>
           </div>
         </div>
         <div className="flex items-center space-x-2">
@@ -170,7 +171,7 @@ const PurchasableBatchInfoPage = () => {
             disabled={loading}
             className="flex items-center space-x-2"
           >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             <span>Refresh</span>
           </Button>
         </div>
@@ -193,21 +194,31 @@ const PurchasableBatchInfoPage = () => {
               <Calendar className="h-4 w-4 text-gray-500" />
               <div>
                 <p className="text-sm font-medium text-gray-600">Created</p>
-                <p className="text-sm text-gray-900">{formatDateTime(batchInfo.created_at)}</p>
+                <p className="text-sm text-gray-900">
+                  {formatDateTime(batchInfo.created_at)}
+                </p>
               </div>
             </div>
             <div className="flex items-center space-x-2">
               <Factory className="h-4 w-4 text-gray-500" />
               <div>
-                <p className="text-sm font-medium text-gray-600">Manufactured</p>
-                <p className="text-sm text-gray-900">{formatDateTime(batchInfo.manufactured_at)}</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Manufactured
+                </p>
+                <p className="text-sm text-gray-900">
+                  {formatDateTime(batchInfo.manufactured_at)}
+                </p>
               </div>
             </div>
             <div className="flex items-center space-x-2">
               <Box className="h-4 w-4 text-gray-500" />
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Products</p>
-                <p className="text-sm text-gray-900">{batchInfo.output_summary?.total_products || 0}</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Total Products
+                </p>
+                <p className="text-sm text-gray-900">
+                  {batchInfo.output_summary?.total_products || 0}
+                </p>
               </div>
             </div>
           </div>
@@ -265,8 +276,11 @@ const PurchasableBatchInfoPage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {!batchInfo.input_materials || batchInfo.input_materials.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">No input materials recorded</p>
+            {!batchInfo.input_materials ||
+            batchInfo.input_materials.length === 0 ? (
+              <p className="text-gray-500 text-center py-4">
+                No input materials recorded
+              </p>
             ) : (
               <Table>
                 <TableHeader>
@@ -283,16 +297,23 @@ const PurchasableBatchInfoPage = () => {
                     <TableRow key={index}>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{material.product.name}</div>
-                          <div className="text-sm text-gray-500">ID: {material.product.id}</div>
+                          <div className="font-medium">
+                            {material.product.name}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            ID: {material.product.id}
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className="font-medium">{formatQuantity(material.quantity, material.product.unit_type)}</span>
+                        <span className="font-medium">
+                          {formatQuantity(
+                            material.quantity,
+                            material.product.unit_type
+                          )}
+                        </span>
                       </TableCell>
-                      <TableCell>
-                        {getStatusBadge(material.status)}
-                      </TableCell>
+                      <TableCell>{getStatusBadge(material.status)}</TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
                           <Store className="h-4 w-4 text-gray-400" />
@@ -302,7 +323,9 @@ const PurchasableBatchInfoPage = () => {
                       <TableCell>
                         <div className="text-sm">
                           <div>{formatDate(material.created_at)}</div>
-                          <div className="text-gray-500">{formatDateTime(material.created_at).split(',')[1]}</div>
+                          <div className="text-gray-500">
+                            {formatDateTime(material.created_at).split(",")[1]}
+                          </div>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -325,8 +348,11 @@ const PurchasableBatchInfoPage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {!batchInfo.output_products || batchInfo.output_products.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">No output products recorded</p>
+            {!batchInfo.output_products ||
+            batchInfo.output_products.length === 0 ? (
+              <p className="text-gray-500 text-center py-4">
+                No output products recorded
+              </p>
             ) : (
               <Table>
                 <TableHeader>
@@ -351,17 +377,24 @@ const PurchasableBatchInfoPage = () => {
                             />
                           )}
                           <div>
-                            <div className="font-medium">{product.product.name}</div>
-                            <div className="text-sm text-gray-500">ID: {product.product.id}</div>
+                            <div className="font-medium">
+                              {product.product.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              ID: {product.product.id}
+                            </div>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className="font-medium">{formatQuantity(product.quantity, product.product.unit_type)}</span>
+                        <span className="font-medium">
+                          {formatQuantity(
+                            product.quantity,
+                            product.product.unit_type
+                          )}
+                        </span>
                       </TableCell>
-                      <TableCell>
-                        {getStatusBadge(product.status)}
-                      </TableCell>
+                      <TableCell>{getStatusBadge(product.status)}</TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
                           <Store className="h-4 w-4 text-gray-400" />
@@ -371,7 +404,9 @@ const PurchasableBatchInfoPage = () => {
                       <TableCell>
                         <div className="text-sm">
                           <div>{formatDate(product.created_at)}</div>
-                          <div className="text-gray-500">{formatDateTime(product.created_at).split(',')[1]}</div>
+                          <div className="text-gray-500">
+                            {formatDateTime(product.created_at).split(",")[1]}
+                          </div>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -391,37 +426,56 @@ const PurchasableBatchInfoPage = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{batchInfo.output_summary?.total_products || 0}</div>
+              <div className="text-2xl font-bold text-blue-600">
+                {batchInfo.output_summary?.total_products || 0}
+              </div>
               <div className="text-sm text-gray-600">Total Products</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{(batchInfo.output_summary?.total_quantity || 0).toLocaleString()}</div>
+              <div className="text-2xl font-bold text-green-600">
+                {(
+                  batchInfo.output_summary?.total_quantity || 0
+                ).toLocaleString()}
+              </div>
               <div className="text-sm text-gray-600">Total Quantity</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">{batchInfo.output_summary?.products_list?.length || 0}</div>
+              <div className="text-2xl font-bold text-purple-600">
+                {batchInfo.output_summary?.products_list?.length || 0}
+              </div>
               <div className="text-sm text-gray-600">Unique Products</div>
             </div>
           </div>
-          
+
           <div>
             <h4 className="font-medium mb-3">Products List:</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {batchInfo.output_summary?.products_list?.map((product, index) => (
-                <div key={index} className="flex items-center space-x-3 p-3 border rounded-lg">
-                  {product.image && (
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  )}
-                  <div>
-                    <div className="font-medium text-sm">{product.name}</div>
-                    <div className="text-xs text-gray-500">{product.unit_type}</div>
+              {batchInfo.output_summary?.products_list?.map(
+                (product, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center space-x-3 p-3 border rounded-lg"
+                  >
+                    {product.image && (
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    )}
+                    <div>
+                      <div className="font-medium text-sm">{product.name}</div>
+                      <div className="text-xs text-gray-500">
+                        {product.unit_type}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              )) || <p className="text-gray-500 col-span-full text-center py-4">No products list available</p>}
+                )
+              ) || (
+                <p className="text-gray-500 col-span-full text-center py-4">
+                  No products list available
+                </p>
+              )}
             </div>
           </div>
         </CardContent>
@@ -430,4 +484,4 @@ const PurchasableBatchInfoPage = () => {
   );
 };
 
-export default PurchasableBatchInfoPage; 
+export default PurchasableBatchInfoPage;
