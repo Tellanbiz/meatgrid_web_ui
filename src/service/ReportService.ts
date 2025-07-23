@@ -55,6 +55,7 @@ export const Reports: ReportData = {
     fileName: "products-list",
     columns: [
       { field: "name", header: "Product Name" },
+      { field: "sku", header: "SKU" },
       { field: "unit_type", header: "Unit Type" },
       {
         field: "regular_price",
@@ -72,18 +73,18 @@ export const Reports: ReportData = {
       {
         field: "stock_info",
         header: "In Stock",
-        format: (value, rowData) => {
+        format: (value, rowData?: Product) => {
           const totalIn = getTotalInStock(value as Partial<StockInfo>);
-          const unitType = (rowData as any)?.unit_type || "";
+          const unitType = rowData?.unit_type || "";
           return `${totalIn.toLocaleString()} ${unitType}`;
         },
       },
       {
         field: "stock_info",
         header: "Consumed",
-        format: (value, rowData) => {
+        format: (value, rowData?: Product) => {
           const totalOut = getTotalConsumed(value as Partial<StockInfo>);
-          const unitType = (rowData as any)?.unit_type || "";
+          const unitType = rowData?.unit_type || "";
           return `${totalOut.toLocaleString()} ${unitType}`;
         },
       },
