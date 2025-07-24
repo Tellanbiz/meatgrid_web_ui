@@ -84,6 +84,12 @@ const PurchasableProducePage = () => {
   // Search states
   const [storeSearch, setStoreSearch] = useState("");
   const [storageTypeSearch, setStorageTypeSearch] = useState("");
+  const [materialSearch, setMaterialSearch] = useState<{
+    [key: number]: string;
+  }>({});
+  const [productSearch, setProductSearch] = useState<{ [key: number]: string }>(
+    {}
+  );
 
   // Dialog states
   const [storeDialogOpen, setStoreDialogOpen] = useState(false);
@@ -270,6 +276,32 @@ const PurchasableProducePage = () => {
         type.name.toLowerCase().includes(normalizedSearch) ||
         (type.description &&
           type.description.toLowerCase().includes(normalizedSearch))
+    );
+  };
+
+  const getFilteredMaterials = (index: number) => {
+    const searchTerm = materialSearch[index] || "";
+    if (!searchTerm.trim()) return purchasables;
+
+    const normalizedSearch = searchTerm.toLowerCase().trim();
+    return purchasables.filter(
+      (material) =>
+        material.name.toLowerCase().includes(normalizedSearch) ||
+        (material.unit_type &&
+          material.unit_type.toLowerCase().includes(normalizedSearch))
+    );
+  };
+
+  const getFilteredProducts = (index: number) => {
+    const searchTerm = productSearch[index] || "";
+    if (!searchTerm.trim()) return products;
+
+    const normalizedSearch = searchTerm.toLowerCase().trim();
+    return products.filter(
+      (product) =>
+        product.name.toLowerCase().includes(normalizedSearch) ||
+        (product.unit_type &&
+          product.unit_type.toLowerCase().includes(normalizedSearch))
     );
   };
 
@@ -769,11 +801,19 @@ const PurchasableProducePage = () => {
                                     <Search className="mr-3 h-5 w-5 shrink-0 text-gray-400" />
                                     <Input
                                       placeholder="Search materials by name..."
+                                      value={materialSearch[index] || ""}
+                                      onChange={(e) =>
+                                        setMaterialSearch((prev) => ({
+                                          ...prev,
+                                          [index]: e.target.value,
+                                        }))
+                                      }
                                       className="border-0 focus:ring-0 text-base shadow-none bg-transparent"
                                     />
                                   </div>
                                   <div className="max-h-80 overflow-y-auto">
-                                    {purchasables.length === 0 ? (
+                                    {getFilteredMaterials(index).length ===
+                                    0 ? (
                                       <div className="py-12 text-center">
                                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                           <Search className="w-8 h-8 text-gray-400" />
@@ -788,42 +828,50 @@ const PurchasableProducePage = () => {
                                       </div>
                                     ) : (
                                       <div className="py-2">
-                                        {purchasables.map((purchasable) => (
-                                          <button
-                                            key={purchasable.id}
-                                            className="w-full px-4 py-3 flex items-center space-x-3 hover:bg-blue-50 border-l-4 border-transparent cursor-pointer text-left"
-                                            onClick={() => {
-                                              handleUpdateMaterial(
-                                                index,
-                                                "product_id",
-                                                purchasable.id
-                                              );
-                                              setMaterialDialogOpen((prev) => ({
-                                                ...prev,
-                                                [index]: false,
-                                              }));
-                                            }}
-                                          >
-                                            <div className="flex-shrink-0">
-                                              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                                <span className="text-blue-600 font-semibold text-sm">
-                                                  {purchasable.name
-                                                    .charAt(0)
-                                                    .toUpperCase()}
-                                                </span>
+                                        {getFilteredMaterials(index).map(
+                                          (purchasable) => (
+                                            <button
+                                              key={purchasable.id}
+                                              className="w-full px-4 py-3 flex items-center space-x-3 hover:bg-blue-50 border-l-4 border-transparent cursor-pointer text-left"
+                                              onClick={() => {
+                                                handleUpdateMaterial(
+                                                  index,
+                                                  "product_id",
+                                                  purchasable.id
+                                                );
+                                                setMaterialDialogOpen(
+                                                  (prev) => ({
+                                                    ...prev,
+                                                    [index]: false,
+                                                  })
+                                                );
+                                                setMaterialSearch((prev) => ({
+                                                  ...prev,
+                                                  [index]: "",
+                                                }));
+                                              }}
+                                            >
+                                              <div className="flex-shrink-0">
+                                                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                                  <span className="text-blue-600 font-semibold text-sm">
+                                                    {purchasable.name
+                                                      .charAt(0)
+                                                      .toUpperCase()}
+                                                  </span>
+                                                </div>
                                               </div>
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                              <div className="font-medium text-gray-900 text-base mb-1">
-                                                {purchasable.name}
+                                              <div className="flex-1 min-w-0">
+                                                <div className="font-medium text-gray-900 text-base mb-1">
+                                                  {purchasable.name}
+                                                </div>
+                                                <div className="text-sm text-gray-600">
+                                                  {purchasable.unit_type}
+                                                </div>
                                               </div>
-                                              <div className="text-sm text-gray-600">
-                                                {purchasable.unit_type}
-                                              </div>
-                                            </div>
-                                            <ChevronDown className="w-5 h-5 text-gray-400 transform rotate-[-90deg]" />
-                                          </button>
-                                        ))}
+                                              <ChevronDown className="w-5 h-5 text-gray-400 transform rotate-[-90deg]" />
+                                            </button>
+                                          )
+                                        )}
                                       </div>
                                     )}
                                   </div>
@@ -992,11 +1040,18 @@ const PurchasableProducePage = () => {
                                     <Search className="mr-3 h-5 w-5 shrink-0 text-gray-400" />
                                     <Input
                                       placeholder="Search products by name..."
+                                      value={productSearch[index] || ""}
+                                      onChange={(e) =>
+                                        setProductSearch((prev) => ({
+                                          ...prev,
+                                          [index]: e.target.value,
+                                        }))
+                                      }
                                       className="border-0 focus:ring-0 text-base shadow-none bg-transparent"
                                     />
                                   </div>
                                   <div className="max-h-80 overflow-y-auto">
-                                    {products.length === 0 ? (
+                                    {getFilteredProducts(index).length === 0 ? (
                                       <div className="py-12 text-center">
                                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                           <Search className="w-8 h-8 text-gray-400" />
@@ -1011,42 +1066,50 @@ const PurchasableProducePage = () => {
                                       </div>
                                     ) : (
                                       <div className="py-2">
-                                        {products.map((productItem) => (
-                                          <button
-                                            key={productItem.id}
-                                            className="w-full px-4 py-3 flex items-center space-x-3 hover:bg-green-50 border-l-4 border-transparent cursor-pointer text-left"
-                                            onClick={() => {
-                                              handleUpdateProduct(
-                                                index,
-                                                "product_id",
-                                                productItem.id
-                                              );
-                                              setProductDialogOpen((prev) => ({
-                                                ...prev,
-                                                [index]: false,
-                                              }));
-                                            }}
-                                          >
-                                            <div className="flex-shrink-0">
-                                              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                                                <span className="text-green-600 font-semibold text-sm">
-                                                  {productItem.name
-                                                    .charAt(0)
-                                                    .toUpperCase()}
-                                                </span>
+                                        {getFilteredProducts(index).map(
+                                          (productItem) => (
+                                            <button
+                                              key={productItem.id}
+                                              className="w-full px-4 py-3 flex items-center space-x-3 hover:bg-green-50 border-l-4 border-transparent cursor-pointer text-left"
+                                              onClick={() => {
+                                                handleUpdateProduct(
+                                                  index,
+                                                  "product_id",
+                                                  productItem.id
+                                                );
+                                                setProductDialogOpen(
+                                                  (prev) => ({
+                                                    ...prev,
+                                                    [index]: false,
+                                                  })
+                                                );
+                                                setProductSearch((prev) => ({
+                                                  ...prev,
+                                                  [index]: "",
+                                                }));
+                                              }}
+                                            >
+                                              <div className="flex-shrink-0">
+                                                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                                  <span className="text-green-600 font-semibold text-sm">
+                                                    {productItem.name
+                                                      .charAt(0)
+                                                      .toUpperCase()}
+                                                  </span>
+                                                </div>
                                               </div>
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                              <div className="font-medium text-gray-900 text-base mb-1">
-                                                {productItem.name}
+                                              <div className="flex-1 min-w-0">
+                                                <div className="font-medium text-gray-900 text-base mb-1">
+                                                  {productItem.name}
+                                                </div>
+                                                <div className="text-sm text-gray-600">
+                                                  {productItem.unit_type}
+                                                </div>
                                               </div>
-                                              <div className="text-sm text-gray-600">
-                                                {productItem.unit_type}
-                                              </div>
-                                            </div>
-                                            <ChevronDown className="w-5 h-5 text-gray-400 transform rotate-[-90deg]" />
-                                          </button>
-                                        ))}
+                                              <ChevronDown className="w-5 h-5 text-gray-400 transform rotate-[-90deg]" />
+                                            </button>
+                                          )
+                                        )}
                                       </div>
                                     )}
                                   </div>
