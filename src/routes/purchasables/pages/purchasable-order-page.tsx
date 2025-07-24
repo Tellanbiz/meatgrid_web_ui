@@ -25,10 +25,17 @@ import {
   SearchIcon,
   XIcon,
   PlusIcon,
-  Calendar,
   RefreshCw,
   Trash2,
 } from "lucide-react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { usePurchasables } from "../hooks/usePurchasables";
 import {
   createPurchaseOrder,
@@ -54,6 +61,7 @@ import { TabNavigation } from "@/components/ui/tab-navigation";
 import DeleteDialog from "@/components/dialogs/DeleteDialog";
 import ExportButton from "@/components/buttons/ExportButton";
 import ExportService from "@/service/ExportService";
+import StockDateRangePicker from "@/routes/manufacturing/stocks/components/StockDateRangePicker";
 
 interface PurchasableOrderPageProps {
   activeTab?: string;
@@ -109,8 +117,16 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
 
   // Order list states
   const [searchQuery, setSearchQuery] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [selectedFilterSupplier, setSelectedFilterSupplier] =
+    useState<string>("");
+  const [selectedFilterProduct, setSelectedFilterProduct] =
+    useState<string>("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
+  const [productSearchTerm, setProductSearchTerm] = useState("");
 
   // Delete states
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -120,18 +136,34 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    fetchPurchasableOrders();
+    // Set default dates (30 days ago to today)
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+    setEndDate(today);
+    setStartDate(thirtyDaysAgo);
+  }, []);
+
+  useEffect(() => {
+    if (startDate && endDate) {
+      const formatDateForAPI = (date: Date) => {
+        const day = date.getDate().toString().padStart(2, "0");
+        const month = (date.getMonth() + 1).toString().padStart(2, "0");
+        const year = date.getFullYear();
+        return `${year}-${month}-${day}`;
+      };
+      fetchPurchasableOrders(
+        formatDateForAPI(startDate),
+        formatDateForAPI(endDate)
+      );
+    }
+  }, [startDate, endDate, fetchPurchasableOrders]);
+
+  useEffect(() => {
     fetchPurchasables();
     dispatch(fetchSuppliers());
     dispatch(fetchStores());
     dispatch(fetchStorageTypes());
-
-    // Set default dates (30 days ago to today)
-    const today = new Date();
-    const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-    setEndDate(today.toISOString().split("T")[0]);
-    setStartDate(thirtyDaysAgo.toISOString().split("T")[0]);
-  }, [fetchPurchasableOrders, fetchPurchasables, dispatch]);
+  }, [fetchPurchasables, dispatch]);
 
   const handleCreateOrder = async () => {
     if (!selectedSupplier) {
@@ -157,9 +189,7 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
     // Validate all items have required fields
     const invalidItems = orderItems.filter(
       (item) =>
-        item.product_id === 0 ||
-        item.unit_of_issue === 0 ||
-        item.unit_cost === 0
+        item.product_id === 0 || item.unit_of_issue === 0 || item.unit_cost < 0
     );
 
     if (invalidItems.length > 0) {
@@ -248,12 +278,11 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
 
   const handleRefreshOrders = () => {
     if (startDate && endDate) {
-      const formatDateForAPI = (dateString: string) => {
-        const date = new Date(dateString);
+      const formatDateForAPI = (date: Date) => {
         const day = date.getDate().toString().padStart(2, "0");
         const month = (date.getMonth() + 1).toString().padStart(2, "0");
         const year = date.getFullYear();
-        return `${day}-${month}-${year}`;
+        return `${year}-${month}-${day}`;
       };
       fetchPurchasableOrders(
         formatDateForAPI(startDate),
@@ -416,15 +445,81 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
     }
   };
 
-  // Filter orders based on search
-  const filteredOrders = purchasableOrders.filter(
-    (order) =>
+  // Filter orders based on search and filters
+  const filteredOrders = purchasableOrders.filter((order) => {
+    // Basic search filter
+    const matchesSearch =
       order.supplier.full_name
         .toLowerCase()
         .includes(searchQuery.toLowerCase()) ||
       order.user.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.id.toString().includes(searchQuery)
-  );
+      order.id.toString().includes(searchQuery);
+
+    // Supplier filter
+    const matchesSupplier =
+      !selectedFilterSupplier ||
+      order.supplier.id.toString() === selectedFilterSupplier;
+
+    // Product filter
+    const matchesProduct =
+      !selectedFilterProduct ||
+      order.items.some(
+        (item) => item.product.id.toString() === selectedFilterProduct
+      );
+
+    // Date filter (convert UTC to local time)
+    const orderDate = new Date(order.created_at);
+    // Remove time for date-only comparison in local time
+    const orderLocalDate = new Date(
+      orderDate.getFullYear(),
+      orderDate.getMonth(),
+      orderDate.getDate()
+    );
+
+    let afterStart = true;
+    let beforeEnd = true;
+
+    if (startDate) {
+      const startLocal = new Date(startDate);
+      const startLocalDate = new Date(
+        startLocal.getFullYear(),
+        startLocal.getMonth(),
+        startLocal.getDate()
+      );
+      afterStart = orderLocalDate >= startLocalDate;
+    }
+
+    if (endDate) {
+      const endLocal = new Date(endDate);
+      const endLocalDate = new Date(
+        endLocal.getFullYear(),
+        endLocal.getMonth(),
+        endLocal.getDate()
+      );
+      beforeEnd = orderLocalDate <= endLocalDate;
+    }
+
+    const matchesDate = afterStart && beforeEnd;
+
+    return matchesSearch && matchesSupplier && matchesProduct && matchesDate;
+  });
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    searchQuery,
+    startDate,
+    endDate,
+    selectedFilterSupplier,
+    selectedFilterProduct,
+  ]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = filteredOrders.slice(startIndex, endIndex);
 
   // Helper function to normalize search terms
   const normalizeSearchTerm = (term: string): string => {
@@ -457,46 +552,149 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
       {currentTab === "orders" && (
         <div className="space-y-6  px-6">
           {/* Search and Filters */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search orders, suppliers, users..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-80">
+                  <div className="relative">
+                    <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Input
+                      placeholder="Search orders, suppliers, users..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+
+                <StockDateRangePicker
+                  startDate={startDate}
+                  endDate={endDate}
+                  onChange={(start, end) => {
+                    setStartDate(start);
+                    setEndDate(end);
+                  }}
+                />
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="flex items-center gap-2"
+                >
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"
+                    />
+                  </svg>
+                  Filters
+                </Button>
+
+                <Button
+                  size="sm"
+                  onClick={handleRefreshOrders}
+                  disabled={!startDate || !endDate}
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Refresh
+                </Button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <ExportButton
+                  onExportExcel={handleExportExcel}
+                  onExportPDF={handleExportPDF}
                 />
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-gray-400" />
-              <Input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="w-40"
-              />
-              <span className="text-gray-400">to</span>
-              <Input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="w-40"
-              />
-              <Button
-                size="sm"
-                onClick={handleRefreshOrders}
-                disabled={!startDate || !endDate}
-              >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh
-              </Button>
-              <ExportButton
-                onExportExcel={handleExportExcel}
-                onExportPDF={handleExportPDF}
-              />
-            </div>
+
+            {/* Advanced Filters */}
+            {showFilters && (
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Supplier Filter */}
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Filter by Supplier
+                    </Label>
+                    <select
+                      value={selectedFilterSupplier}
+                      onChange={(e) =>
+                        setSelectedFilterSupplier(e.target.value)
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    >
+                      <option value="">All Suppliers</option>
+                      {suppliers.map((supplier) => (
+                        <option key={supplier.id} value={supplier.id}>
+                          {supplier.full_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Product Filter with Search */}
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Filter by Product
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        placeholder="Search products..."
+                        value={productSearchTerm}
+                        onChange={(e) => setProductSearchTerm(e.target.value)}
+                        className="mb-2"
+                      />
+                      <select
+                        value={selectedFilterProduct}
+                        onChange={(e) =>
+                          setSelectedFilterProduct(e.target.value)
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      >
+                        <option value="">All Products</option>
+                        {purchasables
+                          .filter((product) =>
+                            product.name
+                              .toLowerCase()
+                              .includes(productSearchTerm.toLowerCase())
+                          )
+                          .map((product) => (
+                            <option key={product.id} value={product.id}>
+                              {product.name}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Clear Filters */}
+                  <div className="flex items-end">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedFilterSupplier("");
+                        setSelectedFilterProduct("");
+                        setProductSearchTerm("");
+                        setShowFilters(false);
+                      }}
+                      className="w-full"
+                    >
+                      Clear Filters
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Orders Table */}
@@ -534,7 +732,7 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredOrders.map((order) => {
+                  currentItems.map((order) => {
                     const totalCost = order.items.reduce(
                       (sum, item) => sum + item.unit_cost,
                       0
@@ -599,6 +797,103 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                 )}
               </TableBody>
             </Table>
+          </div>
+
+          {/* Pagination Info and Controls */}
+          <div className="py-4 border-t mt-4 flex items-center justify-between">
+            <div className="text-sm text-gray-500">
+              Showing {startIndex + 1} to{" "}
+              {Math.min(endIndex, filteredOrders.length)} of{" "}
+              {filteredOrders.length} orders (Page {currentPage} of {totalPages}
+              )
+            </div>
+
+            {filteredOrders.length > 0 && (
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      className={
+                        currentPage === 1
+                          ? "pointer-events-none opacity-50"
+                          : ""
+                      }
+                    />
+                  </PaginationItem>
+
+                  {/* Page Numbers */}
+                  {totalPages <= 7
+                    ? // Show all pages if 7 or fewer
+                      Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                        (page) => (
+                          <PaginationItem key={page}>
+                            <PaginationLink
+                              onClick={() => setCurrentPage(page)}
+                              isActive={page === currentPage}
+                            >
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                        )
+                      )
+                    : // Show first, last, current, and pages around current
+                      Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                        (page) => {
+                          const isFirstPage = page === 1;
+                          const isLastPage = page === totalPages;
+                          const isCurrentPage = page === currentPage;
+                          const isNearCurrentPage =
+                            Math.abs(page - currentPage) <= 1;
+
+                          if (
+                            isFirstPage ||
+                            isLastPage ||
+                            isCurrentPage ||
+                            isNearCurrentPage
+                          ) {
+                            return (
+                              <PaginationItem key={page}>
+                                <PaginationLink
+                                  onClick={() => setCurrentPage(page)}
+                                  isActive={isCurrentPage}
+                                >
+                                  {page}
+                                </PaginationLink>
+                              </PaginationItem>
+                            );
+                          } else if (
+                            (page === 2 && currentPage > 3) ||
+                            (page === totalPages - 1 &&
+                              currentPage < totalPages - 2)
+                          ) {
+                            return (
+                              <PaginationItem key={page}>
+                                <span className="px-4">...</span>
+                              </PaginationItem>
+                            );
+                          }
+                          return null;
+                        }
+                      )}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
+                      className={
+                        currentPage === totalPages
+                          ? "pointer-events-none opacity-50"
+                          : ""
+                      }
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
           </div>
         </div>
       )}

@@ -139,8 +139,8 @@ export default function PurchasableCreateOrderPage() {
       return;
     }
 
-    if (items.some((item) => item.unit_cost <= 0)) {
-      setError("Unit cost must be greater than 0");
+    if (items.some((item) => item.unit_cost < 0)) {
+      setError("Unit cost cannot be negative");
       return;
     }
 
@@ -1024,12 +1024,18 @@ export default function PurchasableCreateOrderPage() {
                           <Input
                             type="number"
                             placeholder="0"
-                            value={item.unit_of_issue || ""}
+                            value={
+                              item.unit_of_issue === 0
+                                ? "0"
+                                : item.unit_of_issue || ""
+                            }
                             onChange={(e) =>
                               updateItem(
                                 index,
                                 "unit_of_issue",
-                                parseFloat(e.target.value) || 0
+                                e.target.value === ""
+                                  ? 0
+                                  : parseFloat(e.target.value) || 0
                               )
                             }
                             min="0"
@@ -1046,12 +1052,16 @@ export default function PurchasableCreateOrderPage() {
                           <Input
                             type="number"
                             placeholder="0.00"
-                            value={item.unit_cost || ""}
+                            value={
+                              item.unit_cost === 0 ? "0" : item.unit_cost || ""
+                            }
                             onChange={(e) =>
                               updateItem(
                                 index,
                                 "unit_cost",
-                                parseFloat(e.target.value) || 0
+                                e.target.value === ""
+                                  ? 0
+                                  : parseFloat(e.target.value) || 0
                               )
                             }
                             min="0"

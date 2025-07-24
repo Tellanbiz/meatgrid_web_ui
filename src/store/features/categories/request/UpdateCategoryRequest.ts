@@ -4,4 +4,5 @@ export interface UpdateCategoryRequest {
   name?: string;
   description?: string;
   parent_id?: string;
+  active?: boolean;
 }

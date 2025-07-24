@@ -5,4 +5,5 @@ export interface Category {
   description: string;
   tag: string;
   parent_id: string;
+  active: boolean;
 }

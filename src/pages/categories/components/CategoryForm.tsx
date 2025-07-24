@@ -18,12 +18,14 @@ import { resetUploadState } from "@/store/features/uploads/uploadSlice";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Category } from "../../../store/features/categories/categoryTypes";
+import { Switch } from "@/components/ui/switch";
 
 export interface CategoryFormData {
   name: string;
   image?: string;
   description?: string;
   parentCategory?: Category | null;
+  active: boolean;
 }
 
 interface CategoryFormProps {
@@ -52,6 +54,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   const [parentCategory, setParentCategory] = useState<Category | null>(null);
   const [image, setImage] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string>("");
+  const [active, setActive] = useState(true);
 
   const isInitialized = useRef(false);
 
@@ -62,6 +65,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       setParentCategory(initialValues.parentCategory || null);
       setImage(initialValues.image || null);
       setPreviewImage(initialValues.image || "");
+      setActive(initialValues.active ?? true);
       isInitialized.current = true;
     }
   }, [initialValues]);
@@ -110,8 +114,9 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       image: image || "",
       description,
       parentCategory,
+      active,
     });
-  }, [name, description, parentCategory, image, onSubmit]);
+  }, [name, description, parentCategory, image, active, onSubmit]);
 
   return (
     <div className="card">
@@ -182,6 +187,17 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
                 {memoizedCategoryOptions}
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Active Status */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Active Status</Label>
+              <div className="text-sm text-gray-500">
+                Enable or disable this category
+              </div>
+            </div>
+            <Switch checked={active} onCheckedChange={setActive} />
           </div>
         </div>
       </div>

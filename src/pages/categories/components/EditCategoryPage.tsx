@@ -33,6 +33,7 @@ import { UpdateCategoryRequest } from "@/store/features/categories/request/Updat
 import { Loader2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { uploadImages } from "../../../store/features/uploads/uploadThunks";
+import { Switch } from "@/components/ui/switch";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -40,6 +41,7 @@ const formSchema = z.object({
   tag: z.string().optional(),
   parent_id: z.string().optional(),
   image: z.string().optional(),
+  active: z.boolean(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -64,6 +66,7 @@ export default function EditCategoryPage() {
       tag: "",
       parent_id: "",
       image: "",
+      active: true,
     },
   });
 
@@ -89,6 +92,7 @@ export default function EditCategoryPage() {
       setValue("tag", category.tag || "");
       setValue("parent_id", category.parent_id || "");
       setValue("image", category.image || "");
+      setValue("active", category.active);
     }
   }, [category, setValue]);
 
@@ -127,6 +131,7 @@ export default function EditCategoryPage() {
       description: values.description || "",
       parent_id: values.parent_id || undefined,
       image: values.image,
+      active: values.active,
     };
 
     try {
@@ -249,6 +254,30 @@ export default function EditCategoryPage() {
                           ))}
                       </SelectContent>
                     </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="active"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <FormLabel>Active Status</FormLabel>
+                        <div className="text-sm text-gray-500">
+                          Enable or disable this category
+                        </div>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -32,6 +32,7 @@ const ManageCategoryPage = () => {
     description: selectedCategory?.description || "",
     parentCategory: selectedCategory || null,
     image: selectedCategory?.image || "",
+    active: selectedCategory?.active ?? true,
   };
 
   const handleSubmit = async (formData: CategoryFormData) => {
@@ -44,6 +45,7 @@ const ManageCategoryPage = () => {
           name: formData.name,
           description: formData.description,
           parent_id: formData.parentCategory?.id || "",
+          active: formData.active,
         };
 
         await dispatch(updateCategory(updateRequest)).unwrap();
@@ -54,6 +56,7 @@ const ManageCategoryPage = () => {
           name: formData.name,
           description: formData.description || "",
           parent_id: formData.parentCategory?.id || "",
+          active: formData.active,
         };
 
         await dispatch(createCategory(createRequest)).unwrap();

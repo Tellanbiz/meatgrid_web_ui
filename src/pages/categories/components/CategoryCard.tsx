@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { selectIsDeletingCategory } from "../../../store/features/categories/categorySelectors";
 import { deleteCategory } from "../../../store/features/categories/categoryThunks";
 import DeleteDialog from "@/components/dialogs/DeleteDialog";
+import { Badge } from "@/components/ui/badge";
 
 interface CategoryCardProps {
   category: Category;
@@ -86,8 +87,20 @@ export default function CategoryCard({
         </CardHeader>
 
         <CardContent className="space-y-1 px-2 pt-1">
-          <div className="text-xs font-semibold px-2 border w-fit bg-green-700 text-white uppercase mb-2">
-            {category.name}
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-xs font-semibold px-2 border w-fit bg-green-700 text-white uppercase">
+              {category.name}
+            </div>
+            <Badge
+              variant={category.active ? "default" : "secondary"}
+              className={
+                category.active
+                  ? "bg-green-100 text-green-800"
+                  : "bg-gray-100 text-gray-600"
+              }
+            >
+              {category.active ? "Active" : "Inactive"}
+            </Badge>
           </div>
           <p className="text-[13px] font-semibold text-black">
             {parentCategory?.name ?? "None"}

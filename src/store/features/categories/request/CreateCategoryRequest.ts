@@ -3,4 +3,5 @@ export interface CreateCategoryRequest {
   name: string;
   description: string;
   parent_id: string;
+  active: boolean;
 }
