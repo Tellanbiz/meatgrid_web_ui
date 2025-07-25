@@ -142,7 +142,7 @@ export default function PurchasablePage() {
     // Convert grams to kilograms if quantity is >= 1000 and unit type is kilograms
     if (
       (unitType === "kilograms" || unitType === "kilogram") &&
-      quantity >= 1000
+      (quantity >= 1000 || quantity <= -1000)
     ) {
       const kgQuantity = quantity / 1000;
       return `${kgQuantity.toLocaleString(undefined, {

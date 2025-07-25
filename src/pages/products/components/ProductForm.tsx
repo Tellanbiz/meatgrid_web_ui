@@ -29,6 +29,9 @@ const unitTypes = {
   kilograms: "Kilograms",
   litres: "Litres",
   pieces: "Pieces",
+  strands: "Stands",
+  rolls: "Rolls",
+  packets: "Packets",
 };
 
 export interface ProductFormData {

@@ -43,14 +43,14 @@ export interface CreatePurchaseParams {
   id?: number
   name: string,
   description: string,
-  unit_type: 'grams' | 'kilograms' | 'liters' | 'pieces'
+  unit_type: 'grams' | 'kilograms' | 'liters' | 'pieces' | 'strands' | 'rolls' | 'packets'
 }
 
 export interface ProcessPurchaseParams {
   id?: number
   name: string,
   description: string,
-  unit_type: 'grams' | 'kilograms' | 'liters' | 'pieces'
+  unit_type: 'grams' | 'kilograms' | 'liters' | 'pieces' | 'strands' | 'rolls' | 'packets'
 }
 
 export interface CreateOrderPurchaseParams {

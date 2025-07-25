@@ -64,7 +64,10 @@ export function PurchasableEditDialog({
             | "grams"
             | "kilograms"
             | "liters"
-            | "pieces",
+            | "pieces"
+            | "strands"
+            | "rolls"
+            | "packets",
         });
       } else {
         setFormData({
@@ -206,7 +209,9 @@ export function PurchasableEditDialog({
                 <SelectItem value="grams">Grams</SelectItem>
                 <SelectItem value="kilograms">Kilograms</SelectItem>
                 <SelectItem value="liters">Liters</SelectItem>
-                <SelectItem value="pieces">Pieces</SelectItem>
+                <SelectItem value="strands">Strands</SelectItem>
+                <SelectItem value="rolls">Rolls</SelectItem>
+                <SelectItem value="packets">Packets</SelectItem>
               </SelectContent>
             </Select>
           </div>
