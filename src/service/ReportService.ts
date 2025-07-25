@@ -45,9 +45,23 @@ const getTotalInStock = (stockInfo: Partial<StockInfo> | undefined | null): numb
 };
 
 const getTotalConsumed = (stockInfo: Partial<StockInfo> | undefined | null): number => {
-  const s = safeStockInfo(stockInfo);
-  const totalOut = s.total_damaged + s.total_migrated + s.total_processed + s.total_sold;
-  return totalOut;
+  const safe = safeStockInfo(stockInfo);
+  return (
+    safe.total_damaged +
+    safe.total_migrated +
+    safe.total_processed +
+    safe.total_sold
+  );
+};
+
+// Helper function to format quantity with unit conversion
+const formatQuantity = (quantity: number, unitType: string) => {
+  // Convert grams to kilograms if quantity is >= 1000 and unit type is kilograms
+  if ((unitType === "kilograms" || unitType === "kilogram") && quantity >= 1000) {
+    const kgQuantity = quantity / 1000;
+    return `${kgQuantity.toLocaleString(undefined, { maximumFractionDigits: 2 })} kg`;
+  }
+  return `${quantity.toLocaleString()} ${unitType}`;
 };
 
 export const Reports: ReportData = {
@@ -76,7 +90,7 @@ export const Reports: ReportData = {
         format: (value, rowData?: Product) => {
           const totalIn = getTotalInStock(value as Partial<StockInfo>);
           const unitType = rowData?.unit_type || "";
-          return `${totalIn.toLocaleString()} ${unitType}`;
+          return formatQuantity(totalIn, unitType);
         },
       },
       {
@@ -85,7 +99,7 @@ export const Reports: ReportData = {
         format: (value, rowData?: Product) => {
           const totalOut = getTotalConsumed(value as Partial<StockInfo>);
           const unitType = rowData?.unit_type || "";
-          return `${totalOut.toLocaleString()} ${unitType}`;
+          return formatQuantity(totalOut, unitType);
         },
       },
     ],

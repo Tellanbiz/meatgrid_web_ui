@@ -105,6 +105,21 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
     return totalIn - totalOut;
   };
 
+  // Helper function to format quantity with unit conversion
+  const formatQuantity = (quantity: number, unitType: string) => {
+    // Convert grams to kilograms if quantity is >= 1000 and unit type is kilograms
+    if (
+      (unitType === "kilograms" || unitType === "kilogram") &&
+      quantity >= 1000
+    ) {
+      const kgQuantity = quantity / 1000;
+      return `${kgQuantity.toLocaleString(undefined, {
+        maximumFractionDigits: 2,
+      })} kg`;
+    }
+    return `${quantity.toLocaleString()} ${unitType}`;
+  };
+
   // Calculate pagination
   const totalPages = Math.ceil(filteredProducts.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
@@ -301,14 +316,18 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
                   </TableCell>
                   <TableCell>
                     <div className="text-sm font-medium">
-                      {getTotalInStock(product).toLocaleString()}{" "}
-                      {product.unit_type}
+                      {formatQuantity(
+                        getTotalInStock(product),
+                        product.unit_type
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">
-                      {getTotalConsumed(product).toLocaleString()}{" "}
-                      {product.unit_type}
+                      {formatQuantity(
+                        getTotalConsumed(product),
+                        product.unit_type
+                      )}
                     </div>
                   </TableCell>
                   <TableCell className="text-right">

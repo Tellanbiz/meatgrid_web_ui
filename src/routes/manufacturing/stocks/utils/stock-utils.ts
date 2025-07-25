@@ -22,6 +22,11 @@ export const validateStockTransfer = (transfer: StockTransfer, availableStock: S
 };
 
 export const formatStockQuantity = (quantity: number, unit: string): string => {
+    // Convert grams to kilograms if quantity is >= 1000 and unit type is kilograms
+    if ((unit === "kilograms" || unit === "kilogram") && quantity >= 1000) {
+        const kgQuantity = quantity / 1000;
+        return `${kgQuantity.toLocaleString(undefined, { maximumFractionDigits: 2 })} kg`;
+    }
     return `${quantity.toLocaleString()} ${unit}`;
 };
 

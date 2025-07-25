@@ -140,6 +140,21 @@ const TransferStockPage = () => {
     }
   };
 
+  // Helper function to format quantity with unit conversion
+  const formatQuantity = (quantity: number, unitType: string) => {
+    // Convert grams to kilograms if quantity is >= 1000 and unit type is kilograms
+    if (
+      (unitType === "kilograms" || unitType === "kilogram") &&
+      quantity >= 1000
+    ) {
+      const kgQuantity = quantity / 1000;
+      return `${kgQuantity.toLocaleString(undefined, {
+        maximumFractionDigits: 2,
+      })} kg`;
+    }
+    return `${quantity.toLocaleString()} ${unitType}`;
+  };
+
   if (isTransferringStock) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -437,7 +452,7 @@ const TransferStockPage = () => {
                           {product.name}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {product.quantity} {product.unit_type}
+                          {formatQuantity(product.quantity, product.unit_type)}
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
