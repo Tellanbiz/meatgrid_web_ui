@@ -62,6 +62,7 @@ const PERMISSION_GROUPS = [
       { key: "receive_stock_alerts", label: "Receive Stock Alerts" },
     ],
   },
+  //d
   {
     key: "user",
     label: "User Management",
