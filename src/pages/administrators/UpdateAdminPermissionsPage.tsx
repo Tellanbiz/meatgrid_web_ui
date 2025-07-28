@@ -57,6 +57,8 @@ const PERMISSION_GROUPS = [
       { key: "allow_warehouse_submit", label: "Manage Warehouses" },
       { key: "allow_storage_type_view", label: "View Storage Types" },
       { key: "allow_storage_type_submit", label: "Manage Storage Types" },
+      { key: "allow_suppliers_view", label: "View Suppliers" },
+      { key: "allow_suppliers_submit", label: "Manage Suppliers" },
       { key: "receive_stock_alerts", label: "Receive Stock Alerts" },
     ],
   },
