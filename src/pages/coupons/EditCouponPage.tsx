@@ -33,10 +33,14 @@ const EditCouponPage = () => {
   const successMessage = useAppSelector(selectCouponSuccessMessage);
 
   useEffect(() => {
+    // Always fetch coupons if we don't have the specific coupon
     if (!coupon) {
       dispatch(fetchCoupons())
         .unwrap()
-        .finally(() => {
+        .then(() => {
+          setIsLoading(false);
+        })
+        .catch(() => {
           setIsLoading(false);
         });
     } else {
@@ -55,12 +59,17 @@ const EditCouponPage = () => {
     if (successMessage) {
       toast.success(successMessage);
       dispatch(clearCouponMessages());
+      // Refetch coupons to get updated data
+      dispatch(fetchCoupons());
       navigate("/coupons");
     }
   }, [successMessage, dispatch, navigate]);
 
   const handleSubmit = (formData: CouponFormData) => {
-    if (!id) return;
+    if (!id) {
+      toast.error("Coupon ID is missing");
+      return;
+    }
 
     const updateData = {
       ...formData,

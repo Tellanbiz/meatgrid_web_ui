@@ -78,6 +78,8 @@ const couponsSlice = createSlice({
       .addCase(updateCoupon.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.successMessage = action.payload;
+        // Refresh coupons after successful update
+        // Note: We'll refetch coupons to get the updated data
       })
       .addCase(updateCoupon.rejected, (state, action) => {
         state.status = "failed";

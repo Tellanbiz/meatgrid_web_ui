@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import TextField from "@/components/common/TextField";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -39,12 +39,9 @@ const CouponForm = ({
     max_used: 0,
   });
 
-  const isInitialRender = useRef(true);
-
   useEffect(() => {
-    if (isInitialRender.current && initialValues) {
+    if (initialValues) {
       setForm(initialValues);
-      isInitialRender.current = false;
     }
   }, [initialValues]);
 
@@ -82,9 +79,12 @@ const CouponForm = ({
           name="amount"
           type="number"
           step="any"
-          value={form.amount.toString()}
+          value={form.amount === 0 ? "0" : form.amount.toString()}
           onChange={(e) =>
-            handleChange("amount", parseFloat(e.target.value) || 0)
+            handleChange(
+              "amount",
+              e.target.value === "" ? 0 : parseFloat(e.target.value) || 0
+            )
           }
           placeholder="e.g. 300"
           required
@@ -94,9 +94,12 @@ const CouponForm = ({
           label="Maximum Usage Limit"
           name="max_used"
           type="number"
-          value={form.max_used.toString()}
+          value={form.max_used === 0 ? "0" : form.max_used.toString()}
           onChange={(e) =>
-            handleChange("max_used", parseInt(e.target.value) || 0)
+            handleChange(
+              "max_used",
+              e.target.value === "" ? 0 : parseInt(e.target.value) || 0
+            )
           }
           placeholder="e.g. 1000"
         />

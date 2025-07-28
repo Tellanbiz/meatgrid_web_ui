@@ -51,6 +51,7 @@ export default function PurchasablePage() {
   } = usePurchasables();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStockStatus, setSelectedStockStatus] = useState<string>("all");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedPurchasable, setSelectedPurchasable] =
     useState<Purchasable | null>(null);
@@ -105,13 +106,19 @@ export default function PurchasablePage() {
       fileName: "purchasables",
       columns: exportColumns,
     });
+    toast.success("Excel file exported successfully");
   };
 
   const handleExportPDF = async () => {
-    await ExportService.exportToPDF(filteredPurchasables, {
-      fileName: "purchasables",
-      columns: exportColumns,
-    });
+    try {
+      await ExportService.exportToPDF(filteredPurchasables, {
+        fileName: "purchasables",
+        columns: exportColumns,
+      });
+      toast.success("PDF file exported successfully");
+    } catch {
+      toast.error("Failed to export PDF");
+    }
   };
 
   // Helper function to get total in stock (same logic as product table)
@@ -157,12 +164,24 @@ export default function PurchasablePage() {
     fetchStores();
   }, [fetchPurchasables, fetchStores]);
 
-  // Filter purchasables based on search query
-  const filteredPurchasables = purchasables.filter(
-    (purchasable) =>
+  // Filter purchasables based on search query and stock status
+  const filteredPurchasables = purchasables.filter((purchasable) => {
+    // Search filter
+    const matchesSearch =
       purchasable.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      purchasable.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      purchasable.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+    // Stock status filter
+    const totalInStock = getTotalInStock(purchasable);
+    const isInStock = totalInStock > 0;
+
+    const matchesStockStatus =
+      selectedStockStatus === "all" ||
+      (selectedStockStatus === "in_stock" && isInStock) ||
+      (selectedStockStatus === "out_of_stock" && !isInStock);
+
+    return matchesSearch && matchesStockStatus;
+  });
 
   // Calculate pagination for filtered results
   const totalPages = Math.ceil(filteredPurchasables.length / itemsPerPage);
@@ -170,10 +189,10 @@ export default function PurchasablePage() {
   const endIndex = startIndex + itemsPerPage;
   const currentPurchasables = filteredPurchasables.slice(startIndex, endIndex);
 
-  // Reset to first page when search changes
+  // Reset to first page when search or stock status changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [searchQuery, selectedStockStatus]);
 
   const handlePreviousPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -266,6 +285,23 @@ export default function PurchasablePage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
             />
+          </div>
+
+          {/* Stock Status Filter */}
+          <div className="flex items-center space-x-2">
+            <Select
+              value={selectedStockStatus}
+              onValueChange={setSelectedStockStatus}
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Stock Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="in_stock">In Stock</SelectItem>
+                <SelectItem value="out_of_stock">Out of Stock</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 

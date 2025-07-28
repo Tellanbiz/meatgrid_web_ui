@@ -171,7 +171,7 @@ const CouponsTable = () => {
         <DropdownMenuContent align="end">
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => navigate(`/coupons/${rowData.id}`)}
+            onClick={() => navigate(`/coupons/edit/${rowData.id}`)}
           >
             <Pencil className="mr-2 h-4 w-4" /> Edit
           </DropdownMenuItem>
