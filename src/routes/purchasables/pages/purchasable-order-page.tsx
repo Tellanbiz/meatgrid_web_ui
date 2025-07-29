@@ -27,6 +27,7 @@ import {
   PlusIcon,
   RefreshCw,
   Trash2,
+  Upload,
 } from "lucide-react";
 import {
   Pagination,
@@ -62,6 +63,16 @@ import DeleteDialog from "@/components/dialogs/DeleteDialog";
 import ExportButton from "@/components/buttons/ExportButton";
 import ExportService from "@/service/ExportService";
 import StockDateRangePicker from "@/routes/manufacturing/stocks/components/StockDateRangePicker";
+import { uploadImages } from "@/store/features/uploads/uploadThunks";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import ImageThumbnail from "@/components/common/ImageThumbnail";
 
 interface PurchasableOrderPageProps {
   activeTab?: string;
@@ -106,6 +117,15 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
   const [productSearch, setProductSearch] = useState<{
     [key: number]: string;
   }>({});
+
+  // New form states for status, notes, and receipt image
+  const [orderStatus, setOrderStatus] = useState<
+    "pending" | "completed" | "cancelled"
+  >("pending");
+  const [orderNotes, setOrderNotes] = useState("");
+  const [receiptImage, setReceiptImage] = useState<File | null>(null);
+  const [receiptImageUrl, setReceiptImageUrl] = useState<string>("");
+  const [previewReceiptImage, setPreviewReceiptImage] = useState<string>("");
 
   // Dialog states
   const [supplierDialogOpen, setSupplierDialogOpen] = useState(false);
@@ -165,6 +185,24 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
     dispatch(fetchStorageTypes());
   }, [fetchPurchasables, dispatch]);
 
+  // File upload handlers
+  const handleReceiptImageChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    const selectedFile = files[0];
+    setReceiptImage(selectedFile);
+    setPreviewReceiptImage(URL.createObjectURL(selectedFile));
+  };
+
+  const handleRemoveReceiptImage = () => {
+    setReceiptImage(null);
+    setReceiptImageUrl("");
+    setPreviewReceiptImage("");
+  };
+
   const handleCreateOrder = async () => {
     if (!selectedSupplier) {
       toast.error("Please select a supplier");
@@ -199,10 +237,28 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
 
     setLoading(true);
     try {
+      // Upload receipt image if provided
+      let uploadedReceiptUrl = receiptImageUrl;
+      if (receiptImage) {
+        try {
+          const uploadedUrls = await dispatch(
+            uploadImages([receiptImage])
+          ).unwrap();
+          uploadedReceiptUrl = uploadedUrls[0];
+        } catch {
+          toast.error("Failed to upload receipt image");
+          setLoading(false);
+          return;
+        }
+      }
+
       const orderData: CreateOrderPurchaseParams = {
         supplier_id: selectedSupplier.id,
         storage_type_id: selectedStorageType.id,
         store_id: selectedStore.id,
+        status: orderStatus,
+        notes: orderNotes || undefined,
+        receipt_image_url: uploadedReceiptUrl || undefined,
         items: orderItems.map((item) => ({
           product_id: item.product_id,
           unit_of_issue: item.unit_of_issue,
@@ -220,6 +276,11 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
         setSelectedStore(null);
         setSelectedStorageType(null);
         setOrderItems([]);
+        setOrderStatus("pending");
+        setOrderNotes("");
+        setReceiptImage(null);
+        setReceiptImageUrl("");
+        setPreviewReceiptImage("");
         setSupplierSearch("");
         setStoreSearch("");
         setStorageTypeSearch("");
@@ -1589,6 +1650,131 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                   ))}
                 </div>
               )}
+            </div>
+
+            {/* Order Status */}
+            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+              <div className="flex items-center mb-4">
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                  <svg
+                    className="w-4 h-4 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <Label className="text-base font-semibold text-gray-900">
+                    Order Status
+                  </Label>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Set the status for this purchase order
+                  </p>
+                </div>
+              </div>
+              <Select
+                value={orderStatus}
+                onValueChange={(value: "pending" | "completed" | "cancelled") =>
+                  setOrderStatus(value)
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Order Notes */}
+            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+              <div className="flex items-center mb-4">
+                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                  <svg
+                    className="w-4 h-4 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <Label className="text-base font-semibold text-gray-900">
+                    Order Notes
+                  </Label>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Add any additional notes for this order
+                  </p>
+                </div>
+              </div>
+              <Textarea
+                placeholder="Enter any notes or comments about this order..."
+                value={orderNotes}
+                onChange={(e) => setOrderNotes(e.target.value)}
+                rows={4}
+                className="w-full"
+              />
+            </div>
+
+            {/* Receipt Image Upload */}
+            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+              <div className="flex items-center mb-4">
+                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                  <Upload className="w-4 h-4 text-purple-600" />
+                </div>
+                <div>
+                  <Label className="text-base font-semibold text-gray-900">
+                    Receipt Image
+                  </Label>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Upload a receipt image for this order (optional)
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                {previewReceiptImage ? (
+                  <div className="flex items-center space-x-4">
+                    <ImageThumbnail
+                      src={previewReceiptImage}
+                      onRemove={handleRemoveReceiptImage}
+                    />
+                  </div>
+                ) : (
+                  <label className="w-full h-32 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors duration-200">
+                    <div className="flex flex-col items-center justify-center text-gray-500">
+                      <Upload className="w-8 h-8 mb-2" />
+                      <span className="text-sm font-medium">
+                        Upload Receipt
+                      </span>
+                      <span className="text-xs mt-1">
+                        Click to upload or drag and drop
+                      </span>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleReceiptImageChange}
+                    />
+                  </label>
+                )}
+              </div>
             </div>
 
             {/* Submit Button */}

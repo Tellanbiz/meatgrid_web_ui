@@ -18,6 +18,9 @@ export interface Purchasable {
 export interface PurchasableOrder {
   id: number;
   created_at: string;
+  status: string;
+  receipt_image_url: string;
+  notes: string;
   supplier: {
     id: string;
     full_name: string;
@@ -57,6 +60,9 @@ export interface CreateOrderPurchaseParams {
   supplier_id: string;
   storage_type_id: string;
   store_id: string;
+  status: 'pending' | 'completed' | 'cancelled';
+  notes?: string;
+  receipt_image_url?: string;
   items: {
     product_id: number;
     unit_of_issue: number;

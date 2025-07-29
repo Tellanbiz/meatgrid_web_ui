@@ -23,6 +23,7 @@ import {
   Store,
   Package,
   ShoppingCart,
+  Upload,
 } from "lucide-react";
 import { createPurchaseOrder } from "@/routes/purchasables/domain/purchasable-post";
 import { usePurchasables } from "../hooks/usePurchasables";
@@ -34,6 +35,16 @@ import { fetchStores } from "@/store/features/stores/storeThunks";
 import { selectStores } from "@/store/features/stores/storeSelectors";
 import { fetchStorageTypes } from "@/store/features/storages/storageThunks";
 import { selectStorageTypes } from "@/store/features/storages/storageSelectors";
+import { uploadImages } from "@/store/features/uploads/uploadThunks";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import ImageThumbnail from "@/components/common/ImageThumbnail";
 import {
   Card,
   CardContent,
@@ -72,6 +83,15 @@ export default function PurchasableCreateOrderPage() {
   const [storageTypeSearch, setStorageTypeSearch] = useState("");
   const [debouncedSupplierSearch, setDebouncedSupplierSearch] = useState("");
 
+  // New form states for status, notes, and receipt image
+  const [orderStatus, setOrderStatus] = useState<
+    "pending" | "completed" | "cancelled"
+  >("pending");
+  const [orderNotes, setOrderNotes] = useState("");
+  const [receiptImage, setReceiptImage] = useState<File | null>(null);
+  const [receiptImageUrl, setReceiptImageUrl] = useState<string>("");
+  const [previewReceiptImage, setPreviewReceiptImage] = useState<string>("");
+
   // Dialog states
   const [supplierDialogOpen, setSupplierDialogOpen] = useState(false);
   const [storeDialogOpen, setStoreDialogOpen] = useState(false);
@@ -95,6 +115,24 @@ export default function PurchasableCreateOrderPage() {
 
     return () => clearTimeout(timer);
   }, [supplierSearch]);
+
+  // File upload handlers
+  const handleReceiptImageChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    const selectedFile = files[0];
+    setReceiptImage(selectedFile);
+    setPreviewReceiptImage(URL.createObjectURL(selectedFile));
+  };
+
+  const handleRemoveReceiptImage = () => {
+    setReceiptImage(null);
+    setReceiptImageUrl("");
+    setPreviewReceiptImage("");
+  };
 
   const addItem = () => {
     setItems([...items, { product_id: 0, unit_of_issue: 0, unit_cost: 0 }]);
@@ -148,10 +186,28 @@ export default function PurchasableCreateOrderPage() {
     setError(null);
 
     try {
+      // Upload receipt image if provided
+      let uploadedReceiptUrl = receiptImageUrl;
+      if (receiptImage) {
+        try {
+          const uploadedUrls = await dispatch(
+            uploadImages([receiptImage])
+          ).unwrap();
+          uploadedReceiptUrl = uploadedUrls[0];
+        } catch {
+          setError("Failed to upload receipt image");
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       const orderData: CreateOrderPurchaseParams = {
         supplier_id: supplierId,
         storage_type_id: storageTypeId,
         store_id: storeId,
+        status: orderStatus,
+        notes: orderNotes || undefined,
+        receipt_image_url: uploadedReceiptUrl || undefined,
         items: items.map((item) => ({
           product_id: item.product_id,
           unit_of_issue: item.unit_of_issue,
@@ -1162,6 +1218,129 @@ export default function PurchasableCreateOrderPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* Order Status */}
+        <Card className="border-2 border-blue-200 bg-blue-50/30">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <svg
+                  className="h-5 w-5 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              Order Status
+            </CardTitle>
+            <CardDescription>
+              Set the status for this purchase order
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Select
+              value={orderStatus}
+              onValueChange={(value: "pending" | "completed" | "cancelled") =>
+                setOrderStatus(value)
+              }
+            >
+              <SelectTrigger className="w-full h-12">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
+
+        {/* Order Notes */}
+        <Card className="border-2 border-green-200 bg-green-50/30">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <svg
+                  className="h-5 w-5 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+              </div>
+              Order Notes
+            </CardTitle>
+            <CardDescription>
+              Add any additional notes for this order
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Textarea
+              placeholder="Enter any notes or comments about this order..."
+              value={orderNotes}
+              onChange={(e) => setOrderNotes(e.target.value)}
+              rows={4}
+              className="w-full"
+            />
+          </CardContent>
+        </Card>
+
+        {/* Receipt Image Upload */}
+        <Card className="border-2 border-purple-200 bg-purple-50/30">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Upload className="h-5 w-5 text-purple-600" />
+              </div>
+              Receipt Image
+            </CardTitle>
+            <CardDescription>
+              Upload a receipt image for this order (optional)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {previewReceiptImage ? (
+                <div className="flex items-center space-x-4">
+                  <ImageThumbnail
+                    src={previewReceiptImage}
+                    onRemove={handleRemoveReceiptImage}
+                  />
+                </div>
+              ) : (
+                <label className="w-full h-32 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors duration-200">
+                  <div className="flex flex-col items-center justify-center text-gray-500">
+                    <Upload className="w-8 h-8 mb-2" />
+                    <span className="text-sm font-medium">Upload Receipt</span>
+                    <span className="text-xs mt-1">
+                      Click to upload or drag and drop
+                    </span>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleReceiptImageChange}
+                  />
+                </label>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
