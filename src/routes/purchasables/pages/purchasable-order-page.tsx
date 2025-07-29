@@ -143,6 +143,7 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
     useState<string>("");
   const [selectedFilterProduct, setSelectedFilterProduct] =
     useState<string>("");
+  const [selectedFilterStatus, setSelectedFilterStatus] = useState<string>("");
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
@@ -154,6 +155,11 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
     null
   );
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Image dialog states
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string>("");
+  const [selectedImageTitle, setSelectedImageTitle] = useState<string>("");
 
   useEffect(() => {
     // Set default dates (30 days ago to today)
@@ -416,6 +422,21 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
             return total.toFixed(2);
           },
         },
+        {
+          field: "status",
+          header: "Status",
+          format: (value: unknown) => (value as string) || "N/A",
+        },
+        {
+          field: "notes",
+          header: "Notes",
+          format: (value: unknown) => (value as string) || "No notes",
+        },
+        {
+          field: "receipt_image_url",
+          header: "Receipt URL",
+          format: (value: unknown) => (value as string) || "No receipt",
+        },
       ],
     };
 
@@ -469,6 +490,21 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
             return total.toFixed(2);
           },
         },
+        {
+          field: "status",
+          header: "Status",
+          format: (value: unknown) => (value as string) || "N/A",
+        },
+        {
+          field: "notes",
+          header: "Notes",
+          format: (value: unknown) => (value as string) || "No notes",
+        },
+        {
+          field: "receipt_image_url",
+          header: "Receipt URL",
+          format: (value: unknown) => (value as string) || "No receipt",
+        },
       ],
     };
 
@@ -514,7 +550,10 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
         .toLowerCase()
         .includes(searchQuery.toLowerCase()) ||
       order.user.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.id.toString().includes(searchQuery);
+      order.id.toString().includes(searchQuery) ||
+      order.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (order.notes &&
+        order.notes.toLowerCase().includes(searchQuery.toLowerCase()));
 
     // Supplier filter
     const matchesSupplier =
@@ -527,6 +566,10 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
       order.items.some(
         (item) => item.product.id.toString() === selectedFilterProduct
       );
+
+    // Status filter
+    const matchesStatus =
+      !selectedFilterStatus || order.status === selectedFilterStatus;
 
     // Date filter (convert UTC to local time)
     const orderDate = new Date(order.created_at);
@@ -562,7 +605,13 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
 
     const matchesDate = afterStart && beforeEnd;
 
-    return matchesSearch && matchesSupplier && matchesProduct && matchesDate;
+    return (
+      matchesSearch &&
+      matchesSupplier &&
+      matchesProduct &&
+      matchesStatus &&
+      matchesDate
+    );
   });
 
   // Reset to first page when filters change
@@ -574,6 +623,7 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
     endDate,
     selectedFilterSupplier,
     selectedFilterProduct,
+    selectedFilterStatus,
   ]);
 
   // Pagination logic
@@ -680,7 +730,7 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
             {/* Advanced Filters */}
             {showFilters && (
               <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   {/* Supplier Filter */}
                   <div>
                     <Label className="text-sm font-medium text-gray-700 mb-2 block">
@@ -699,6 +749,23 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                           {supplier.full_name}
                         </option>
                       ))}
+                    </select>
+                  </div>
+
+                  {/* Status Filter */}
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Filter by Status
+                    </Label>
+                    <select
+                      value={selectedFilterStatus}
+                      onChange={(e) => setSelectedFilterStatus(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    >
+                      <option value="">All Statuses</option>
+                      <option value="pending">Pending</option>
+                      <option value="completed">Completed</option>
+                      <option value="cancelled">Cancelled</option>
                     </select>
                   </div>
 
@@ -745,6 +812,7 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                       onClick={() => {
                         setSelectedFilterSupplier("");
                         setSelectedFilterProduct("");
+                        setSelectedFilterStatus("");
                         setProductSearchTerm("");
                         setShowFilters(false);
                       }}
@@ -767,15 +835,18 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                   <TableHead>Created Date</TableHead>
                   <TableHead>Created By</TableHead>
                   <TableHead>Supplier</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>Items</TableHead>
                   <TableHead>Total Cost</TableHead>
+                  <TableHead>Notes</TableHead>
+                  <TableHead>Receipt</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {ordersLoading ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8">
+                    <TableCell colSpan={10} className="text-center py-8">
                       <div className="flex items-center justify-center space-x-2">
                         <RefreshCw className="h-4 w-4 animate-spin text-gray-400" />
                         <p className="text-gray-500">Loading orders...</p>
@@ -784,7 +855,7 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                   </TableRow>
                 ) : filteredOrders.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8">
+                    <TableCell colSpan={10} className="text-center py-8">
                       <p className="text-gray-500">
                         {searchQuery
                           ? "No orders found matching your search."
@@ -827,6 +898,22 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                           </div>
                         </TableCell>
                         <TableCell>
+                          <div className="flex items-center">
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                order.status === "completed"
+                                  ? "bg-green-100 text-green-800"
+                                  : order.status === "cancelled"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                              }`}
+                            >
+                              {order.status.charAt(0).toUpperCase() +
+                                order.status.slice(1)}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
                           <div className="space-y-1">
                             {order.items.map((item, index) => (
                               <div key={index} className="text-sm">
@@ -838,6 +925,50 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                         </TableCell>
                         <TableCell className="font-medium">
                           KES {totalCost.toFixed(2)}
+                        </TableCell>
+                        <TableCell>
+                          <div className="max-w-xs">
+                            {order.notes ? (
+                              <div
+                                className="text-sm text-gray-600 truncate"
+                                title={order.notes}
+                              >
+                                {order.notes.length > 50
+                                  ? order.notes.substring(0, 50) + "..."
+                                  : order.notes}
+                              </div>
+                            ) : (
+                              <span className="text-sm text-gray-400">
+                                No notes
+                              </span>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {order.receipt_image_url ? (
+                            <div className="flex items-center">
+                              <img
+                                src={order.receipt_image_url}
+                                alt="Receipt"
+                                className="w-8 h-8 rounded object-cover border border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
+                                onClick={() => {
+                                  setSelectedImage(order.receipt_image_url);
+                                  setSelectedImageTitle(
+                                    `Receipt for Order #${order.id}`
+                                  );
+                                  setImageDialogOpen(true);
+                                }}
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src =
+                                    "https://via.placeholder.com/32";
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <span className="text-sm text-gray-400">
+                              No receipt
+                            </span>
+                          )}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
@@ -1824,6 +1955,28 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
         onConfirm={confirmDeleteOrder}
         isLoading={isDeleting}
       />
+
+      {/* Image Dialog */}
+      <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-gray-900">
+              {selectedImageTitle}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center justify-center p-4">
+            <img
+              src={selectedImage}
+              alt="Receipt"
+              className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src =
+                  "https://via.placeholder.com/400x300?text=Image+Not+Found";
+              }}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

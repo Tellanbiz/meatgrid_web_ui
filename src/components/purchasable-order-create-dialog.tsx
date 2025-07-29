@@ -122,6 +122,7 @@ export function PurchasableOrderCreateDialog({
         supplier_id: supplierId,
         storage_type_id: storageTypeId,
         store_id: storeId,
+        status: "pending",
         items: items.map((item) => ({
           product_id: item.product_id,
           unit_of_issue: item.unit_of_issue,
