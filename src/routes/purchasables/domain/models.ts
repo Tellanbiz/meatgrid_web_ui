@@ -49,6 +49,14 @@ export interface CreatePurchaseParams {
   unit_type: 'grams' | 'kilograms' | 'liters' | 'pieces' | 'strands' | 'rolls' | 'packets'
 }
 
+export interface UpdatePurchaseParams {
+  id: number;
+  status: "pending" | "completed" | "cancelled";
+  notes?: string;
+  receipt_image_url?: string;
+}
+
+
 export interface ProcessPurchaseParams {
   id?: number
   name: string,

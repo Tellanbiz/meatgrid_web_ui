@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,6 +82,7 @@ interface PurchasableOrderPageProps {
 const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
   activeTab = "orders",
 }) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const {
     purchasableOrders,
@@ -870,7 +872,13 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                       0
                     );
                     return (
-                      <TableRow key={order.id}>
+                      <TableRow
+                        key={order.id}
+                        className="cursor-pointer hover:bg-gray-50 transition-colors duration-200"
+                        onClick={() =>
+                          navigate(`/purchasable-orders/${order.id}`)
+                        }
+                      >
                         <TableCell className="font-medium">
                           #{order.id}
                         </TableCell>
@@ -971,7 +979,10 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                           )}
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-2">
+                          <div
+                            className="flex items-center gap-2"
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             <Button
                               type="button"
                               variant="outline"

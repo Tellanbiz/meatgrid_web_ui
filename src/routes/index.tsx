@@ -42,6 +42,7 @@ import ProcessingFormPage from "@/routes/processing-module/pages/ProcessingFormP
 import SchedulesPage from "@/pages/schedules/SchedulesPage.js";
 import PurchasablePage from "@/routes/purchasables/pages/purchasable-page";
 import PurchasableOrderPage from "@/routes/purchasables/pages/purchasable-order-page";
+import PurchasableOrderDetailPage from "@/routes/purchasables/pages/purchasable-order-detail-page";
 import PurchasableCreateOrderPage from "@/routes/purchasables/pages/purchasable-create-order-page";
 import PurchasableStockPage from "@/routes/purchasables/pages/purchasable-stock-page";
 import PurchasableProcessStockPage from "@/routes/purchasables/pages/purchasable-process-stock-page";
@@ -479,6 +480,14 @@ const routes: RouteObject[] = [
         element: (
           <PrivateRoute>
             <PurchasableOrderPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "purchasable-orders/:orderId",
+        element: (
+          <PrivateRoute>
+            <PurchasableOrderDetailPage />
           </PrivateRoute>
         ),
       },
