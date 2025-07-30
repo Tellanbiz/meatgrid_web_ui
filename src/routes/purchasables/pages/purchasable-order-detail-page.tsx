@@ -300,10 +300,7 @@ export default function PurchasableOrderDetailPage() {
     );
   }
 
-  const totalCost = order.items.reduce(
-    (sum, item) => sum + item.unit_cost * item.unit_of_issue,
-    0
-  );
+  const totalCost = order.items.reduce((sum, item) => sum + item.unit_cost, 0);
 
   const currentStatus = statusConfig[status];
   const StatusIcon = currentStatus.icon;
@@ -504,13 +501,10 @@ export default function PurchasableOrderDetailPage() {
                         </div>
                         <div className="text-right">
                           <p className="font-bold text-lg text-[#F10027]">
-                            {formatCurrency(
-                              item.unit_of_issue * item.unit_cost
-                            )}
+                            {formatCurrency(item.unit_cost)}
                           </p>
                           <p className="text-sm text-gray-500">
-                            {item.unit_of_issue} ×{" "}
-                            {formatCurrency(item.unit_cost)}
+                            {item.unit_of_issue} {item.product.unit_type}
                           </p>
                         </div>
                       </div>
