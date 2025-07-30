@@ -26,7 +26,12 @@ import {
 } from "@/components/ui/dialog";
 import { ArrowLeft, Save, RefreshCw, Upload, Eye, Trash2 } from "lucide-react";
 import { updatePurchasableOrder } from "../domain/purchasable-post";
-import type { PurchasableOrder, UpdatePurchaseParams } from "../domain/models";
+import { getPurchasableOrderInfo } from "../domain/purchasable-get";
+import type {
+  PurchasableOrder,
+  UpdatePurchaseParams,
+  PurchasableOrderInfo,
+} from "../domain/models";
 import { uploadImages } from "@/store/features/uploads/uploadThunks";
 import { useAppDispatch } from "@/store/hooks";
 
@@ -56,44 +61,43 @@ export default function PurchasableOrderDetailPage() {
   const [selectedImageTitle, setSelectedImageTitle] = useState<string>("");
 
   useEffect(() => {
-    if (orderId) {
-      // In a real app, you would fetch the order data here
-      // For now, we'll simulate it with mock data
-      const mockOrder: PurchasableOrder = {
-        id: parseInt(orderId),
-        created_at: new Date().toISOString(),
-        status: "pending",
-        notes: "Sample order notes",
-        receipt_image_url: "",
-        supplier: {
-          id: "1",
-          full_name: "Sample Supplier",
-          email: "supplier@example.com",
-        },
-        user: {
-          id: "1",
-          full_name: "John Doe",
-        },
-        items: [
-          {
-            id: 1,
-            product: {
-              id: 1,
-              name: "Sample Product",
-              unit_type: "pieces",
-            },
-            unit_cost: 10.5,
-            unit_of_issue: 5,
-          },
-        ],
-      };
-      setOrder(mockOrder);
-      setStatus(mockOrder.status as "pending" | "completed" | "cancelled");
-      setNotes(mockOrder.notes || "");
-      setReceiptImageUrl(mockOrder.receipt_image_url || "");
-      setPreviewReceiptImage(mockOrder.receipt_image_url || "");
-      setLoading(false);
-    }
+    const fetchOrderData = async () => {
+      if (!orderId) return;
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        const orderData: PurchasableOrderInfo = await getPurchasableOrderInfo(
+          parseInt(orderId)
+        );
+
+        // Convert PurchasableOrderInfo to PurchasableOrder format
+        const order: PurchasableOrder = {
+          id: orderData.id,
+          created_at: orderData.created_at,
+          status: orderData.status,
+          notes: orderData.notes,
+          receipt_image_url: orderData.receipt_image_url,
+          supplier: orderData.supplier,
+          user: orderData.user,
+          items: orderData.items,
+        };
+
+        setOrder(order);
+        setStatus(orderData.status as "pending" | "completed" | "cancelled");
+        setNotes(orderData.notes || "");
+        setReceiptImageUrl(orderData.receipt_image_url || "");
+        setPreviewReceiptImage(orderData.receipt_image_url || "");
+      } catch (err) {
+        console.error("Error fetching order data:", err);
+        setError("Failed to load order details. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrderData();
   }, [orderId]);
 
   const handleReceiptImageChange = async (
