@@ -45,3 +45,8 @@ export async function deletePurchasable(id: string) {
     const response = await axios.delete(`/purchasables?id=${id}`);
     return response.data.error
 }
+
+export async function deletePurchasableBatch(id: string) {
+    const response = await axios.delete(`/purchasables/batches?id=${id}`);
+    return response.data.error
+}

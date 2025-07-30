@@ -18,10 +18,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getProductionBatches } from "../domain/purchasable-get";
+import { deletePurchasableBatch } from "../domain/purchasable-post";
 import type { ProductionBatch } from "../domain/production-models";
 import { toast } from "sonner";
 import ExportButton from "@/components/buttons/ExportButton";
 import ExportService from "@/service/ExportService";
+import DeleteDialog from "@/components/dialogs/DeleteDialog";
 
 // Helper function to format quantity with unit conversion
 const formatQuantity = (quantity: number, unitType?: string): string => {
@@ -46,6 +48,11 @@ const PurchasableProductionBatchesPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [batchToDelete, setBatchToDelete] = useState<ProductionBatch | null>(
+    null
+  );
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchBatches();
@@ -98,6 +105,32 @@ const PurchasableProductionBatchesPage = () => {
 
   const handleProduceProducts = () => {
     navigate("/purchasable-produce");
+  };
+
+  const handleDeleteBatch = (batch: ProductionBatch) => {
+    setBatchToDelete(batch);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteBatch = async () => {
+    if (!batchToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const error = await deletePurchasableBatch(batchToDelete.production_id);
+      if (error) {
+        toast.error(error);
+      } else {
+        toast.success("Production batch deleted successfully");
+        fetchBatches(); // Refresh the list
+      }
+    } catch {
+      toast.error("Failed to delete production batch");
+    } finally {
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
+      setBatchToDelete(null);
+    }
   };
 
   // Export columns for ProductionBatch
@@ -304,18 +337,31 @@ const PurchasableProductionBatchesPage = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(
-                              `/purchasable-production-batches/${batch.id}`
-                            );
-                          }}
-                        >
-                          View Details
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(
+                                `/purchasable-production-batches/${batch.id}`
+                              );
+                            }}
+                          >
+                            View Details
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteBatch(batch);
+                            }}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            Delete
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -359,6 +405,37 @@ const PurchasableProductionBatchesPage = () => {
           </div>
         )}
       </div>
+
+      {/* Delete Dialog */}
+      <DeleteDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Production Batch"
+        description={
+          <div>
+            <p>Are you sure you want to delete this production batch?</p>
+            {batchToDelete && (
+              <div className="mt-2 p-3 bg-gray-50 rounded-md">
+                <p className="font-medium text-gray-900">
+                  Batch #{batchToDelete.batch_number}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Product: {batchToDelete.product.name}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Created:{" "}
+                  {new Date(batchToDelete.created_at).toLocaleDateString()}
+                </p>
+              </div>
+            )}
+            <p className="text-sm text-red-600 mt-2">
+              This action cannot be undone.
+            </p>
+          </div>
+        }
+        onConfirm={confirmDeleteBatch}
+        isLoading={isDeleting}
+      />
     </div>
   );
 };
