@@ -23,6 +23,21 @@ import { toast } from "sonner";
 import ExportButton from "@/components/buttons/ExportButton";
 import ExportService from "@/service/ExportService";
 
+// Helper function to format quantity with unit conversion
+const formatQuantity = (quantity: number, unitType?: string): string => {
+  // Convert grams to kilograms if quantity is >= 1000 or <= -1000 and unit type is kilograms
+  if (
+    (unitType === "kilograms" || unitType === "kilogram") &&
+    (quantity >= 1000 || quantity <= -1000)
+  ) {
+    const kgQuantity = quantity / 1000;
+    return `${kgQuantity.toLocaleString(undefined, {
+      maximumFractionDigits: 2,
+    })} kg`;
+  }
+  return `${quantity.toLocaleString()} ${unitType || "units"}`;
+};
+
 const PurchasableProductionBatchesPage = () => {
   const navigate = useNavigate();
   const [searchString, setSearchString] = useState<string>("");
@@ -89,7 +104,11 @@ const PurchasableProductionBatchesPage = () => {
   const exportColumns = [
     { field: "batch_number", header: "Batch Number" },
     { field: "product_name", header: "Product" },
-    { field: "quantity", header: "Quantity" },
+    {
+      field: "quantity",
+      header: "Quantity",
+      format: (value: unknown) => formatQuantity(value as number, "units"),
+    },
     {
       field: "frozen_at",
       header: "Frozen At",
@@ -253,9 +272,8 @@ const PurchasableProductionBatchesPage = () => {
                       </TableCell>
                       <TableCell>
                         <span className="font-medium">
-                          {(batch.quantity || 0).toLocaleString()}
+                          {formatQuantity(batch.quantity || 0, "units")}
                         </span>
-                        {/* Note: Unit type not available in ProductionBatch interface */}
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">

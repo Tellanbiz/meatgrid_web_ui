@@ -41,7 +41,7 @@ const PurchasableStocksTable: React.FC<PurchasableStocksTableProps> = ({
   selectedStore,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
+  const rowsPerPage = 20;
 
   // Calculate pagination
   const totalPages = Math.ceil(stocks.length / rowsPerPage);
@@ -73,9 +73,14 @@ const PurchasableStocksTable: React.FC<PurchasableStocksTableProps> = ({
 
   const formatQuantity = (quantity: number, unitType: string) => {
     // Convert grams to kilograms if quantity is >= 1000 and unit type is kilograms
-    if ((unitType === "kilograms" || unitType === "kilogram") && quantity >= 1000) {
+    if (
+      (unitType === "kilograms" || unitType === "kilogram") &&
+      quantity >= 1000
+    ) {
       const kgQuantity = quantity / 1000;
-      return `${kgQuantity.toLocaleString(undefined, { maximumFractionDigits: 2 })} kg`;
+      return `${kgQuantity.toLocaleString(undefined, {
+        maximumFractionDigits: 2,
+      })} kg`;
     }
     return `${quantity.toLocaleString()} ${unitType}`;
   };
@@ -97,12 +102,7 @@ const PurchasableStocksTable: React.FC<PurchasableStocksTableProps> = ({
 
   return (
     <div className="space-y-4">
-      {loading && (
-        <Progress
-          value={undefined}
-          className="w-full"
-        />
-      )}
+      {loading && <Progress value={undefined} className="w-full" />}
 
       <div className="bg-white rounded-md overflow-hidden border border-gray-200">
         <div className="flex-1">
@@ -121,7 +121,11 @@ const PurchasableStocksTable: React.FC<PurchasableStocksTableProps> = ({
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-8">
                     <p className="text-gray-500">
-                      {searchTerm || selectedStatus !== "all" || selectedStore !== "all" || startDate || endDate
+                      {searchTerm ||
+                      selectedStatus !== "all" ||
+                      selectedStore !== "all" ||
+                      startDate ||
+                      endDate
                         ? "No stocks found matching your filters."
                         : "No purchasable stocks found."}
                     </p>
@@ -131,12 +135,14 @@ const PurchasableStocksTable: React.FC<PurchasableStocksTableProps> = ({
                 currentStocks.map((stock) => {
                   // Handle both 'purchasable' and 'product' properties
                   const purchasable = stock.purchasable || stock.product;
-                  
+
                   return (
                     <TableRow key={stock.id}>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{purchasable?.name || "Unknown Purchasable"}</div>
+                          <div className="font-medium">
+                            {purchasable?.name || "Unknown Purchasable"}
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -146,7 +152,10 @@ const PurchasableStocksTable: React.FC<PurchasableStocksTableProps> = ({
                       </TableCell>
                       <TableCell>
                         <div className="text-sm font-medium">
-                          {formatQuantity(stock.quantity, purchasable?.unit_type || "pieces")}
+                          {formatQuantity(
+                            stock.quantity,
+                            purchasable?.unit_type || "pieces"
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -156,7 +165,9 @@ const PurchasableStocksTable: React.FC<PurchasableStocksTableProps> = ({
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
-                          {stock.created_at ? formatLocalDate(stock.created_at) : "N/A"}
+                          {stock.created_at
+                            ? formatLocalDate(stock.created_at)
+                            : "N/A"}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -174,8 +185,7 @@ const PurchasableStocksTable: React.FC<PurchasableStocksTableProps> = ({
               <div className="flex items-center space-x-2">
                 <p className="text-sm text-gray-700">
                   Showing {stocks.length > 0 ? startIndex + 1 : 0} to{" "}
-                  {Math.min(endIndex, stocks.length)} of{" "}
-                  {stocks.length} stocks
+                  {Math.min(endIndex, stocks.length)} of {stocks.length} stocks
                 </p>
               </div>
 
@@ -183,25 +193,39 @@ const PurchasableStocksTable: React.FC<PurchasableStocksTableProps> = ({
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious
-                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      onClick={() =>
+                        setCurrentPage(Math.max(1, currentPage - 1))
+                      }
+                      className={
+                        currentPage === 1
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
                     />
                   </PaginationItem>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <PaginationItem key={page}>
-                      <PaginationLink
-                        onClick={() => setCurrentPage(page)}
-                        isActive={currentPage === page}
-                        className="cursor-pointer"
-                      >
-                        {page}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(page)}
+                          isActive={currentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )
+                  )}
                   <PaginationItem>
                     <PaginationNext
-                      onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      onClick={() =>
+                        setCurrentPage(Math.min(totalPages, currentPage + 1))
+                      }
+                      className={
+                        currentPage === totalPages
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
                     />
                   </PaginationItem>
                 </PaginationContent>
@@ -214,4 +238,4 @@ const PurchasableStocksTable: React.FC<PurchasableStocksTableProps> = ({
   );
 };
 
-export default PurchasableStocksTable; 
+export default PurchasableStocksTable;
