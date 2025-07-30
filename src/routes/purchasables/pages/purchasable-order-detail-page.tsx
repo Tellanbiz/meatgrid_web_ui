@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -24,16 +23,66 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ArrowLeft, Save, RefreshCw, Upload, Eye, Trash2 } from "lucide-react";
-import { updatePurchasableOrder } from "../domain/purchasable-post";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import DeleteDialog from "@/components/dialogs/DeleteDialog";
+import {
+  ArrowLeft,
+  Save,
+  RefreshCw,
+  Upload,
+  Eye,
+  Trash2,
+  Calendar,
+  User,
+  Building2,
+  Package,
+  Receipt,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+  Clock,
+} from "lucide-react";
+import {
+  updatePurchasableOrder,
+  deletePurchaseOrder,
+} from "../domain/purchasable-post";
 import { getPurchasableOrderInfo } from "../domain/purchasable-get";
-import type {
-  PurchasableOrder,
-  UpdatePurchaseParams,
-  PurchasableOrderInfo,
-} from "../domain/models";
+import type { PurchasableOrder, UpdatePurchaseParams } from "../domain/models";
 import { uploadImages } from "@/store/features/uploads/uploadThunks";
 import { useAppDispatch } from "@/store/hooks";
+
+// Currency formatter for KES
+const formatCurrency = (value: number): string => {
+  return value.toLocaleString("en-KE", {
+    style: "currency",
+    currency: "KES",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
+// Status configuration
+const statusConfig = {
+  pending: {
+    label: "Pending",
+    icon: Clock,
+    color: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    bgColor: "bg-yellow-50",
+  },
+  completed: {
+    label: "Completed",
+    icon: CheckCircle,
+    color: "bg-green-100 text-green-800 border-green-200",
+    bgColor: "bg-green-50",
+  },
+  cancelled: {
+    label: "Cancelled",
+    icon: XCircle,
+    color: "bg-red-100 text-red-800 border-red-200",
+    bgColor: "bg-red-50",
+  },
+};
 
 export default function PurchasableOrderDetailPage() {
   const navigate = useNavigate();
@@ -59,6 +108,8 @@ export default function PurchasableOrderDetailPage() {
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [selectedImageTitle, setSelectedImageTitle] = useState<string>("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchOrderData = async () => {
@@ -68,7 +119,7 @@ export default function PurchasableOrderDetailPage() {
         setLoading(true);
         setError(null);
 
-        const orderData: PurchasableOrderInfo = await getPurchasableOrderInfo(
+        const orderData: PurchasableOrder = await getPurchasableOrderInfo(
           parseInt(orderId)
         );
 
@@ -107,6 +158,19 @@ export default function PurchasableOrderDetailPage() {
     if (!files.length) return;
 
     const selectedFile = files[0];
+
+    // Validate file type
+    if (!selectedFile.type.startsWith("image/")) {
+      toast.error("Please select a valid image file");
+      return;
+    }
+
+    // Validate file size (5MB limit)
+    if (selectedFile.size > 5 * 1024 * 1024) {
+      toast.error("Image size should be less than 5MB");
+      return;
+    }
+
     setReceiptImage(selectedFile);
     setPreviewReceiptImage(URL.createObjectURL(selectedFile));
   };
@@ -173,15 +237,42 @@ export default function PurchasableOrderDetailPage() {
   };
 
   const handleBack = () => {
-    navigate("/purchasable-orders");
+    navigate("/purchasables/orders");
+  };
+
+  const handleDeleteOrder = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteOrder = async () => {
+    if (!order) return;
+
+    setIsDeleting(true);
+    try {
+      const error = await deletePurchaseOrder(order.id.toString());
+      if (error) {
+        toast.error(error);
+      } else {
+        toast.success("Order deleted successfully");
+        navigate("/purchasables/orders");
+      }
+    } catch {
+      toast.error("Failed to delete order");
+    } finally {
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
+    }
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="flex items-center space-x-2">
-          <RefreshCw className="h-6 w-6 animate-spin text-gray-400" />
-          <p className="text-gray-500">Loading order details...</p>
+        <div className="flex flex-col items-center space-y-4">
+          <RefreshCw className="h-8 w-8 animate-spin text-[#F10027]" />
+          <p className="text-gray-600 font-medium">Loading order details...</p>
+          <p className="text-sm text-gray-500">
+            Please wait while we fetch the information
+          </p>
         </div>
       </div>
     );
@@ -190,11 +281,19 @@ export default function PurchasableOrderDetailPage() {
   if (!order) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-500 mb-4">Order not found</p>
-          <Button onClick={handleBack} variant="outline">
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="h-8 w-8 text-red-600" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            Order Not Found
+          </h3>
+          <p className="text-gray-500 mb-6">
+            The order you're looking for doesn't exist or has been removed.
+          </p>
+          <Button onClick={handleBack} variant="outline" className="w-full">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Orders
+            Back to Purchasable Orders
           </Button>
         </div>
       </div>
@@ -206,48 +305,68 @@ export default function PurchasableOrderDetailPage() {
     0
   );
 
+  const currentStatus = statusConfig[status];
+  const StatusIcon = currentStatus.icon;
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b">
+      <div className="bg-white border-b shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleBack}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Orders
-              </Button>
-              <div>
-                <h1 className="text-2xl font-semibold text-gray-900">
-                  Order #{order.id}
-                </h1>
-                <p className="text-sm text-gray-500 mt-1">
-                  Manage order details and status
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#F10027] rounded-lg flex items-center justify-center">
+                  <Package className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    Order #{order.id}
+                  </h1>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge className={currentStatus.color}>
+                      <StatusIcon className="h-3 w-3 mr-1" />
+                      {currentStatus.label}
+                    </Badge>
+                    <span className="text-sm text-gray-500">
+                      •{" "}
+                      {new Date(order.created_at).toLocaleDateString("en-KE", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
-            <Button
-              onClick={handleSave}
-              disabled={saving}
-              className="px-6 bg-[#F10027] hover:bg-[#F10027]/90 text-white"
-            >
-              {saving ? (
-                <>
-                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Changes
-                </>
-              )}
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={handleDeleteOrder}
+                variant="outline"
+                className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Order
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={saving}
+                className="px-6 bg-[#F10027] hover:bg-[#F10027]/90 text-white font-medium"
+              >
+                {saving ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Save Changes
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -255,7 +374,8 @@ export default function PurchasableOrderDetailPage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         {error && (
-          <div className="mb-6 p-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+          <div className="mb-6 p-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
+            <AlertCircle className="h-4 w-4" />
             {error}
           </div>
         )}
@@ -263,79 +383,101 @@ export default function PurchasableOrderDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Order Information */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Basic Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3">
+            {/* Order Summary */}
+            <Card className="border-0 shadow-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-3 text-lg">
                   <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                     <Eye className="h-4 w-4 text-blue-600" />
                   </div>
-                  Order Information
+                  Order Summary
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700">
-                      Order ID
-                    </Label>
-                    <p className="text-lg font-semibold text-gray-900">
-                      #{order.id}
-                    </p>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <Calendar className="h-4 w-4 text-gray-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">
+                          Created Date
+                        </p>
+                        <p className="text-gray-900 font-medium">
+                          {new Date(order.created_at).toLocaleDateString(
+                            "en-KE",
+                            {
+                              day: "2-digit",
+                              month: "long",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                        <User className="h-4 w-4 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">
+                          Created By
+                        </p>
+                        <p className="text-gray-900 font-medium">
+                          {order.user.full_name}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700">
-                      Created Date
-                    </Label>
-                    <p className="text-gray-900">
-                      {new Date(order.created_at).toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700">
-                      Created By
-                    </Label>
-                    <p className="text-gray-900">{order.user.full_name}</p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700">
-                      Supplier
-                    </Label>
-                    <p className="text-gray-900">{order.supplier.full_name}</p>
-                    <p className="text-sm text-gray-500">
-                      {order.supplier.email}
-                    </p>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <Building2 className="h-4 w-4 text-purple-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">
+                          Supplier
+                        </p>
+                        <p className="text-gray-900 font-medium">
+                          {order.supplier.full_name}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {order.supplier.email}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <Receipt className="h-4 w-4 text-orange-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">
+                          Total Cost
+                        </p>
+                        <p className="text-xl font-bold text-[#F10027]">
+                          {formatCurrency(totalCost)}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Order Items */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3">
+            <Card className="border-0 shadow-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-3 text-lg">
                   <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                    <svg
-                      className="h-4 w-4 text-green-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                      />
-                    </svg>
+                    <Package className="h-4 w-4 text-green-600" />
                   </div>
-                  Order Items
+                  Order Items ({order.items.length})
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -343,38 +485,47 @@ export default function PurchasableOrderDetailPage() {
                   {order.items.map((item, index) => (
                     <div
                       key={index}
-                      className="border border-gray-200 rounded-lg p-4"
+                      className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
                     >
                       <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-semibold text-gray-900">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-900 mb-1">
                             {item.product.name}
                           </h4>
-                          <p className="text-sm text-gray-500">
-                            Unit: {item.product.unit_type}
-                          </p>
+                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                            <span>Unit: {item.product.unit_type}</span>
+                            <span>
+                              Quantity: {item.unit_of_issue.toLocaleString()}
+                            </span>
+                            <span>
+                              Unit Cost: {formatCurrency(item.unit_cost)}
+                            </span>
+                          </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold text-gray-900">
-                            {item.unit_of_issue} x ${item.unit_cost}
+                          <p className="font-bold text-lg text-[#F10027]">
+                            {formatCurrency(
+                              item.unit_of_issue * item.unit_cost
+                            )}
                           </p>
                           <p className="text-sm text-gray-500">
-                            Total: $
-                            {(item.unit_of_issue * item.unit_cost).toFixed(2)}
+                            {item.unit_of_issue} ×{" "}
+                            {formatCurrency(item.unit_cost)}
                           </p>
                         </div>
                       </div>
                     </div>
                   ))}
-                  <div className="border-t pt-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-semibold text-gray-900">
-                        Total Cost
-                      </span>
-                      <span className="text-lg font-semibold text-[#F10027]">
-                        ${totalCost.toFixed(2)}
-                      </span>
-                    </div>
+
+                  <Separator className="my-4" />
+
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-lg font-semibold text-gray-900">
+                      Total Cost
+                    </span>
+                    <span className="text-2xl font-bold text-[#F10027]">
+                      {formatCurrency(totalCost)}
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -384,8 +535,8 @@ export default function PurchasableOrderDetailPage() {
           {/* Edit Form */}
           <div className="space-y-6">
             {/* Status */}
-            <Card>
-              <CardHeader>
+            <Card className="border-0 shadow-sm">
+              <CardHeader className="pb-4">
                 <CardTitle className="text-lg">Order Status</CardTitle>
                 <CardDescription>Update the order status</CardDescription>
               </CardHeader>
@@ -400,17 +551,32 @@ export default function PurchasableOrderDetailPage() {
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                    <SelectItem value="pending">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-yellow-600" />
+                        Pending
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="completed">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        Completed
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="cancelled">
+                      <div className="flex items-center gap-2">
+                        <XCircle className="h-4 w-4 text-red-600" />
+                        Cancelled
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </CardContent>
             </Card>
 
             {/* Notes */}
-            <Card>
-              <CardHeader>
+            <Card className="border-0 shadow-sm">
+              <CardHeader className="pb-4">
                 <CardTitle className="text-lg">Order Notes</CardTitle>
                 <CardDescription>Add or update order notes</CardDescription>
               </CardHeader>
@@ -420,14 +586,14 @@ export default function PurchasableOrderDetailPage() {
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={4}
-                  className="w-full"
+                  className="w-full resize-none"
                 />
               </CardContent>
             </Card>
 
             {/* Receipt Image */}
-            <Card>
-              <CardHeader>
+            <Card className="border-0 shadow-sm">
+              <CardHeader className="pb-4">
                 <CardTitle className="text-lg">Receipt Image</CardTitle>
                 <CardDescription>
                   Upload or update receipt image
@@ -436,38 +602,44 @@ export default function PurchasableOrderDetailPage() {
               <CardContent>
                 <div className="space-y-4">
                   {previewReceiptImage ? (
-                    <div className="space-y-2">
-                      <img
-                        src={previewReceiptImage}
-                        alt="Receipt"
-                        className="w-full h-32 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
-                        onClick={() => {
-                          setSelectedImage(previewReceiptImage);
-                          setSelectedImageTitle(
-                            `Receipt for Order #${order.id}`
-                          );
-                          setImageDialogOpen(true);
-                        }}
-                      />
+                    <div className="space-y-3">
+                      <div className="relative">
+                        <img
+                          src={previewReceiptImage}
+                          alt="Receipt"
+                          className="w-full h-40 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() => {
+                            setSelectedImage(previewReceiptImage);
+                            setSelectedImageTitle(
+                              `Receipt for Order #${order.id}`
+                            );
+                            setImageDialogOpen(true);
+                          }}
+                        />
+                      </div>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={handleRemoveReceiptImage}
-                        className="text-red-600 hover:text-red-700"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50 w-full"
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
                         Remove Receipt
                       </Button>
                     </div>
                   ) : (
-                    <label className="w-full h-32 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors duration-200">
-                      <div className="flex flex-col items-center justify-center text-gray-500">
-                        <Upload className="w-8 h-8 mb-2" />
-                        <span className="text-sm font-medium">
+                    <label className="w-full h-40 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors duration-200 group">
+                      <div className="flex flex-col items-center justify-center text-gray-500 group-hover:text-gray-700">
+                        <Upload className="w-10 h-10 mb-3 group-hover:scale-110 transition-transform" />
+                        <span className="text-sm font-medium mb-1">
                           Upload Receipt
                         </span>
-                        <span className="text-xs mt-1">
+                        <span className="text-xs text-center">
                           Click to upload or drag and drop
+                          <br />
+                          <span className="text-gray-400">
+                            Max 5MB • JPG, PNG, GIF
+                          </span>
                         </span>
                       </div>
                       <input
@@ -506,6 +678,34 @@ export default function PurchasableOrderDetailPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Dialog */}
+      <DeleteDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Order"
+        description={
+          <div>
+            <p>Are you sure you want to delete this order?</p>
+            {order && (
+              <div className="mt-2 p-3 bg-gray-50 rounded-md">
+                <p className="font-medium text-gray-900">Order #{order.id}</p>
+                <p className="text-sm text-gray-600">
+                  Supplier: {order.supplier.full_name}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Created: {new Date(order.created_at).toLocaleDateString()}
+                </p>
+              </div>
+            )}
+            <p className="text-sm text-red-600 mt-2">
+              This action cannot be undone.
+            </p>
+          </div>
+        }
+        onConfirm={confirmDeleteOrder}
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

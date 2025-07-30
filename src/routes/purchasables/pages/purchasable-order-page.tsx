@@ -27,7 +27,6 @@ import {
   XIcon,
   PlusIcon,
   RefreshCw,
-  Trash2,
   Upload,
 } from "lucide-react";
 import {
@@ -39,10 +38,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { usePurchasables } from "../hooks/usePurchasables";
-import {
-  createPurchaseOrder,
-  deletePurchaseOrder,
-} from "../domain/purchasable-post";
+import { createPurchaseOrder } from "../domain/purchasable-post";
 import type {
   CreateOrderPurchaseParams,
   Purchasable,
@@ -60,7 +56,7 @@ import { fetchStores } from "@/store/features/stores/storeThunks";
 import { fetchStorageTypes } from "@/store/features/storages/storageThunks";
 import type { AppDispatch } from "@/store/store";
 import { TabNavigation } from "@/components/ui/tab-navigation";
-import DeleteDialog from "@/components/dialogs/DeleteDialog";
+
 import ExportButton from "@/components/buttons/ExportButton";
 import ExportService from "@/service/ExportService";
 import StockDateRangePicker from "@/routes/manufacturing/stocks/components/StockDateRangePicker";
@@ -150,13 +146,6 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
   const [productSearchTerm, setProductSearchTerm] = useState("");
-
-  // Delete states
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [orderToDelete, setOrderToDelete] = useState<PurchasableOrder | null>(
-    null
-  );
-  const [isDeleting, setIsDeleting] = useState(false);
 
   // Image dialog states
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
@@ -518,32 +507,6 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
     }
   };
 
-  const handleDeleteOrder = (order: PurchasableOrder) => {
-    setOrderToDelete(order);
-    setDeleteDialogOpen(true);
-  };
-
-  const confirmDeleteOrder = async () => {
-    if (!orderToDelete) return;
-
-    setIsDeleting(true);
-    try {
-      const error = await deletePurchaseOrder(orderToDelete.id.toString());
-      if (error) {
-        toast.error(error);
-      } else {
-        toast.success("Order deleted successfully");
-        refreshOrders();
-      }
-    } catch {
-      toast.error("Failed to delete order");
-    } finally {
-      setIsDeleting(false);
-      setDeleteDialogOpen(false);
-      setOrderToDelete(null);
-    }
-  };
-
   // Filter orders based on search and filters
   const filteredOrders = purchasableOrders.filter((order) => {
     // Basic search filter
@@ -842,7 +805,7 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                   <TableHead>Total Cost</TableHead>
                   <TableHead>Notes</TableHead>
                   <TableHead>Receipt</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead>Details</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -923,12 +886,17 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                         </TableCell>
                         <TableCell>
                           <div className="space-y-1">
-                            {order.items.map((item, index) => (
+                            {order.items.slice(0, 2).map((item, index) => (
                               <div key={index} className="text-sm">
                                 {item.product.name} - {item.unit_of_issue}{" "}
                                 {item.product.unit_type}
                               </div>
                             ))}
+                            {order.items.length > 2 && (
+                              <div className="text-sm text-gray-500 italic">
+                                +{order.items.length - 2} more...
+                              </div>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell className="font-medium">
@@ -979,19 +947,8 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                           )}
                         </TableCell>
                         <TableCell>
-                          <div
-                            className="flex items-center gap-2"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeleteOrder(order)}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                          <div className="text-sm text-gray-400">
+                            Click to view details
                           </div>
                         </TableCell>
                       </TableRow>
@@ -1935,37 +1892,6 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
           </div>
         </div>
       )}
-
-      {/* Delete Dialog */}
-      <DeleteDialog
-        open={deleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
-        title="Delete Order"
-        description={
-          <div>
-            <p>Are you sure you want to delete this order?</p>
-            {orderToDelete && (
-              <div className="mt-2 p-3 bg-gray-50 rounded-md">
-                <p className="font-medium text-gray-900">
-                  Order #{orderToDelete.id}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Supplier: {orderToDelete.supplier.full_name}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Created:{" "}
-                  {new Date(orderToDelete.created_at).toLocaleDateString()}
-                </p>
-              </div>
-            )}
-            <p className="text-sm text-red-600 mt-2">
-              This action cannot be undone.
-            </p>
-          </div>
-        }
-        onConfirm={confirmDeleteOrder}
-        isLoading={isDeleting}
-      />
 
       {/* Image Dialog */}
       <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>

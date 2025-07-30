@@ -31,7 +31,7 @@ export async function createPurchaseOrder(params: CreateOrderPurchaseParams) {
 }
 
 export async function updatePurchasableOrder(params: UpdatePurchaseParams): Promise<string | undefined> {
-    const response = await axios.post("/purchasables/orders/update", params);
+    const response = await axios.post("/purchasables/order/update", params);
     return response.data.error;
 }
 

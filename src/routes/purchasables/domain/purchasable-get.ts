@@ -1,5 +1,5 @@
 import axios from "@/service/api";
-import { Purchasable, PurchasableOrder, PurchasableOrderInfo, PurchasableStock } from "./models";
+import { Purchasable, PurchasableOrder, PurchasableStock } from "./models";
 import { ProductionBatch, ProductionBatchInfo } from "./production-models";
 
 export async function getPurchasables(store_id?: string, name?: string): Promise<Purchasable[]> {
@@ -17,8 +17,8 @@ export async function getPurchasableOrders(startDate: string, endDate: string): 
     return response.data as PurchasableOrder[];
 }
 
-export async function getPurchasableOrderInfo(orderId: number): Promise<PurchasableOrderInfo> {
-    const response = await axios.get<PurchasableOrderInfo>(`/purchasables/orders/info?id=${orderId}`);
+export async function getPurchasableOrderInfo(orderId: number): Promise<PurchasableOrder> {
+    const response = await axios.get<PurchasableOrder>(`/purchasables/orders/info?id=${orderId}`);
     return response.data;
 }
 
