@@ -805,7 +805,6 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                   <TableHead>Total Cost</TableHead>
                   <TableHead>Notes</TableHead>
                   <TableHead>Receipt</TableHead>
-                  <TableHead>Details</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -945,11 +944,6 @@ const PurchasableOrderPage: React.FC<PurchasableOrderPageProps> = ({
                               No receipt
                             </span>
                           )}
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-sm text-gray-400">
-                            Click to view details
-                          </div>
                         </TableCell>
                       </TableRow>
                     );

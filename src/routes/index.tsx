@@ -16,7 +16,7 @@ import SupplierPage from "@/routes/manufacturing/suppliers/pages/SupplierPage.js
 import StocksPage from "@/routes/manufacturing/stocks/pages/StocksPage.js";
 import WareHousePage from "@/routes/manufacturing/warehouses/pages/WareHousePage.js";
 import ManageWareHousePage from "@/routes/manufacturing/warehouses/pages/ManageWareHousePage.js";
-import PaymentMethodsPage from "@/pages/payment-methods/PaymentMethodsPage.js";
+import PaymentMethodsPage from "@/routes/payment-methods/pages/PaymentMethodsPage.js";
 import BannersPage from "@/pages/banners/BannersPage.js";
 import ManageBannerPage from "@/pages/banners/ManageBannerPage.js";
 import ManageCategoryPage from "@/pages/categories/ManageCategoryPage.js";

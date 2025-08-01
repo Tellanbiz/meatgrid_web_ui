@@ -1,4 +1,10 @@
-import { EllipsisVertical, Pencil, Plus, RefreshCcw } from "lucide-react";
+import {
+  EllipsisVertical,
+  Pencil,
+  Plus,
+  RefreshCw,
+  Search,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "primereact/datatable";
 import {
@@ -8,24 +14,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Column } from "primereact/column";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   selectIsFetchingPaymentMethods,
   selectPaymentMethods,
   selectPaymentMethodById,
   selectPaymentMethodError,
   selectPaymentMethodSuccessMessage,
-} from "../../store/features/payment-methods/paymentMethodSelectors";
+} from "../../../store/features/payment-methods/paymentMethodSelectors";
 import { useEffect, useState } from "react";
 import {
   createPaymentMethod,
   fetchPaymentMethods,
   updatePaymentMethod,
-} from "../../store/features/payment-methods/paymentMethodThunks";
+} from "../../../store/features/payment-methods/paymentMethodThunks";
 import {
   DataTableStyle,
   TableHeaderStyle,
-} from "../../shared/constants/TableStyles";
+} from "../../../shared/constants/TableStyles";
 import { ProgressBar } from "primereact/progressbar";
 import {
   Dialog,
@@ -35,11 +41,20 @@ import {
 } from "@/components/ui/dialog";
 import PaymentMethodForm, {
   PaymentMethodFormData,
-} from "./components/PaymentMethodForm";
-import { useModal } from "../../shared/hooks/use-modal";
-import { PaymentMethod } from "../../store/features/payment-methods/paymentMethodTypes";
+} from "../components/PaymentMethodForm";
+import { useModal } from "../../../shared/hooks/use-modal";
+import { PaymentMethod } from "../../../store/features/payment-methods/paymentMethodTypes";
 import { toast } from "sonner";
-import { resetPaymentMethodState } from "../../store/features/payment-methods/paymentMethodSlice";
+import { resetPaymentMethodState } from "../../../store/features/payment-methods/paymentMethodSlice";
+import { Input } from "@/components/ui/input";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const PaymentMethodsPage = () => {
   const dispatch = useAppDispatch();
@@ -48,6 +63,8 @@ const PaymentMethodsPage = () => {
     selectIsFetchingPaymentMethods
   );
 
+  const [searchString, setSearchString] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [isDialogOpen, setIsDialogOpen] = useModal();
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<
@@ -61,12 +78,42 @@ const PaymentMethodsPage = () => {
       : () => undefined
   );
 
+  // Filter payment methods based on search and status
+  const getFilteredPaymentMethods = () => {
+    let filtered = paymentMethods.filter(
+      (method) =>
+        method.name.toLowerCase().includes(searchString.toLowerCase()) ||
+        method.tag.toLowerCase().includes(searchString.toLowerCase())
+    );
+
+    // Apply status filter
+    if (selectedStatus !== "all") {
+      filtered = filtered.filter((method) => {
+        if (selectedStatus === "active") return method.active;
+        if (selectedStatus === "inactive") return !method.active;
+        return true;
+      });
+    }
+
+    return filtered;
+  };
+
+  const filteredPaymentMethods = getFilteredPaymentMethods();
+
   useEffect(() => {
     dispatch(fetchPaymentMethods());
   }, [dispatch]);
 
   const handleRefresh = () => {
     dispatch(fetchPaymentMethods());
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchString(e.target.value);
+  };
+
+  const handleStatusChange = (value: string) => {
+    setSelectedStatus(value);
   };
 
   const paymentMethodError = useAppSelector(selectPaymentMethodError);
@@ -112,6 +159,7 @@ const PaymentMethodsPage = () => {
             id: selectedPaymentMethodId,
             name: formData.name,
             active: formData.active,
+            disable_total: formData.disable_total,
           })
         ).unwrap();
       } else {
@@ -120,6 +168,7 @@ const PaymentMethodsPage = () => {
           createPaymentMethod({
             name: formData.name,
             active: formData.active,
+            disable_total: formData.disable_total,
           })
         ).unwrap();
       }
@@ -154,38 +203,63 @@ const PaymentMethodsPage = () => {
   };
 
   return (
-    <div className="h-full p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">Payment Methods</h1>
-        <div className="flex gap-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={isLoadingPaymentMethods}
-          >
-            <RefreshCcw
-              className={`h-4 w-4 ${
-                isLoadingPaymentMethods ? "animate-spin" : ""
-              }`}
-            />
-            <span className="ml-2">Refresh</span>
-          </Button>
+    <div className="space-y-4 p-6 bg-white">
+      <div className="flex flex-col">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search payment methods..."
+                value={searchString}
+                onChange={handleSearchChange}
+                className="pl-9 h-10 border-gray-200 focus-visible:ring-1 focus-visible:ring-primary"
+              />
+            </div>
 
-          <Button size="sm" onClick={() => handleOpenDialog(false)}>
-            <Plus className="h-4 w-4" />
-            <span className="ml-2">Add Payment Method</span>
-          </Button>
+            <Select value={selectedStatus} onValueChange={handleStatusChange}>
+              <SelectTrigger className="w-40 h-10 border-gray-200 bg-white">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex space-x-2">
+            <Button
+              variant="outline"
+              onClick={handleRefresh}
+              disabled={isLoadingPaymentMethods}
+              size="sm"
+              className="px-2"
+            >
+              <RefreshCw
+                className={`h-4 w-4 ${
+                  isLoadingPaymentMethods ? "animate-spin" : ""
+                }`}
+              />
+              <span className="ml-2">Refresh</span>
+            </Button>
+
+            <Button onClick={() => handleOpenDialog(false)} size="sm">
+              <Plus className="h-4 w-4 mr-1" />
+              <span>Add Payment Method</span>
+            </Button>
+          </div>
         </div>
       </div>
 
-      <div className="h-table">
+      <div className="h-table rounded-md border border-gray-200 overflow-hidden bg-white">
         {isLoadingPaymentMethods && (
           <ProgressBar mode="indeterminate" style={{ height: "4px" }} />
         )}
 
         <DataTable
-          value={paymentMethods}
+          value={filteredPaymentMethods}
           dataKey="id"
           paginator
           rows={25}
@@ -198,12 +272,41 @@ const PaymentMethodsPage = () => {
           tableStyle={DataTableStyle}
           className="bg-white"
         >
-          <Column field="name" header="Name" headerStyle={TableHeaderStyle} />
-          <Column field="tag" header="Tag" headerStyle={TableHeaderStyle} />
+          <Column
+            field="name"
+            header="Name"
+            headerStyle={TableHeaderStyle}
+            body={(rowData) => (
+              <span className="font-bold">{rowData.name}</span>
+            )}
+            style={{ paddingLeft: "1rem", paddingRight: "1rem" }}
+          />
+          <Column
+            field="tag"
+            header="Tag"
+            headerStyle={TableHeaderStyle}
+            style={{ paddingLeft: "1rem", paddingRight: "1rem" }}
+          />
           <Column
             field="active"
             header="Active"
             headerStyle={TableHeaderStyle}
+            style={{ paddingLeft: "1rem", paddingRight: "1rem" }}
+          />
+          <Column
+            field="disable_total"
+            header="Disable Total"
+            headerStyle={TableHeaderStyle}
+            body={(rowData) => (
+              <span
+                className={
+                  rowData.disable_total ? "text-green-600" : "text-red-600"
+                }
+              >
+                {rowData.disable_total ? "Enabled" : "Disabled"}
+              </span>
+            )}
+            style={{ paddingLeft: "1rem", paddingRight: "1rem" }}
           />
           <Column
             header="Created At"
@@ -218,11 +321,13 @@ const PaymentMethodsPage = () => {
               });
             }}
             headerStyle={TableHeaderStyle}
+            style={{ paddingLeft: "1rem", paddingRight: "1rem" }}
           />
           <Column
             header="Actions"
             headerStyle={TableHeaderStyle}
             body={actionsBodyTemplate}
+            style={{ paddingLeft: "1rem", paddingRight: "1rem" }}
           />
         </DataTable>
       </div>
@@ -242,6 +347,7 @@ const PaymentMethodsPage = () => {
                     name: selectedPaymentMethod.name,
                     tag: selectedPaymentMethod.tag,
                     active: selectedPaymentMethod.active,
+                    disable_total: selectedPaymentMethod.disable_total,
                   }
                 : undefined
             }

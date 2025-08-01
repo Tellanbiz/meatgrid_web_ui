@@ -3,5 +3,6 @@ export interface PaymentMethod {
   name: string;
   tag: string;
   active: boolean;
+  disable_total: boolean;
   created_at: string;
 }

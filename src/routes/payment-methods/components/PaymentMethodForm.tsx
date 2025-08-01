@@ -3,12 +3,13 @@ import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
 
 export interface PaymentMethodFormData {
   name: string;
   tag: string;
   active: boolean;
+  disable_total: boolean;
 }
 
 interface PaymentMethodFormProps {
@@ -29,6 +30,7 @@ const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
     name: "",
     tag: "",
     active: false,
+    disable_total: false,
   });
 
   const initialValuesLoaded = useRef(false);
@@ -62,26 +64,31 @@ const PaymentMethodForm: React.FC<PaymentMethodFormProps> = ({
           />
         </div>
       </div>
-      <div className="flex flex-col gap-y-3">
-        <Label>Payment Status</Label>
-        <RadioGroup
-          value={form.active ? "active" : "inactive"}
-          onValueChange={(value) => handleChange("active", value === "active")}
-          className="grid grid-cols-2 gap-4"
-        >
-          <div className="flex items-center space-x-3">
-            <RadioGroupItem value="active" id="active" />
-            <Label htmlFor="active" className="text-gray-500 w-full">
-              Active
-            </Label>
-          </div>
-          <div className="flex items-center space-x-3">
-            <RadioGroupItem value="inactive" id="inactive" />
-            <Label htmlFor="inactive" className="text-gray-500 w-full">
-              Inactive
-            </Label>
-          </div>
-        </RadioGroup>
+      <div className="flex items-center justify-between">
+        <div className="space-y-0.5">
+          <Label>Payment Status</Label>
+          <p className="text-sm text-gray-500">
+            Enable or disable this payment method
+          </p>
+        </div>
+        <Switch
+          checked={form.active}
+          onCheckedChange={(checked) => handleChange("active", checked)}
+        />
+      </div>
+
+      <div className="flex items-center justify-between">
+        <div className="space-y-0.5">
+          <Label>Disable Total</Label>
+          <p className="text-sm text-gray-500">
+            Enable or disable total calculation for this payment method
+          </p>
+        </div>
+        <Switch
+          name="disable_total"
+          checked={form.disable_total}
+          onCheckedChange={(checked) => handleChange("disable_total", checked)}
+        />
       </div>
 
       <div className="flex justify-end mt-4">
