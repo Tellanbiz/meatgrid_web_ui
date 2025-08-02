@@ -212,6 +212,7 @@ export function PurchasableEditDialog({
                 <SelectItem value="strands">Strands</SelectItem>
                 <SelectItem value="rolls">Rolls</SelectItem>
                 <SelectItem value="packets">Packets</SelectItem>
+                <SelectItem value="pieces">Pieces</SelectItem>
               </SelectContent>
             </Select>
           </div>
