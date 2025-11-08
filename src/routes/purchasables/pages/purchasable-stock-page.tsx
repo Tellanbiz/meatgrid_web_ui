@@ -243,6 +243,7 @@ const PurchasableStockPage = () => {
           endDate={endDate} 
           selectedStatus={selectedStatus}
           selectedStore={selectedStore}
+          onDelete={fetchStocks}
         />
       </div>
     </div>

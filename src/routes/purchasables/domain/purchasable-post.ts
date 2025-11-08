@@ -35,6 +35,11 @@ export async function updatePurchasableOrder(params: UpdatePurchaseParams): Prom
     return response.data.error;
 }
 
+export async function updatePurchasableStock(params: { id: string, quantity: number }): Promise<string | undefined> {
+    const response = await axios.post("/purchasables/stocks/update", params);
+    return response.data.error;
+}
+
 
 export async function deletePurchaseOrder(id: string) {
     const response = await axios.delete(`/purchasables/orders?id=${id}`);
@@ -48,5 +53,10 @@ export async function deletePurchasable(id: string) {
 
 export async function deletePurchasableBatch(id: string) {
     const response = await axios.delete(`/purchasables/batches?id=${id}`);
+    return response.data.error
+}
+
+export async function deletePurchasableStock(id: string) {
+    const response = await axios.delete(`/purchasables/stocks?id=${id}`);
     return response.data.error
 }
