@@ -127,7 +127,7 @@ const PurchasableStocksTable: React.FC<PurchasableStocksTableProps> = ({
     if (!stockToUpdate || !updateQuantity) return;
 
     const quantity = parseFloat(updateQuantity);
-    if (isNaN(quantity) || quantity <= 0) {
+    if (isNaN(quantity) || quantity < 0) {
       toast.error("Please enter a valid quantity");
       return;
     }
@@ -453,7 +453,7 @@ const PurchasableStocksTable: React.FC<PurchasableStocksTableProps> = ({
                 id="quantity"
                 type="number"
                 step="0.01"
-                min="0.01"
+                min="0"
                 value={updateQuantity}
                 onChange={(e) => setUpdateQuantity(e.target.value)}
                 placeholder="Enter new quantity"
