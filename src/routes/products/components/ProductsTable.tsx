@@ -51,6 +51,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 interface ProductsTableProps {
   searchString: string;
   selectedStore: string | null;
+  _selectedStore?: string | null;
   selectedStockStatus: string;
   filteredProducts: Product[];
 }
