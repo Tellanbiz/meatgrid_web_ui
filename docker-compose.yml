@@ -4,5 +4,5 @@ services:
       context: .
       dockerfile: docker/Dockerfile
     ports:
-      - "${PORT:-8000}:80"
+      - "7000:80"
     restart: unless-stopped
