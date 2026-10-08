@@ -34,7 +34,6 @@ interface ProductsTableProps {
 
 const ProductsTable: React.FC<ProductsTableProps> = ({ 
   searchString,
-  _selectedStore
 }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();

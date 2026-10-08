@@ -30,9 +30,9 @@ export function CompanyHeader({
         >
           <div className="flex items-center justify-start h-full text-white space-x-2">
             <div className="size-9 bg-accent flex items-center justify-center rounded-md">
-              <span className="text-xl font-bold">L</span>
+              <span className="text-xl font-bold">{company.name.charAt(0)}</span>
             </div>
-            <span className="font-medium text-lg">Lampo</span>
+            <span className="font-medium text-lg">{company.name}</span>
           </div>
         </SidebarMenuButton>
       </SidebarMenuItem>
